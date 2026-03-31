@@ -1,0 +1,1800 @@
+/* LogoForge - Main Stylesheet */
+
+/* Global Reset and Base Styles */
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+html {
+  scroll-behavior: smooth;
+}
+
+body {
+  font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  overflow-x: hidden;
+  background-color: #0A0A0A;
+  color: #FFFFFF;
+}
+
+/* App Container */
+.app-container {
+  min-height: 100vh;
+  background: #0A0A0A;
+  color: #F3F4F6;
+  position: relative;
+}
+
+/* Loading Spinner for PublicRoute */
+.spinner {
+  width: 50px;
+  height: 50px;
+  border: 3px solid rgba(255, 255, 255, 0.1);
+  border-radius: 50%;
+  border-top-color: #639CF1;
+  animation: spin 1s ease-in-out infinite;
+}
+
+@keyframes spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+/* Common Components */
+
+/* Header Styles */
+.logoforge-header {
+  box-sizing: border-box;
+  width: 100%;
+  height: 77px;
+  background: rgba(18, 18, 18, 0.95);
+  border-bottom: 1px solid #242424;
+  position: fixed;
+  top: 0;
+  left: 0;
+  z-index: 1100;
+  backdrop-filter: blur(10px);
+}
+
+.logoforge-nav {
+  width: 100%;
+  max-width: 1280px;
+  height: 76px;
+  margin: 0 auto;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.logoforge-nav-content {
+  width: 100%;
+  height: 44px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0 24px;
+}
+
+.logoforge-logo-section {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.logoforge-logo-icon {
+  width: 40px;
+  height: 40px;
+  background: linear-gradient(135deg, #3B4C9F 0%, #5C80F6 70.71%);
+  border-radius: 8px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.logoforge-logo-text {
+  font-size: 24px;
+  font-weight: 700;
+  line-height: 32px;
+  color: #639CF1;
+  letter-spacing: -0.5px;
+}
+
+.logoforge-nav-menu {
+  display: flex;
+  gap: 21px;
+  align-items: center;
+}
+
+.logoforge-nav-item {
+  font-size: 16px;
+  font-weight: 400;
+  color: #D1D5DB;
+  cursor: pointer;
+  transition: color 0.3s ease;
+  padding: 4px 8px;
+  border: none;
+  background: none;
+  font-family: inherit;
+}
+
+.logoforge-nav-item:hover {
+  color: #639CF1;
+}
+
+.logoforge-nav-buttons {
+  display: flex;
+  gap: 16px;
+  align-items: center;
+}
+
+.logoforge-nav-button {
+  height: 44px;
+  font-size: 16px;
+  font-weight: 400;
+  border: none;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  border-radius: 8px;
+  padding: 0 20px;
+  font-family: inherit;
+}
+
+.logoforge-nav-button.signin {
+  background: transparent;
+  color: #D1D5DB;
+}
+
+.logoforge-nav-button.signin:hover {
+  color: #639CF1;
+  background: rgba(99, 156, 241, 0.1);
+}
+
+.logoforge-nav-button.getstarted {
+  background: linear-gradient(90deg, #394999 0%, #5C80F6 100%);
+  color: #F3F4F6;
+  font-weight: 600;
+}
+
+.logoforge-nav-button.getstarted:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 6px 20px rgba(92, 128, 246, 0.4);
+}
+
+/* Background Gradients */
+.logoforge-gradients {
+  position: absolute;
+  width: 100%;
+  height: 100%;
+  pointer-events: none;
+  overflow: hidden;
+  z-index: 0;
+}
+
+.logoforge-ellipse {
+  position: absolute;
+  border-radius: 50%;
+  filter: blur(34.1px);
+  opacity: 0.6;
+}
+
+.ellipse-116 {
+  width: 828px;
+  height: 935px;
+  left: -366px;
+  top: -20px;
+  background: radial-gradient(50% 50% at 50% 50%, rgba(73, 86, 168, 0.45) 0%, rgba(75, 100, 224, 0) 100%);
+}
+
+.ellipse-117 {
+  width: 828px;
+  height: 935px;
+  left: 990px;
+  top: 508px;
+  background: radial-gradient(50% 50% at 50% 50%, rgba(164, 176, 255, 0.45) 2.88%, rgba(73, 86, 168, 0.45) 18.75%, rgba(75, 95, 224, 0) 100%);
+}
+
+.ellipse-118 {
+  width: 828px;
+  height: 935px;
+  left: -347px;
+  top: 1158px;
+  background: radial-gradient(50% 50% at 50% 50%, rgba(73, 86, 168, 0.45) 0%, rgba(75, 100, 224, 0) 100%);
+}
+
+.ellipse-119 {
+  width: 828px;
+  height: 935px;
+  left: 966px;
+  top: 1895px;
+  background: radial-gradient(50% 50% at 50% 50%, rgba(73, 86, 168, 0.45) 0%, rgba(75, 100, 224, 0) 100%);
+}
+
+.ellipse-120 {
+  width: 828px;
+  height: 935px;
+  left: -373px;
+  top: 3165px;
+  background: radial-gradient(50% 50% at 50% 50%, rgba(164, 176, 255, 0.45) 2.88%, rgba(73, 86, 168, 0.45) 18.75%, rgba(75, 95, 224, 0) 100%);
+}
+
+.ellipse-121 {
+  width: 828px;
+  height: 935px;
+  left: 1069px;
+  top: 2747px;
+  background: radial-gradient(50% 50% at 50% 50%, rgba(164, 176, 255, 0.45) 2.88%, rgba(73, 86, 168, 0.45) 18.75%, rgba(75, 95, 224, 0) 100%);
+}
+
+/* Hero Section (HomePage) */
+.logoforge-hero {
+  position: relative;
+  width: 100%;
+  min-height: 700px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+  padding: 120px 20px 80px;
+  z-index: 1;
+}
+
+.logoforge-hero-content {
+  max-width: 900px;
+  width: 100%;
+  padding: 0 20px;
+}
+
+.logoforge-hero-title {
+  font-size: 56px;
+  font-weight: 700;
+  line-height: 75px;
+  margin-bottom: 30px;
+  background: linear-gradient(90deg, #F3F4F6 0%, #639CF1 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+  letter-spacing: -1px;
+}
+
+.logoforge-hero-subtitle {
+  font-size: 18px;
+  font-weight: 400;
+  line-height: 33px;
+  color: #9CA3AF;
+  margin-bottom: 50px;
+  max-width: 849px;
+  margin-left: auto;
+  margin-right: auto;
+  opacity: 0.9;
+}
+
+.logoforge-input-section {
+  width: 100%;
+  max-width: 946px;
+  margin: 0 auto;
+}
+
+.logoforge-business-input {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  padding: 10px 33px;
+  gap: 10px;
+  width: 100%;
+  height: 80px;
+  background: #2C2E48;
+  border: 1px solid #2E2E2E;
+  border-radius: 8px;
+  transition: all 0.3s ease;
+}
+
+.logoforge-business-input:hover {
+  border-color: #639CF1;
+}
+
+.logoforge-input-placeholder {
+  flex: 1;
+  font-size: 18px;
+  font-weight: 600;
+  color: #9CA3AF;
+  text-align: left;
+  background: transparent;
+  border: none;
+  outline: none;
+  font-family: inherit;
+}
+
+.logoforge-input-placeholder::placeholder {
+  color: #9CA3AF;
+}
+
+.logoforge-start-button {
+  width: 256px;
+  height: 60px;
+  background: linear-gradient(90deg, #394999 0%, #5C80F6 100%);
+  border-radius: 8px;
+  border: none;
+  color: #F3F4F6;
+  font-size: 18px;
+  font-weight: 600;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  transition: transform 0.3s ease, box-shadow 0.3s ease;
+  font-family: inherit;
+}
+
+.logoforge-start-button:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 6px 20px rgba(92, 128, 246, 0.4);
+}
+
+.logoforge-arrow-icon {
+  font-size: 20px;
+  margin-left: 4px;
+}
+
+/* Login & Signup Pages */
+.login-page-container,
+.signup-page-container {
+  min-height: 100vh;
+  background: linear-gradient(135deg, #0A0A0A 0%, #121212 100%);
+  color: #F3F4F6;
+}
+
+.login-page-header,
+.signup-page-header {
+  background: rgba(18, 18, 18, 0.95);
+  border-bottom: 1px solid #242424;
+  backdrop-filter: blur(10px);
+  position: sticky;
+  top: 0;
+  z-index: 1000;
+}
+
+.login-logo-icon,
+.signup-logo-icon {
+  width: 40px;
+  height: 40px;
+  background: linear-gradient(135deg, #3B4C9F 0%, #5C80F6 70.71%);
+  border-radius: 8px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.login-logo-text,
+.signup-logo-text {
+  font-size: 24px;
+  font-weight: 700;
+  color: #639CF1;
+  letter-spacing: -0.5px;
+}
+
+.login-main-content,
+.signup-main-content {
+  padding: 4rem 1rem 2rem;
+  min-height: calc(100vh - 77px);
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+}
+
+.login-card,
+.signup-card {
+  background: rgba(18, 18, 18, 0.95);
+  border: 1px solid #242424;
+  border-radius: 16px;
+  padding: 2.5rem;
+  backdrop-filter: blur(10px);
+  box-shadow: 0 20px 60px rgba(0, 0, 0, 0.5);
+  margin: 0 auto;
+  width: 100%;
+  max-width: 480px;
+}
+
+/* Login & Signup Form Styles */
+.login-form-group,
+.signup-form-group {
+  margin-bottom: 1.5rem;
+}
+
+.login-form-group label,
+.signup-form-group label {
+  display: block;
+  margin-bottom: 0.5rem;
+  font-size: 0.875rem;
+  font-weight: 500;
+  color: #9CA3AF;
+}
+
+.login-form-group input,
+.signup-form-group input {
+  width: 100%;
+  padding: 0.875rem 1rem;
+  background: #1A1A1A;
+  border: 1px solid #2E2E2E;
+  border-radius: 8px;
+  font-size: 1rem;
+  color: #F3F4F6;
+  transition: border-color 0.3s ease;
+  font-family: inherit;
+}
+
+.login-form-group input:focus,
+.signup-form-group input:focus {
+  outline: none;
+  border-color: #639CF1;
+  box-shadow: 0 0 0 2px rgba(99, 156, 241, 0.2);
+}
+
+.login-form-group input::placeholder,
+.signup-form-group input::placeholder {
+  color: #6B7280;
+}
+
+.login-submit-button,
+.signup-submit-button {
+  width: 100%;
+  padding: 1rem;
+  background: linear-gradient(90deg, #394999 0%, #5C80F6 100%);
+  border: none;
+  border-radius: 8px;
+  font-size: 1rem;
+  font-weight: 600;
+  color: #F3F4F6;
+  cursor: pointer;
+  transition: transform 0.3s ease, box-shadow 0.3s ease;
+  margin-top: 1rem;
+  font-family: inherit;
+}
+
+.login-submit-button:hover,
+.signup-submit-button:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 6px 20px rgba(92, 128, 246, 0.4);
+}
+
+.login-forgot-button,
+.signup-forgot-button {
+  background: none;
+  border: none;
+  color: #639CF1;
+  font-size: 0.875rem;
+  cursor: pointer;
+  padding: 0.25rem;
+  transition: color 0.2s ease;
+  font-family: inherit;
+  text-decoration: none;
+}
+
+.login-forgot-button:hover,
+.signup-forgot-button:hover {
+  color: #5C80F6;
+  text-decoration: underline;
+}
+
+.login-signup-section,
+.signup-login-section {
+  text-align: center;
+  padding-top: 1.5rem;
+  border-top: 1px solid #2E2E2E;
+  margin-top: 2rem;
+}
+
+.login-signup-section p,
+.signup-login-section p {
+  color: #9CA3AF;
+  font-size: 0.875rem;
+}
+
+.login-signup-button,
+.signup-login-button {
+  background: none;
+  border: 1px solid #639CF1;
+  color: #639CF1;
+  padding: 0.5rem 1.5rem;
+  border-radius: 6px;
+  font-size: 0.875rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  font-family: inherit;
+  text-decoration: none;
+  display: inline-block;
+}
+
+.login-signup-button:hover,
+.signup-login-button:hover {
+  background: rgba(99, 156, 241, 0.1);
+  border-color: #5C80F6;
+}
+
+/* Social Login */
+.social-login-container {
+  margin-bottom: 2rem;
+}
+
+.social-login-buttons {
+  display: flex;
+  gap: 1rem;
+  margin-top: 1rem;
+}
+
+.social-button {
+  flex: 1;
+  padding: 0.75rem;
+  border: 1px solid #2E2E2E;
+  border-radius: 8px;
+  background: transparent;
+  color: #F3F4F6;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  font-family: inherit;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+}
+
+.social-button:hover {
+  background: rgba(255, 255, 255, 0.05);
+  border-color: #639CF1;
+}
+
+.divider {
+  display: flex;
+  align-items: center;
+  margin: 2rem 0;
+  color: #9CA3AF;
+}
+
+.divider::before,
+.divider::after {
+  content: "";
+  flex: 1;
+  height: 1px;
+  background: #2E2E2E;
+}
+
+.divider span {
+  padding: 0 1rem;
+  font-size: 0.875rem;
+}
+
+/* Common Section Styles (HomePage) */
+.logoforge-section {
+  padding: 80px 20px;
+  position: relative;
+  z-index: 1;
+}
+
+.section-container {
+  max-width: 1280px;
+  margin: 0 auto;
+  width: 100%;
+}
+
+.section-title {
+  font-size: 36px;
+  font-weight: 700;
+  line-height: 40px;
+  text-align: center;
+  color: #F3F4F6;
+  margin-bottom: 16px;
+}
+
+.section-subtitle {
+  font-size: 20px;
+  font-weight: 400;
+  line-height: 28px;
+  text-align: center;
+  color: #9CA3AF;
+  margin-bottom: 60px;
+  max-width: 800px;
+  margin-left: auto;
+  margin-right: auto;
+}
+
+/* How It Works Section */
+.how-it-works {
+  background: transparent;
+}
+
+.steps-line {
+  width: 100%;
+  height: 2px;
+  background: linear-gradient(90deg, rgba(0, 0, 0, 0) 0%, #6366F1 50%, rgba(0, 0, 0, 0) 100%);
+  margin: 40px auto 80px;
+  max-width: 1000px;
+}
+
+.steps-container {
+  display: flex;
+  justify-content: space-between;
+  gap: 40px;
+  max-width: 1200px;
+  margin: 0 auto;
+}
+
+.step {
+  flex: 1;
+  text-align: center;
+  padding: 20px;
+}
+
+.step-circle {
+  width: 80px;
+  height: 80px;
+  background: #1A1A1A;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin: 0 auto 24px;
+  border: 1px solid #242424;
+}
+
+.step-number {
+  font-size: 24px;
+  font-weight: 700;
+  color: #F3F4F6;
+}
+
+.step-title {
+  font-size: 24px;
+  font-weight: 700;
+  line-height: 32px;
+  color: #F3F4F6;
+  margin-bottom: 12px;
+}
+
+.step-description {
+  font-size: 16px;
+  font-weight: 400;
+  line-height: 24px;
+  color: #9CA3AF;
+  max-width: 395px;
+  margin: 0 auto;
+}
+
+/* Pricing Section */
+.pricing-section {
+  background: transparent;
+}
+
+.pricing-cards {
+  display: flex;
+  justify-content: center;
+  gap: 32px;
+  max-width: 1300px;
+  margin: 0 auto;
+}
+
+.pricing-card {
+  flex: 1;
+  background: #121212;
+  border: 1px solid #242424;
+  border-radius: 16px;
+  padding: 33px;
+  position: relative;
+  transition: all 0.3s ease;
+  min-height: 500px;
+  display: flex;
+  flex-direction: column;
+}
+
+.pricing-card:hover {
+  border-color: #639CF1;
+  transform: translateY(-5px);
+}
+
+.pricing-card.popular {
+  background: linear-gradient(135deg, #1A1A1A 0%, #242424 70.71%);
+  border: 2px solid #639CF1;
+  transform: translateY(-12.5px);
+}
+
+.popular-badge {
+  position: absolute;
+  top: 0;
+  right: 0;
+  background: #639CF1;
+  color: #FFFFFF;
+  padding: 9px 20px;
+  font-size: 14px;
+  font-weight: 600;
+  border-radius: 0 0 0 8px;
+}
+
+.plan-title {
+  font-size: 24px;
+  font-weight: 700;
+  color: #F3F4F6;
+  margin-bottom: 10px;
+}
+
+.plan-description {
+  font-size: 16px;
+  font-weight: 400;
+  color: #9CA3AF;
+  margin-bottom: 30px;
+}
+
+.plan-price {
+  display: flex;
+  align-items: baseline;
+  gap: 8px;
+  margin-bottom: 30px;
+}
+
+.price {
+  font-size: 48px;
+  font-weight: 700;
+  color: #F3F4F6;
+  line-height: 48px;
+}
+
+.price-period {
+  font-size: 16px;
+  font-weight: 400;
+  color: #9CA3AF;
+}
+
+.plan-features {
+  list-style: none;
+  flex: 1;
+  margin-bottom: 30px;
+}
+
+.plan-features li {
+  font-size: 16px;
+  font-weight: 400;
+  color: #D1D5DB;
+  margin-bottom: 16px;
+  display: flex;
+  align-items: center;
+}
+
+.plan-features li:before {
+  content: "✓";
+  color: #639CF1;
+  margin-right: 10px;
+  font-weight: bold;
+}
+
+.plan-button {
+  width: 100%;
+  padding: 16px;
+  background: #1A1A1A;
+  border: none;
+  border-radius: 8px;
+  color: #F3F4F6;
+  font-size: 16px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  font-family: inherit;
+}
+
+.plan-button:hover {
+  background: #242424;
+  transform: translateY(-2px);
+}
+
+.plan-button.primary {
+  background: linear-gradient(90deg, #394999 0%, #5C80F6 100%);
+}
+
+.plan-button.primary:hover {
+  background: linear-gradient(90deg, #2d3a7a 0%, #4a6ce0 100%);
+}
+
+/* Logos Section */
+.logos-section {
+  background: transparent;
+}
+
+.logos-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(358px, 1fr));
+  gap: 40px;
+  max-width: 1400px;
+  margin: 0 auto;
+}
+
+.logo-item {
+  height: 199px;
+  background: rgba(255, 255, 255, 0.05);
+  border-radius: 32px;
+  box-shadow: 0px 4px 92px rgba(121, 97, 243, 0.2);
+  transition: all 0.3s ease;
+  border: 1px solid rgba(121, 97, 243, 0.1);
+}
+
+.logo-item:hover {
+  transform: translateY(-5px);
+  box-shadow: 0px 4px 92px rgba(121, 97, 243, 0.4);
+  border-color: rgba(121, 97, 243, 0.3);
+}
+
+/* Footer */
+.logoforge-footer {
+  background: rgba(18, 18, 18, 0.95);
+  border-top: 1px solid #242424;
+  padding: 60px 20px;
+  position: relative;
+  z-index: 1;
+}
+
+.footer-content {
+  max-width: 1280px;
+  margin: 0 auto;
+  text-align: center;
+}
+
+.footer-logo {
+  font-size: 267px;
+  font-weight: 700;
+  color: rgba(99, 156, 241, 0.2);
+  line-height: 1;
+  margin-bottom: 20px;
+  letter-spacing: -10px;
+}
+
+.footer-tagline {
+  font-size: 24px;
+  font-weight: 600;
+  color: #F3F4F6;
+  margin-bottom: 40px;
+}
+
+.footer-links {
+  display: flex;
+  justify-content: center;
+  gap: 40px;
+  margin-bottom: 40px;
+  flex-wrap: wrap;
+}
+
+.footer-link {
+  color: #9CA3AF;
+  text-decoration: none;
+  font-size: 16px;
+  transition: color 0.3s ease;
+}
+
+.footer-link:hover {
+  color: #639CF1;
+}
+
+.footer-copyright {
+  color: #6B7280;
+  font-size: 14px;
+}
+
+/* Loading Animation */
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.logoforge-hero-content,
+.login-card,
+.signup-card,
+.step,
+.pricing-card,
+.logo-item {
+  animation: fadeIn 0.6s ease-out forwards;
+}
+
+.logoforge-hero-content {
+  animation-delay: 0.1s;
+}
+
+.login-card,
+.signup-card {
+  animation-delay: 0.3s;
+}
+
+/* Custom Scrollbar */
+::-webkit-scrollbar {
+  width: 10px;
+}
+
+::-webkit-scrollbar-track {
+  background: #0A0A0A;
+}
+
+::-webkit-scrollbar-thumb {
+  background: linear-gradient(180deg, #394999, #5C80F6);
+  border-radius: 5px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: linear-gradient(180deg, #2d3a7a, #4a6ce0);
+}
+
+/* Selection Color */
+::selection {
+  background-color: rgba(99, 156, 241, 0.3);
+  color: #F3F4F6;
+}
+
+/* ====== LOGIN & SIGNUP PAGE STYLES ====== */
+
+/* Login Page Specific Styles */
+.login-page-container {
+  min-height: 100vh;
+  background: #000000;
+  color: #F3F4F6;
+  font-family: 'Inter', sans-serif;
+}
+
+/* Background Gradients */
+.login-gradients {
+  position: fixed;
+  width: 100%;
+  height: 100%;
+  pointer-events: none;
+  z-index: 0;
+}
+
+.login-ellipse {
+  position: absolute;
+  border-radius: 50%;
+  filter: blur(100px);
+  opacity: 0.4;
+}
+
+.ellipse-right {
+  width: 800px;
+  height: 800px;
+  right: -300px;
+  top: 200px;
+  background: radial-gradient(50% 50% at 50% 50%, rgba(164, 176, 255, 0.45) 0%, rgba(73, 86, 168, 0.45) 50%, rgba(75, 95, 224, 0) 100%);
+}
+
+.ellipse-left {
+  width: 700px;
+  height: 700px;
+  left: -250px;
+  top: -200px;
+  background: radial-gradient(50% 50% at 50% 50%, rgba(99, 156, 241, 0.4) 0%, rgba(92, 128, 246, 0.4) 50%, rgba(75, 95, 224, 0) 100%);
+}
+
+/* Form Container */
+.login-form-container {
+  width: 100%;
+  max-width: 480px;
+  margin: 0 auto;
+  padding: 40px 20px;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+}
+
+/* Form Elements */
+.login-form {
+  display: flex;
+  flex-direction: column;
+  gap: 24px;
+}
+
+.form-field-group {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.form-field-label {
+  font-size: 14px;
+  font-weight: 600;
+  color: #D1D5DB;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.form-input-field {
+  background: #1A1A1A;
+  border: 1px solid #2E2E2E;
+  border-radius: 12px;
+  transition: all 0.3s ease;
+}
+
+.form-input-field .MuiOutlinedInput-root {
+  color: #F3F4F6;
+  font-size: 16px;
+}
+
+.form-input-field .MuiOutlinedInput-root:hover .MuiOutlinedInput-notchedOutline {
+  border-color: #639CF1;
+}
+
+.form-input-field .MuiOutlinedInput-root.Mui-focused .MuiOutlinedInput-notchedOutline {
+  border-color: #639CF1;
+  border-width: 2px;
+}
+
+.form-input-field .MuiOutlinedInput-input {
+  padding: 16px;
+  height: 24px;
+}
+
+.form-input-field .MuiOutlinedInput-notchedOutline {
+  border-color: #2E2E2E;
+  border-radius: 12px;
+}
+
+.password-toggle {
+  color: #9CA3AF;
+  margin-right: 8px;
+}
+
+.password-toggle:hover {
+  color: #639CF1;
+  background: rgba(99, 156, 241, 0.1);
+}
+
+/* Form Options */
+.form-options {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-top: 8px;
+}
+
+.remember-checkbox .MuiCheckbox-root {
+  color: #9CA3AF;
+}
+
+.remember-checkbox .MuiCheckbox-root.Mui-checked {
+  color: #639CF1;
+}
+
+.remember-checkbox .MuiFormControlLabel-label {
+  color: #9CA3AF;
+  font-size: 14px;
+}
+
+.forgot-password-link {
+  color: #639CF1;
+  text-transform: none;
+  font-size: 14px;
+  font-weight: 600;
+  padding: 4px 8px;
+  min-width: auto;
+}
+
+.forgot-password-link:hover {
+  background: rgba(99, 156, 241, 0.1);
+  text-decoration: underline;
+}
+
+/* Login Button */
+.login-submit-button {
+  background: linear-gradient(90deg, #394999 0%, #5C80F6 100%);
+  color: #FFFFFF;
+  padding: 16px 32px;
+  border-radius: 12px;
+  font-size: 16px;
+  font-weight: 600;
+  text-transform: none;
+  height: 56px;
+  margin-top: 8px;
+  box-shadow: 0 8px 32px rgba(92, 128, 246, 0.3);
+  transition: all 0.3s ease;
+}
+
+.login-submit-button:hover {
+  background: linear-gradient(90deg, #2d3a7a 0%, #4a6ce0 100%);
+  transform: translateY(-2px);
+  box-shadow: 0 12px 40px rgba(92, 128, 246, 0.4);
+}
+
+.login-submit-button:disabled {
+  background: #2E2E2E;
+  color: #9CA3AF;
+  transform: none;
+  box-shadow: none;
+}
+
+.login-spinner {
+  color: #FFFFFF;
+}
+
+/* Sign Up Link */
+.signup-link-container {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  margin-top: 24px;
+}
+
+.signup-text {
+  color: #9CA3AF;
+  font-size: 14px;
+}
+
+.signup-link-button {
+  color: #639CF1;
+  text-transform: none;
+  font-size: 14px;
+  font-weight: 600;
+  padding: 0;
+  min-width: auto;
+}
+
+.signup-link-button:hover {
+  background: transparent;
+  text-decoration: underline;
+}
+
+/* Divider */
+.form-divider {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  margin: 32px 0;
+}
+
+.divider-line {
+  flex: 1;
+  height: 1px;
+  background: #2E2E2E;
+}
+
+.divider-text {
+  color: #9CA3AF;
+  font-size: 14px;
+  font-weight: 500;
+}
+
+/* Social Login */
+.social-login-buttons {
+  display: flex;
+  gap: 16px;
+}
+
+.social-button {
+  flex: 1;
+  padding: 12px 24px;
+  border: 1px solid #2E2E2E;
+  border-radius: 12px;
+  background: #1A1A1A;
+  color: #D1D5DB;
+  text-transform: none;
+  font-size: 14px;
+  font-weight: 500;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  transition: all 0.3s ease;
+}
+
+.social-button:hover {
+  background: rgba(255, 255, 255, 0.05);
+  border-color: #639CF1;
+  transform: translateY(-2px);
+}
+
+.social-button.google {
+  background: #1A1A1A;
+}
+
+.social-button.google:hover {
+  border-color: #DB4437;
+}
+
+.social-button.github {
+  background: #1A1A1A;
+}
+
+.social-button.github:hover {
+  border-color: #FFFFFF;
+}
+
+.social-button svg {
+  width: 20px;
+  height: 20px;
+}
+
+/* Alerts */
+.login-alert {
+  border-radius: 12px;
+  margin-bottom: 24px;
+}
+
+.login-alert .MuiAlert-message {
+  font-size: 14px;
+}
+
+/* Footer */
+.login-footer {
+  margin-top: auto;
+  padding-top: 32px;
+  border-top: 1px solid #2E2E2E;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.footer-text {
+  color: #6B7280;
+  font-size: 12px;
+}
+
+.footer-links {
+  display: flex;
+  gap: 24px;
+}
+
+.footer-link {
+  color: #9CA3AF;
+  text-transform: none;
+  font-size: 12px;
+  font-weight: 500;
+  padding: 4px 8px;
+  min-width: auto;
+}
+
+.footer-link:hover {
+  color: #639CF1;
+  background: transparent;
+}
+
+/* Modal Styles */
+.modal-backdrop {
+  background: rgba(0, 0, 0, 0.8) !important;
+  backdrop-filter: blur(8px) !important;
+}
+
+.login-modal-content {
+  background: #121212 !important;
+  border: 1px solid #242424 !important;
+  border-radius: 16px !important;
+  box-shadow: 0 20px 60px rgba(0, 0, 0, 0.8) !important;
+  overflow: hidden !important;
+}
+
+/* Scrollbar for modal */
+.login-modal-content::-webkit-scrollbar {
+  width: 8px;
+}
+
+.login-modal-content::-webkit-scrollbar-track {
+  background: #1A1A1A;
+  border-radius: 4px;
+}
+
+.login-modal-content::-webkit-scrollbar-thumb {
+  background: #394999;
+  border-radius: 4px;
+}
+
+.login-modal-content::-webkit-scrollbar-thumb:hover {
+  background: #5C80F6;
+}
+
+/* ====== ADD LOGO PAGE STYLES ====== */
+
+.add-logo-container {
+  background: #0A0A0A;
+  min-height: 100vh;
+}
+
+.color-chip-red {
+  background-color: #f44336 !important;
+  color: white !important;
+}
+
+.color-chip-blue {
+  background-color: #2196f3 !important;
+  color: white !important;
+}
+
+.color-chip-yellow {
+  background-color: #ffeb3b !important;
+  color: black !important;
+}
+
+.color-chip-green {
+  background-color: #4caf50 !important;
+  color: white !important;
+}
+
+.color-chip-black {
+  background-color: #000000 !important;
+  color: white !important;
+}
+
+.color-chip-white {
+  background-color: #ffffff !important;
+  color: black !important;
+  border: 1px solid #e0e0e0 !important;
+}
+
+.color-chip-orange {
+  background-color: #ff9800 !important;
+  color: black !important;
+}
+
+.color-chip-purple {
+  background-color: #9c27b0 !important;
+  color: white !important;
+}
+
+.color-chip-pink {
+  background-color: #e91e63 !important;
+  color: white !important;
+}
+
+.color-chip-brown {
+  background-color: #795548 !important;
+  color: white !important;
+}
+
+.color-chip-gray {
+  background-color: #9e9e9e !important;
+  color: white !important;
+}
+
+/* File upload area */
+.file-upload-area {
+  border: 2px dashed #667eea;
+  border-radius: 8px;
+  padding: 40px;
+  text-align: center;
+  background: rgba(102, 126, 234, 0.05);
+  transition: all 0.3s ease;
+  cursor: pointer;
+}
+
+.file-upload-area:hover {
+  background: rgba(102, 126, 234, 0.1);
+  border-color: #764ba2;
+}
+
+.file-upload-area.drag-active {
+  background: rgba(102, 126, 234, 0.2);
+  border-color: #4CAF50;
+}
+
+/* Image preview */
+.image-preview {
+  max-width: 100%;
+  max-height: 300px;
+  object-fit: contain;
+  border-radius: 8px;
+  margin-top: 16px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+}
+
+/* Success message animation */
+@keyframes slideIn {
+  from {
+    opacity: 0;
+    transform: translateY(-20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.success-message {
+  animation: slideIn 0.5s ease-out;
+}
+
+/* ====== EDIT PAGE STYLES ====== */
+
+.edit-page-container {
+  background: #0A0A0A;
+  min-height: 100vh;
+}
+
+.logo-grid-container {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+  gap: 24px;
+  padding: 20px 0;
+}
+
+.logo-card {
+  background: rgba(18, 18, 18, 0.95);
+  border: 1px solid #242424;
+  border-radius: 16px;
+  overflow: hidden;
+  transition: all 0.3s ease;
+}
+
+.logo-card:hover {
+  transform: translateY(-4px);
+  border-color: #667eea;
+  box-shadow: 0 8px 25px rgba(102, 126, 234, 0.2);
+}
+
+.logo-image-container {
+  position: relative;
+  width: 100%;
+  height: 200px;
+  background: #1A1A1A;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  overflow: hidden;
+}
+
+.logo-image {
+  max-width: 100%;
+  max-height: 100%;
+  object-fit: contain;
+}
+
+.logo-actions {
+  position: absolute;
+  top: 10px;
+  right: 10px;
+  display: flex;
+  gap: 8px;
+}
+
+.action-button {
+  background: rgba(0, 0, 0, 0.7);
+  border: 1px solid #242424;
+  color: #FFFFFF;
+  border-radius: 8px;
+  padding: 8px;
+  cursor: pointer;
+  transition: all 0.3s ease;
+}
+
+.action-button:hover {
+  background: rgba(102, 126, 234, 0.8);
+  border-color: #667eea;
+}
+
+.action-button.delete:hover {
+  background: rgba(244, 67, 54, 0.8);
+  border-color: #f44336;
+}
+
+.logo-metadata {
+  padding: 16px;
+}
+
+.metadata-row {
+  display: flex;
+  justify-content: space-between;
+  margin-bottom: 8px;
+  font-size: 14px;
+}
+
+.metadata-label {
+  color: #9CA3AF;
+  font-weight: 500;
+}
+
+.metadata-value {
+  color: #FFFFFF;
+  font-weight: 600;
+}
+
+/* Responsive Design for New Login Page */
+@media (max-width: 1200px) {
+  .login-form-container {
+    width: 60%;
+    padding: 60px 40px;
+  }
+}
+
+@media (max-width: 900px) {
+  .login-form-container {
+    width: 100%;
+    padding: 40px 24px;
+  }
+
+  .login-input-field {
+    width: 100%;
+  }
+}
+
+@media (max-width: 768px) {
+  .login-form-container {
+    padding: 32px 20px;
+  }
+
+  .login-primary-button {
+    width: 160px;
+    height: 56px;
+    font-size: 16px;
+  }
+
+  .login-input-field {
+    height: 70px;
+    font-size: 16px;
+    padding: 12px 18px;
+  }
+
+  .logo-grid-container {
+    grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+  }
+}
+
+@media (max-width: 480px) {
+  .login-form-container {
+    padding: 24px 16px;
+  }
+
+  .login-primary-button {
+    width: 140px;
+    height: 50px;
+    font-size: 14px;
+  }
+
+  .login-input-field {
+    height: 60px;
+    font-size: 14px;
+    padding: 10px 16px;
+  }
+
+  .social-login-button {
+    height: 45px;
+    font-size: 14px;
+  }
+
+  .logo-grid-container {
+    grid-template-columns: 1fr;
+  }
+}
+
+/* Responsive Design */
+@media (max-width: 1440px) {
+  .logoforge-nav {
+    max-width: 1200px;
+  }
+
+  .logoforge-hero-title {
+    font-size: 48px;
+    line-height: 60px;
+  }
+
+  .footer-logo {
+    font-size: 200px;
+  }
+}
+
+@media (max-width: 1024px) {
+  .steps-container {
+    flex-direction: column;
+    max-width: 600px;
+  }
+
+  .pricing-cards {
+    flex-direction: column;
+    max-width: 400px;
+  }
+
+  .logos-grid {
+    grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+  }
+
+  .footer-logo {
+    font-size: 150px;
+  }
+
+  .social-login-buttons {
+    flex-direction: column;
+  }
+}
+
+@media (max-width: 768px) {
+  .logoforge-nav-menu {
+    display: none;
+  }
+
+  .logoforge-hero-title {
+    font-size: 36px;
+    line-height: 48px;
+  }
+
+  .logoforge-hero-subtitle {
+    font-size: 16px;
+    line-height: 28px;
+  }
+
+  .logoforge-business-input {
+    flex-direction: column;
+    height: auto;
+    padding: 20px;
+  }
+
+  .logoforge-start-button {
+    width: 100%;
+    margin-top: 15px;
+  }
+
+  .section-title {
+    font-size: 28px;
+  }
+
+  .section-subtitle {
+    font-size: 16px;
+  }
+
+  .footer-logo {
+    font-size: 100px;
+    letter-spacing: -5px;
+  }
+
+  .footer-links {
+    flex-direction: column;
+    gap: 20px;
+  }
+
+  .logoforge-gradients {
+    display: none;
+  }
+
+  .login-card,
+  .signup-card {
+    padding: 1.5rem;
+  }
+
+  .login-page-header .logoforge-nav-content,
+  .signup-page-header .logoforge-nav-content {
+    flex-direction: column;
+    gap: 1rem;
+    text-align: center;
+  }
+}
+
+@media (max-width: 480px) {
+  .logoforge-hero-title {
+    font-size: 28px;
+    line-height: 36px;
+  }
+
+  .logoforge-hero {
+    height: 500px;
+    padding: 100px 20px 60px;
+  }
+
+  .logoforge-nav-buttons {
+    gap: 10px;
+  }
+
+  .logoforge-nav-button {
+    font-size: 14px;
+    padding: 0 12px;
+    height: 36px;
+  }
+
+  .logoforge-nav-button.signin {
+    width: auto;
+  }
+
+  .logoforge-nav-button.getstarted {
+    width: auto;
+  }
+
+  .pricing-card {
+    padding: 20px;
+  }
+
+  .footer-logo {
+    font-size: 70px;
+  }
+
+  .login-card,
+  .signup-card {
+    padding: 1rem;
+  }
+}
+
+/* Success Animation */
+@keyframes successPulse {
+  0%, 100% {
+    transform: scale(1);
+  }
+  50% {
+    transform: scale(1.05);
+  }
+}
+
+.login-success-message {
+  animation: successPulse 1s ease-in-out;
+}
+
+/* Transition Effects */
+.fade-enter {
+  opacity: 0;
+}
+
+.fade-enter-active {
+  opacity: 1;
+  transition: opacity 300ms ease-in;
+}
+
+.fade-exit {
+  opacity: 1;
+}
+
+.fade-exit-active {
+  opacity: 0;
+  transition: opacity 300ms ease-out;
+}
+
+/* Utility Classes for App.js */
+.text-gradient {
+  background: linear-gradient(90deg, #639CF1 0%, #8B5CF6 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+
+.glass-effect {
+  background: rgba(18, 18, 18, 0.7);
+  backdrop-filter: blur(10px);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+/* Smooth transitions for route changes */
+.page-transition-enter {
+  opacity: 0;
+  transform: translateY(10px);
+}
+
+.page-transition-enter-active {
+  opacity: 1;
+  transform: translateY(0);
+  transition: opacity 300ms, transform 300ms;
+}
+
+.page-transition-exit {
+  opacity: 1;
+  transform: translateY(0);
+}
+
+.page-transition-exit-active {
+  opacity: 0;
+  transform: translateY(-10px);
+  transition: opacity 300ms, transform 300ms;
+}
+
+/* Focus Outline for accessibility */
+:focus {
+  outline: 2px solid #639CF1;
+  outline-offset: 2px;
+}
+
+/* Responsive Design Enhancements */
+@media (max-width: 768px) {
+  .app-container {
+    padding: 0;
+  }
+}
+
+/* Spinner animation */
+@keyframes spin {
+  from {
+    transform: rotate(0deg);
+  }
+  to {
+    transform: rotate(360deg);
+  }
+}

@@ -1,0 +1,40 @@
+/* src/index.css */
+@keyframes pulse {
+  0% {
+    opacity: 1;
+    transform: scale(1);
+  }
+  50% {
+    opacity: 0.7;
+    transform: scale(1.05);
+  }
+  100% {
+    opacity: 1;
+    transform: scale(1);
+  }
+}
+
+@keyframes float {
+  0%, 100% {
+    transform: translateY(0);
+  }
+  50% {
+    transform: translateY(-5px);
+  }
+}
+
+.preview-image {
+  transition: transform 0.3s ease, filter 0.3s ease, opacity 0.3s ease;
+}
+
+/* Add these styles for better preview */
+.image-preview-container {
+  position: relative;
+  overflow: hidden;
+  background: linear-gradient(45deg, #fdf2ff, #fff0f5);
+}
+
+.text-overlay {
+  pointer-events: none;
+  user-select: none;
+}

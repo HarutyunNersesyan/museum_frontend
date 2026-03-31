@@ -1,0 +1,360 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project version="4">
+  <component name="AutoImportSettings">
+    <option name="autoReloadType" value="SELECTIVE" />
+  </component>
+  <component name="ChangeListManager">
+    <list default="true" id="52f9de53-701b-4b52-b101-40303d7b40ec" name="Changes" comment="" />
+    <option name="SHOW_DIALOG" value="false" />
+    <option name="HIGHLIGHT_CONFLICTS" value="true" />
+    <option name="HIGHLIGHT_NON_ACTIVE_CHANGELIST" value="false" />
+    <option name="LAST_RESOLUTION" value="IGNORE" />
+  </component>
+  <component name="FileTemplateManagerImpl">
+    <option name="RECENT_TEMPLATES">
+      <list>
+        <option value="JavaScript File" />
+      </list>
+    </option>
+  </component>
+  <component name="Git.Settings">
+    <option name="RECENT_GIT_ROOT_PATH" value="$PROJECT_DIR$" />
+  </component>
+  <component name="HighlightingSettingsPerFile">
+    <setting file="file://$PROJECT_DIR$/src/services/api.js" root0="FORCE_HIGHLIGHTING" />
+  </component>
+  <component name="MarkdownSettingsMigration">
+    <option name="stateVersion" value="1" />
+  </component>
+  <component name="ProjectId" id="36hY8vi51w9IRD0QZRhtkePHq9o" />
+  <component name="ProjectLevelVcsManager">
+    <ConfirmationsSetting value="1" id="Add" />
+  </component>
+  <component name="ProjectViewState">
+    <option name="hideEmptyMiddlePackages" value="true" />
+    <option name="showLibraryContents" value="true" />
+  </component>
+  <component name="PropertiesComponent">{
+  &quot;keyToString&quot;: {
+    &quot;ASKED_MARK_IGNORED_FILES_AS_EXCLUDED&quot;: &quot;true&quot;,
+    &quot;RunOnceActivity.OpenProjectViewOnStart&quot;: &quot;true&quot;,
+    &quot;RunOnceActivity.ShowReadmeOnStart&quot;: &quot;true&quot;,
+    &quot;SHARE_PROJECT_CONFIGURATION_FILES&quot;: &quot;true&quot;,
+    &quot;WebServerToolWindowFactoryState&quot;: &quot;false&quot;,
+    &quot;last_opened_file_path&quot;: &quot;C:/Users/HARUT_037/Desktop/image/public/images&quot;,
+    &quot;node.js.detected.package.eslint&quot;: &quot;true&quot;,
+    &quot;node.js.detected.package.tslint&quot;: &quot;true&quot;,
+    &quot;node.js.selected.package.eslint&quot;: &quot;(autodetect)&quot;,
+    &quot;node.js.selected.package.tslint&quot;: &quot;(autodetect)&quot;,
+    &quot;nodejs_interpreter_path&quot;: &quot;node&quot;,
+    &quot;nodejs_package_manager_path&quot;: &quot;npm&quot;,
+    &quot;project.structure.last.edited&quot;: &quot;Project&quot;,
+    &quot;project.structure.proportion&quot;: &quot;0.0&quot;,
+    &quot;project.structure.side.proportion&quot;: &quot;0.2&quot;
+  }
+}</component>
+  <component name="RecentsManager">
+    <key name="CopyFile.RECENT_KEYS">
+      <recent name="C:\Users\HARUT_037\Desktop\image\public\images" />
+    </key>
+    <key name="MoveFile.RECENT_KEYS">
+      <recent name="C:\Users\HARUT_037\Desktop\image-editor-frontend\src" />
+    </key>
+  </component>
+  <component name="RunManager" selected="npm.npm start">
+    <configuration name="Debug Application" type="JavascriptDebugType" uri="http://localhost:3000">
+      <method v="2" />
+    </configuration>
+    <configuration name="npm start" type="js.build_tools.npm">
+      <package-json value="$PROJECT_DIR$/package.json" />
+      <command value="run" />
+      <scripts>
+        <script value="start" />
+      </scripts>
+      <node-interpreter value="project" />
+      <envs />
+      <method v="2" />
+    </configuration>
+  </component>
+  <component name="SpellCheckerSettings" RuntimeDictionaries="0" Folders="0" CustomDictionaries="0" DefaultDictionary="application-level" UseSingleDictionary="true" transferred="true" />
+  <component name="TaskManager">
+    <task active="true" id="Default" summary="Default task">
+      <changelist id="52f9de53-701b-4b52-b101-40303d7b40ec" name="Changes" comment="" />
+      <created>1765460117230</created>
+      <option name="number" value="Default" />
+      <option name="presentableId" value="Default" />
+      <updated>1765460117230</updated>
+      <workItem from="1765460118521" duration="6407000" />
+      <workItem from="1765555792606" duration="8941000" />
+      <workItem from="1765796341242" duration="405000" />
+      <workItem from="1765796775460" duration="9000" />
+      <workItem from="1765933780524" duration="6449000" />
+      <workItem from="1765950242527" duration="2057000" />
+      <workItem from="1765971708194" duration="520000" />
+      <workItem from="1766100424719" duration="75000" />
+      <workItem from="1766114254694" duration="118000" />
+      <workItem from="1766425012441" duration="13000" />
+      <workItem from="1766425057433" duration="38000" />
+      <workItem from="1766425350001" duration="1038000" />
+      <workItem from="1766426666317" duration="1127000" />
+      <workItem from="1766470799962" duration="12880000" />
+      <workItem from="1766580544411" duration="7867000" />
+      <workItem from="1766631363610" duration="14048000" />
+      <workItem from="1766764821678" duration="2941000" />
+      <workItem from="1766811755503" duration="15142000" />
+      <workItem from="1766831321380" duration="2000" />
+      <workItem from="1766914209740" duration="1075000" />
+      <workItem from="1766933114426" duration="1366000" />
+      <workItem from="1766988492238" duration="8537000" />
+      <workItem from="1767103132035" duration="2554000" />
+      <workItem from="1767516882019" duration="5405000" />
+      <workItem from="1767988965491" duration="4333000" />
+      <workItem from="1768029827287" duration="6242000" />
+      <workItem from="1768040177352" duration="1266000" />
+      <workItem from="1768041829003" duration="314000" />
+      <workItem from="1768315815378" duration="932000" />
+      <workItem from="1768317797340" duration="10579000" />
+      <workItem from="1769839947785" duration="1238000" />
+      <workItem from="1771564841897" duration="4119000" />
+      <workItem from="1772461413455" duration="1437000" />
+      <workItem from="1772469538415" duration="4444000" />
+      <workItem from="1772478864259" duration="86000" />
+      <workItem from="1772534706981" duration="3868000" />
+      <workItem from="1772626992885" duration="5970000" />
+      <workItem from="1772820094045" duration="1313000" />
+      <workItem from="1772864640103" duration="7722000" />
+      <workItem from="1772878334910" duration="3173000" />
+      <workItem from="1772891747428" duration="4000" />
+      <workItem from="1773005128206" duration="1253000" />
+      <workItem from="1773084418524" duration="246000" />
+      <workItem from="1773249138469" duration="142000" />
+      <workItem from="1773405723381" duration="157000" />
+      <workItem from="1773716077396" duration="2941000" />
+      <workItem from="1773720848252" duration="1214000" />
+      <workItem from="1773728195544" duration="1385000" />
+      <workItem from="1773836575993" duration="34000" />
+      <workItem from="1773843866284" duration="2120000" />
+      <workItem from="1773847821087" duration="97000" />
+      <workItem from="1774070274324" duration="1034000" />
+      <workItem from="1774085823882" duration="512000" />
+      <workItem from="1774088258880" duration="397000" />
+      <workItem from="1774193030301" duration="2389000" />
+      <workItem from="1774203906763" duration="16000" />
+      <workItem from="1774763766914" duration="7157000" />
+      <workItem from="1774780358218" duration="1691000" />
+      <workItem from="1774885189643" duration="7424000" />
+      <workItem from="1774947836738" duration="1221000" />
+      <workItem from="1774949278122" duration="1021000" />
+    </task>
+    <task id="LOCAL-00001" summary="first commit">
+      <created>1765462776214</created>
+      <option name="number" value="00001" />
+      <option name="presentableId" value="LOCAL-00001" />
+      <option name="project" value="LOCAL" />
+      <updated>1765462776214</updated>
+    </task>
+    <task id="LOCAL-00002" summary="first commit">
+      <created>1765562449452</created>
+      <option name="number" value="00002" />
+      <option name="presentableId" value="LOCAL-00002" />
+      <option name="project" value="LOCAL" />
+      <updated>1765562449453</updated>
+    </task>
+    <task id="LOCAL-00003" summary="first commit">
+      <created>1765566813548</created>
+      <option name="number" value="00003" />
+      <option name="presentableId" value="LOCAL-00003" />
+      <option name="project" value="LOCAL" />
+      <updated>1765566813548</updated>
+    </task>
+    <task id="LOCAL-00004" summary="first commit">
+      <created>1765569380187</created>
+      <option name="number" value="00004" />
+      <option name="presentableId" value="LOCAL-00004" />
+      <option name="project" value="LOCAL" />
+      <updated>1765569380187</updated>
+    </task>
+    <task id="LOCAL-00005" summary="updated logic for image editor">
+      <created>1765940458994</created>
+      <option name="number" value="00005" />
+      <option name="presentableId" value="LOCAL-00005" />
+      <option name="project" value="LOCAL" />
+      <updated>1765940458994</updated>
+    </task>
+    <task id="LOCAL-00006" summary="Created login, signup and home pages">
+      <created>1766480727364</created>
+      <option name="number" value="00006" />
+      <option name="presentableId" value="LOCAL-00006" />
+      <option name="project" value="LOCAL" />
+      <updated>1766480727364</updated>
+    </task>
+    <task id="LOCAL-00007" summary="Created login, signup and home pages">
+      <created>1766642297106</created>
+      <option name="number" value="00007" />
+      <option name="presentableId" value="LOCAL-00007" />
+      <option name="project" value="LOCAL" />
+      <updated>1766642297106</updated>
+    </task>
+    <task id="LOCAL-00008" summary="Created login, signup and home pages">
+      <created>1766645453429</created>
+      <option name="number" value="00008" />
+      <option name="presentableId" value="LOCAL-00008" />
+      <option name="project" value="LOCAL" />
+      <updated>1766645453429</updated>
+    </task>
+    <task id="LOCAL-00009" summary="Created login, signup and home pages">
+      <created>1766657480446</created>
+      <option name="number" value="00009" />
+      <option name="presentableId" value="LOCAL-00009" />
+      <option name="project" value="LOCAL" />
+      <updated>1766657480446</updated>
+    </task>
+    <task id="LOCAL-00010" summary="Created login, signup and home pages">
+      <created>1766659829534</created>
+      <option name="number" value="00010" />
+      <option name="presentableId" value="LOCAL-00010" />
+      <option name="project" value="LOCAL" />
+      <updated>1766659829534</updated>
+    </task>
+    <task id="LOCAL-00011" summary="Created verify page">
+      <created>1766664253631</created>
+      <option name="number" value="00011" />
+      <option name="presentableId" value="LOCAL-00011" />
+      <option name="project" value="LOCAL" />
+      <updated>1766664253631</updated>
+    </task>
+    <task id="LOCAL-00012" summary="Created verify page">
+      <created>1766825587159</created>
+      <option name="number" value="00012" />
+      <option name="presentableId" value="LOCAL-00012" />
+      <option name="project" value="LOCAL" />
+      <updated>1766825587159</updated>
+    </task>
+    <task id="LOCAL-00013" summary="Updated Login page and JWT token generating">
+      <created>1766827577650</created>
+      <option name="number" value="00013" />
+      <option name="presentableId" value="LOCAL-00013" />
+      <option name="project" value="LOCAL" />
+      <updated>1766827577650</updated>
+    </task>
+    <task id="LOCAL-00014" summary="Updated Login page and JWT token generating">
+      <created>1766829329422</created>
+      <option name="number" value="00014" />
+      <option name="presentableId" value="LOCAL-00014" />
+      <option name="project" value="LOCAL" />
+      <updated>1766829329422</updated>
+    </task>
+    <task id="LOCAL-00015" summary="Updated Login page and JWT token generating">
+      <created>1766915283815</created>
+      <option name="number" value="00015" />
+      <option name="presentableId" value="LOCAL-00015" />
+      <option name="project" value="LOCAL" />
+      <updated>1766915283815</updated>
+    </task>
+    <task id="LOCAL-00016" summary="Added Logo edit functionality and EditPage.js">
+      <created>1766994365115</created>
+      <option name="number" value="00016" />
+      <option name="presentableId" value="LOCAL-00016" />
+      <option name="project" value="LOCAL" />
+      <updated>1766994365115</updated>
+    </task>
+    <task id="LOCAL-00017" summary="Created page for adding logo">
+      <created>1767521088579</created>
+      <option name="number" value="00017" />
+      <option name="presentableId" value="LOCAL-00017" />
+      <option name="project" value="LOCAL" />
+      <updated>1767521088579</updated>
+    </task>
+    <task id="LOCAL-00018" summary="Created frontend piece for VeilVision project, &#10;created HomePage, Login, SignUp, Verify pages, AuthContext and JWT resolver">
+      <created>1768033596787</created>
+      <option name="number" value="00018" />
+      <option name="presentableId" value="LOCAL-00018" />
+      <option name="project" value="LOCAL" />
+      <updated>1768033596787</updated>
+    </task>
+    <task id="LOCAL-00019" summary="Created frontend piece for VeilVision project, &#10;created HomePage, Login, SignUp, Verify pages, AuthContext and JWT resolver">
+      <created>1768035888608</created>
+      <option name="number" value="00019" />
+      <option name="presentableId" value="LOCAL-00019" />
+      <option name="project" value="LOCAL" />
+      <updated>1768035888608</updated>
+    </task>
+    <task id="LOCAL-00020" summary="Created EncodePage.js for encoding texts.">
+      <created>1768035959511</created>
+      <option name="number" value="00020" />
+      <option name="presentableId" value="LOCAL-00020" />
+      <option name="project" value="LOCAL" />
+      <updated>1768035959511</updated>
+    </task>
+    <task id="LOCAL-00021" summary="Created EncodePage.js for encoding texts.">
+      <created>1768332250639</created>
+      <option name="number" value="00021" />
+      <option name="presentableId" value="LOCAL-00021" />
+      <option name="project" value="LOCAL" />
+      <updated>1768332250639</updated>
+    </task>
+    <task id="LOCAL-00022" summary="Created About us page and added logic for reading from .docx and .txt files.">
+      <created>1772536535629</created>
+      <option name="number" value="00022" />
+      <option name="presentableId" value="LOCAL-00022" />
+      <option name="project" value="LOCAL" />
+      <updated>1772536535629</updated>
+    </task>
+    <task id="LOCAL-00023" summary="Created About us page and added logic for reading from .docx and .txt files.">
+      <created>1772539514090</created>
+      <option name="number" value="00023" />
+      <option name="presentableId" value="LOCAL-00023" />
+      <option name="project" value="LOCAL" />
+      <updated>1772539514090</updated>
+    </task>
+    <task id="LOCAL-00024" summary="Bugs fixes.">
+      <created>1772630143446</created>
+      <option name="number" value="00024" />
+      <option name="presentableId" value="LOCAL-00024" />
+      <option name="project" value="LOCAL" />
+      <updated>1772630143446</updated>
+    </task>
+    <task id="LOCAL-00025" summary="Bugs fixes.">
+      <created>1772880416609</created>
+      <option name="number" value="00025" />
+      <option name="presentableId" value="LOCAL-00025" />
+      <option name="project" value="LOCAL" />
+      <updated>1772880416610</updated>
+    </task>
+    <task id="LOCAL-00026" summary="Created Profile page.">
+      <created>1772880563282</created>
+      <option name="number" value="00026" />
+      <option name="presentableId" value="LOCAL-00026" />
+      <option name="project" value="LOCAL" />
+      <updated>1772880563282</updated>
+    </task>
+    <task id="LOCAL-00027" summary="Bugs fixe.">
+      <created>1773732190684</created>
+      <option name="number" value="00027" />
+      <option name="presentableId" value="LOCAL-00027" />
+      <option name="project" value="LOCAL" />
+      <updated>1773732190684</updated>
+    </task>
+    <option name="localTasksCounter" value="28" />
+    <servers />
+  </component>
+  <component name="TypeScriptGeneratedFilesManager">
+    <option name="version" value="3" />
+  </component>
+  <component name="VcsManagerConfiguration">
+    <MESSAGE value="first commit" />
+    <MESSAGE value="updated logic for image editor" />
+    <MESSAGE value="Created login, signup and home pages" />
+    <MESSAGE value="Created verify page" />
+    <MESSAGE value="Updated Login page and JWT token generating" />
+    <MESSAGE value="Added Logo edit functionality and EditPage.js" />
+    <MESSAGE value="Created page for adding logo" />
+    <MESSAGE value="Created frontend piece for VeilVision project, &#10;created HomePage, Login, SignUp, Verify pages, AuthContext and JWT resolver" />
+    <MESSAGE value="Created EncodePage.js for encoding texts." />
+    <MESSAGE value="Created About us page and added logic for reading from .docx and .txt files." />
+    <MESSAGE value="Bugs fixes." />
+    <MESSAGE value="Created Profile page." />
+    <MESSAGE value="Bugs fixe." />
+    <option name="LAST_COMMIT_MESSAGE" value="Bugs fixe." />
+  </component>
+</project>
