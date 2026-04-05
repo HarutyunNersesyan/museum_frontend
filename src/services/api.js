@@ -50,7 +50,7 @@ api.interceptors.response.use(
                 console.log('Token expired or invalid. Redirecting to login...');
                 localStorage.removeItem('token');
                 localStorage.removeItem('user');
-                window.location.href = '/'; // Redirect to home
+                window.location.href = '/';
             }
         } else if (error.request) {
             console.error('🔌 No response from server. Is backend running on port 8080?');
@@ -124,7 +124,8 @@ export const authAPI = {
             throw error;
         }
     },
-    
+
+    // Verify Email
     verifyEmail: async (email, pin) => {
         try {
             console.log('Verifying email:', email, 'PIN:', pin);
@@ -203,6 +204,398 @@ export const authAPI = {
             return response;
         } catch (error) {
             console.error('Update profile API error:', error);
+            throw error;
+        }
+    },
+
+    // Get user by email
+    getUserByEmail: async (email) => {
+        try {
+            const response = await api.get(`/api/public/user/get/${email}`);
+            return response;
+        } catch (error) {
+            console.error('Get user by email error:', error);
+            throw error;
+        }
+    },
+
+    // Get user by username
+    getUserByUserName: async (userName) => {
+        try {
+            const response = await api.get(`/api/public/user/username/${userName}`);
+            return response;
+        } catch (error) {
+            console.error('Get user by username error:', error);
+            throw error;
+        }
+    },
+
+    // Get username by email
+    getUserNameByEmail: async (email) => {
+        try {
+            const response = await api.get(`/api/public/user/get/userName/${email}`);
+            return response;
+        } catch (error) {
+            console.error('Get username by email error:', error);
+            throw error;
+        }
+    },
+
+    // Change password
+    changePassword: async (email, oldPassword, newPassword, newPasswordRepeat) => {
+        try {
+            const response = await api.put('/api/public/user/changePassword', null, {
+                params: { email },
+                data: {
+                    oldPassword,
+                    newPassword,
+                    newPasswordRepeat
+                }
+            });
+            return response;
+        } catch (error) {
+            console.error('Change password error:', error);
+            throw error;
+        }
+    },
+
+    // Delete account
+    deleteAccount: async (email, password) => {
+        try {
+            const response = await api.delete('/api/public/user/delete/account', {
+                data: { email, password }
+            });
+            return response;
+        } catch (error) {
+            console.error('Delete account error:', error);
+            throw error;
+        }
+    },
+
+    // Cancel verification (delete unverified account)
+    cancelVerification: async (email) => {
+        try {
+            const response = await api.delete(`/api/public/user/delete/verify/${email}`);
+            return response;
+        } catch (error) {
+            console.error('Cancel verification error:', error);
+            throw error;
+        }
+    }
+};
+
+// ==================== SERVICE API (Public) ====================
+export const serviceAPI = {
+    // Get all available services
+    getAllServices: async (page = 0, size = 20) => {
+        try {
+            const response = await api.get(`/api/services?page=${page}&size=${size}`);
+            return response;
+        } catch (error) {
+            console.error('Get all services error:', error);
+            throw error;
+        }
+    },
+
+    // Get service by ID
+    getServiceById: async (serviceId) => {
+        try {
+            const response = await api.get(`/api/services/${serviceId}`);
+            return response;
+        } catch (error) {
+            console.error('Get service by ID error:', error);
+            throw error;
+        }
+    },
+
+    // Search services
+    searchServices: async (searchParams) => {
+        try {
+            const response = await api.post('/api/services/search', searchParams);
+            return response;
+        } catch (error) {
+            console.error('Search services error:', error);
+            throw error;
+        }
+    },
+
+    // Get all categories
+    getCategories: async () => {
+        try {
+            const response = await api.get('/api/services/categories');
+            return response;
+        } catch (error) {
+            console.error('Get categories error:', error);
+            throw error;
+        }
+    },
+
+    // Get all locations
+    getLocations: async () => {
+        try {
+            const response = await api.get('/api/services/locations');
+            return response;
+        } catch (error) {
+            console.error('Get locations error:', error);
+            throw error;
+        }
+    },
+
+    // ==================== Favorites ====================
+    addToFavorites: async (serviceId) => {
+        try {
+            const response = await api.post(`/api/services/${serviceId}/favorite`);
+            return response;
+        } catch (error) {
+            console.error('Add to favorites error:', error);
+            throw error;
+        }
+    },
+
+    removeFromFavorites: async (serviceId) => {
+        try {
+            const response = await api.delete(`/api/services/${serviceId}/favorite`);
+            return response;
+        } catch (error) {
+            console.error('Remove from favorites error:', error);
+            throw error;
+        }
+    },
+
+    getFavorites: async (page = 0, size = 20) => {
+        try {
+            const response = await api.get(`/api/services/favorites?page=${page}&size=${size}`);
+            return response;
+        } catch (error) {
+            console.error('Get favorites error:', error);
+            throw error;
+        }
+    },
+
+    isFavorited: async (serviceId) => {
+        try {
+            const response = await api.get(`/api/services/${serviceId}/favorite/check`);
+            return response;
+        } catch (error) {
+            console.error('Check favorite status error:', error);
+            throw error;
+        }
+    },
+
+    getFavoriteCount: async (serviceId) => {
+        try {
+            const response = await api.get(`/api/services/${serviceId}/favorite/count`);
+            return response;
+        } catch (error) {
+            console.error('Get favorite count error:', error);
+            throw error;
+        }
+    },
+
+    // ==================== Inquiries ====================
+    sendInquiry: async (serviceId, inquiryData) => {
+        try {
+            const response = await api.post(`/api/services/${serviceId}/inquiry`, inquiryData);
+            return response;
+        } catch (error) {
+            console.error('Send inquiry error:', error);
+            throw error;
+        }
+    },
+
+    getUserInquiries: async (page = 0, size = 20) => {
+        try {
+            const response = await api.get(`/api/services/inquiries?page=${page}&size=${size}`);
+            return response;
+        } catch (error) {
+            console.error('Get inquiries error:', error);
+            throw error;
+        }
+    }
+};
+
+// ==================== ADMIN API (Private) ====================
+export const adminAPI = {
+    // ==================== Service Management ====================
+    getAllServices: async (page = 0, size = 20) => {
+        try {
+            const response = await api.get(`/api/private/admin/services?page=${page}&size=${size}`);
+            return response;
+        } catch (error) {
+            console.error('Get all services error:', error);
+            throw error;
+        }
+    },
+
+    // Create service with JSON only
+    createServiceJSON: async (serviceData) => {
+        try {
+            const response = await api.post('/api/private/admin/services', serviceData);
+            return response;
+        } catch (error) {
+            console.error('Create service JSON error:', error);
+            throw error;
+        }
+    },
+
+    // Create service with image upload
+    createService: async (serviceData, imageFiles = []) => {
+        try {
+            const formData = new FormData();
+
+            // Add each field individually
+            formData.append('name', serviceData.name);
+            formData.append('description', serviceData.description);
+            formData.append('price', serviceData.price.toString());
+            formData.append('category', serviceData.category);
+            formData.append('location', serviceData.location);
+
+            if (serviceData.duration) {
+                formData.append('duration', serviceData.duration.toString());
+            }
+            if (serviceData.maxParticipants) {
+                formData.append('maxParticipants', serviceData.maxParticipants.toString());
+            }
+            if (serviceData.tags) {
+                formData.append('tags', serviceData.tags);
+            }
+
+            // Add image files
+            imageFiles.forEach((file) => {
+                formData.append('images', file);
+            });
+
+            const response = await api.post('/api/private/admin/services/with-images', formData, {
+                headers: {
+                    'Content-Type': 'multipart/form-data'
+                }
+            });
+            return response;
+        } catch (error) {
+            console.error('Create service error:', error);
+            throw error;
+        }
+    },
+
+    // Update service with JSON only
+    updateServiceJSON: async (serviceId, serviceData) => {
+        try {
+            const response = await api.put(`/api/private/admin/services/${serviceId}`, serviceData);
+            return response;
+        } catch (error) {
+            console.error('Update service JSON error:', error);
+            throw error;
+        }
+    },
+
+    // Update service with images
+    updateService: async (serviceId, serviceData, imageFiles = [], existingImageUrls = []) => {
+        try {
+            const formData = new FormData();
+
+            // Add each field individually
+            formData.append('name', serviceData.name);
+            formData.append('description', serviceData.description);
+            formData.append('price', serviceData.price.toString());
+            formData.append('category', serviceData.category);
+            formData.append('location', serviceData.location);
+
+            if (serviceData.duration) {
+                formData.append('duration', serviceData.duration.toString());
+            }
+            if (serviceData.maxParticipants) {
+                formData.append('maxParticipants', serviceData.maxParticipants.toString());
+            }
+            if (serviceData.tags) {
+                formData.append('tags', serviceData.tags);
+            }
+
+            // Add existing image URLs
+            existingImageUrls.forEach((url) => {
+                formData.append('existingImageUrls', url);
+            });
+
+            // Add new image files
+            imageFiles.forEach((file) => {
+                formData.append('images', file);
+            });
+
+            const response = await api.put(`/api/private/admin/services/${serviceId}/with-images`, formData, {
+                headers: {
+                    'Content-Type': 'multipart/form-data'
+                }
+            });
+            return response;
+        } catch (error) {
+            console.error('Update service error:', error);
+            throw error;
+        }
+    },
+
+    deleteService: async (serviceId) => {
+        try {
+            const response = await api.delete(`/api/private/admin/services/${serviceId}`);
+            return response;
+        } catch (error) {
+            console.error('Delete service error:', error);
+            throw error;
+        }
+    },
+
+    toggleAvailability: async (serviceId) => {
+        try {
+            const response = await api.patch(`/api/private/admin/services/${serviceId}/toggle-availability`);
+            return response;
+        } catch (error) {
+            console.error('Toggle availability error:', error);
+            throw error;
+        }
+    },
+
+    // ==================== Image Management ====================
+    deleteImage: async (serviceId, imageUrl) => {
+        try {
+            const response = await api.delete(`/api/private/admin/services/${serviceId}/images`, {
+                params: { imageUrl }
+            });
+            return response;
+        } catch (error) {
+            console.error('Delete image error:', error);
+            throw error;
+        }
+    },
+
+    // ==================== Inquiry Management ====================
+    getAllInquiries: async (page = 0, size = 20, status = null) => {
+        try {
+            const url = status
+                ? `/api/private/admin/inquiries?page=${page}&size=${size}&status=${status}`
+                : `/api/private/admin/inquiries?page=${page}&size=${size}`;
+            const response = await api.get(url);
+            return response;
+        } catch (error) {
+            console.error('Get inquiries error:', error);
+            throw error;
+        }
+    },
+
+    respondToInquiry: async (inquiryId, responseData) => {
+        try {
+            const response = await api.post(`/api/private/admin/inquiries/${inquiryId}/respond`, responseData);
+            return response;
+        } catch (error) {
+            console.error('Respond to inquiry error:', error);
+            throw error;
+        }
+    },
+
+    // ==================== Dashboard Stats ====================
+    getStats: async () => {
+        try {
+            const response = await api.get('/api/private/admin/stats');
+            return response;
+        } catch (error) {
+            console.error('Get stats error:', error);
             throw error;
         }
     }
@@ -288,22 +681,18 @@ export const formatErrorMessage = (error) => {
     return error.message || 'An error occurred';
 };
 
-// ==================== CONVENIENCE FUNCTIONS ====================
+// Format price to AMD (Armenian Dram)
+export const formatPriceAMD = (price) => {
+    if (!price && price !== 0) return '֏0';
+    return new Intl.NumberFormat('hy-AM', {
+        style: 'currency',
+        currency: 'AMD',
+        minimumFractionDigits: 0,
+        maximumFractionDigits: 0
+    }).format(price);
+};
 
-// Authentication exports
-export const login = authAPI.login;
-export const logout = authAPI.logout;
-export const signUp = authAPI.signUp;
-export const verifyEmail = authAPI.verifyEmail;
-export const forgotPassword = authAPI.forgotPassword;
-export const resendVerification = authAPI.resendVerification;
-export const getProfile = authAPI.getProfile;
-export const updateProfile = authAPI.updateProfile;
-
-/**
- * JWT Utility Functions
- * For client-side token decoding (not verification)
- */
+// ==================== JWT UTILITY FUNCTIONS ====================
 
 /**
  * Decode JWT token without verification
@@ -426,7 +815,19 @@ export const isValidToken = (token) => {
     return !isTokenExpired(token);
 };
 
-// ==================== CREATE DEFAULT EXPORT OBJECT ====================
+// ==================== CONVENIENCE EXPORTS ====================
+
+// Authentication exports
+export const login = authAPI.login;
+export const logout = authAPI.logout;
+export const signUp = authAPI.signUp;
+export const verifyEmail = authAPI.verifyEmail;
+export const forgotPassword = authAPI.forgotPassword;
+export const resendVerification = authAPI.resendVerification;
+export const getProfile = authAPI.getProfile;
+export const updateProfile = authAPI.updateProfile;
+
+// ==================== DEFAULT EXPORT ====================
 const apiService = {
     api,
 
@@ -441,6 +842,12 @@ const apiService = {
     getProfile,
     updateProfile,
 
+    // Services
+    serviceAPI,
+
+    // Admin
+    adminAPI,
+
     // Utilities
     isAuthenticated,
     getCurrentUser,
@@ -449,6 +856,7 @@ const apiService = {
     checkBackendHealth,
     testAPIConnection,
     formatErrorMessage,
+    formatPriceAMD,
 
     // JWT Utilities
     decodeJWT,
