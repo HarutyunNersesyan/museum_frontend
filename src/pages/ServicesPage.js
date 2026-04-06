@@ -27,12 +27,15 @@ import {
     Snackbar,
     InputAdornment,
     Menu,
-    Avatar,
     Divider,
     CircularProgress,
     Zoom,
     Tooltip,
-    Backdrop
+    Backdrop,
+    Paper,
+    Fade,
+    Tabs,
+    Tab
 } from '@mui/material';
 import {
     Favorite as FavoriteIcon,
@@ -43,20 +46,26 @@ import {
     Close as CloseIcon,
     LocationOn as LocationIcon,
     AttachMoney as PriceIcon,
+    AccessTime as TimeIcon,
+    Event as EventIcon,
     AccountCircle as AccountCircleIcon,
     Logout as LogoutIcon,
     Person as PersonIcon,
     Celebration as CelebrationIcon,
     Lock as LockIcon,
     AddShoppingCart as AddCartIcon,
-    AdminPanelSettings as AdminIcon
+    AdminPanelSettings as AdminIcon,
+    Star as StarIcon,
+    Whatshot as WhatshotIcon,
+    NewReleases as NewIcon,
+    TrendingUp as TrendingIcon
 } from '@mui/icons-material';
 import { useAuth } from '../context/AuthContext';
 import serviceAPI from '../services/serviceAPI';
 import { alpha } from '@mui/material/styles';
 import { isAdmin } from '../utils/jwtUtils';
+import dayjs from 'dayjs';
 
-// Format price to AMD
 const formatPriceAMD = (price) => {
     if (!price && price !== 0) return '֏0';
     return new Intl.NumberFormat('hy-AM', {
@@ -67,7 +76,16 @@ const formatPriceAMD = (price) => {
     }).format(price);
 };
 
-// Armenian cities matching backend enum
+const formatDate = (dateString) => {
+    if (!dateString) return null;
+    return dayjs(dateString).format('MMM D, YYYY');
+};
+
+const formatTime = (timeString) => {
+    if (!timeString) return null;
+    return dayjs(timeString, 'HH:mm').format('HH:mm');
+};
+
 const ARMENIAN_CITIES = [
     { value: 'YEREVAN', label: 'Yerevan' },
     { value: 'GYUMRI', label: 'Gyumri' },
@@ -137,6 +155,7 @@ const ServicesPage = () => {
     const [cartItems, setCartItems] = useState([]);
     const [cartTotal, setCartTotal] = useState(0);
     const [userIsAdmin, setUserIsAdmin] = useState(false);
+    const [activeTab, setActiveTab] = useState(0);
 
     useEffect(() => {
         if (user && user.userName) {
@@ -153,7 +172,7 @@ const ServicesPage = () => {
         loadCategories();
         loadFavorites();
         loadCart();
-    }, [page, selectedCategory, location]);
+    }, [page, selectedCategory, location, activeTab]);
 
     useEffect(() => {
         const handleMouseMove = (e) => {
@@ -402,13 +421,13 @@ const ServicesPage = () => {
     const LoadingSkeleton = () => (
         <Grid container spacing={3}>
             {[1, 2, 3, 4, 5, 6].map((i) => (
-                <Grid item xs={12} sm={6} md={4} key={i}>
-                    <Card sx={{ background: alpha('#1A1A1A', 0.8), borderRadius: '20px' }}>
-                        <Skeleton variant="rectangular" height={200} animation="wave" />
+                <Grid item xs={12} sm={6} md={4} lg={3} key={i}>
+                    <Card sx={{ background: '#FFFFFF', borderRadius: '20px', boxShadow: '0 4px 12px rgba(0,0,0,0.05)' }}>
+                        <Skeleton variant="rectangular" height={200} animation="wave" sx={{ bgcolor: '#F0F0F0' }} />
                         <CardContent>
-                            <Skeleton variant="text" height={32} width="80%" />
-                            <Skeleton variant="text" height={20} width="60%" />
-                            <Skeleton variant="text" height={20} width="40%" />
+                            <Skeleton variant="text" height={32} width="80%" sx={{ bgcolor: '#F0F0F0' }} />
+                            <Skeleton variant="text" height={20} width="60%" sx={{ bgcolor: '#F0F0F0' }} />
+                            <Skeleton variant="text" height={20} width="40%" sx={{ bgcolor: '#F0F0F0' }} />
                         </CardContent>
                     </Card>
                 </Grid>
@@ -418,8 +437,8 @@ const ServicesPage = () => {
 
     if (!user) {
         return (
-            <Backdrop open={true} sx={{ zIndex: 9999 }}>
-                <CircularProgress sx={{ color: '#4CAF50' }} />
+            <Backdrop open={true} sx={{ zIndex: 9999, backgroundColor: 'rgba(255,255,255,0.9)' }}>
+                <CircularProgress sx={{ color: '#FF6B35' }} />
             </Backdrop>
         );
     }
@@ -427,11 +446,11 @@ const ServicesPage = () => {
     return (
         <Box sx={{
             minHeight: '100vh',
-            background: 'linear-gradient(135deg, #0A0A0A 0%, #1A1A1A 100%)',
-            color: '#FFFFFF',
+            background: 'linear-gradient(135deg, #FFF9F0 0%, #F5F0E8 100%)',
             fontFamily: "'Inter', sans-serif",
             position: 'relative'
         }}>
+            {/* Animated Background */}
             <Box sx={{
                 position: 'fixed',
                 top: 0,
@@ -440,9 +459,8 @@ const ServicesPage = () => {
                 height: '100%',
                 zIndex: 0,
                 background: `
-                    radial-gradient(circle at ${backgroundPosition.x * 100}% ${backgroundPosition.y * 100}%, ${alpha('#009688', 0.15)} 0%, transparent 50%),
-                    radial-gradient(circle at ${100 - backgroundPosition.x * 100}% ${100 - backgroundPosition.y * 100}%, ${alpha('#4CAF50', 0.15)} 0%, transparent 50%),
-                    #0A0A0A
+                    radial-gradient(circle at ${backgroundPosition.x * 100}% ${backgroundPosition.y * 100}%, rgba(255,107,53,0.06) 0%, transparent 50%),
+                    radial-gradient(circle at ${100 - backgroundPosition.x * 100}% ${100 - backgroundPosition.y * 100}%, rgba(255,193,7,0.06) 0%, transparent 50%)
                 `,
                 transition: 'background 0.3s ease-out'
             }} />
@@ -450,18 +468,13 @@ const ServicesPage = () => {
             <style>{`
                 @keyframes float {
                     0%, 100% { transform: translateY(0) translateX(0); }
-                    25% { transform: translateY(-20px) translateX(10px); }
-                    50% { transform: translateY(-40px) translateX(-10px); }
-                    75% { transform: translateY(-20px) translateX(10px); }
+                    25% { transform: translateY(-10px) translateX(5px); }
+                    50% { transform: translateY(-20px) translateX(-5px); }
+                    75% { transform: translateY(-10px) translateX(5px); }
                 }
                 @keyframes pulse {
                     0%, 100% { opacity: 0.5; transform: scale(1); }
-                    50% { opacity: 0.8; transform: scale(1.1); }
-                }
-                @keyframes gradient {
-                    0% { background-position: 0% 50%; }
-                    50% { background-position: 100% 50%; }
-                    100% { background-position: 0% 50%; }
+                    50% { opacity: 0.8; transform: scale(1.05); }
                 }
             `}</style>
 
@@ -470,70 +483,71 @@ const ServicesPage = () => {
                 position: 'sticky',
                 top: 0,
                 zIndex: 1000,
-                backgroundColor: alpha('#0A0A0A', 0.95),
+                backgroundColor: alpha('#FFFFFF', 0.95),
                 backdropFilter: 'blur(10px)',
-                borderBottom: '1px solid rgba(255, 255, 255, 0.1)'
+                borderBottom: '1px solid rgba(0,0,0,0.08)',
+                boxShadow: '0 2px 20px rgba(0,0,0,0.03)'
             }}>
                 <Box sx={{ padding: '0 24px' }}>
                     <Box sx={{
                         display: 'flex',
                         alignItems: 'center',
                         justifyContent: 'space-between',
-                        height: '80px',
+                        height: '70px',
                         maxWidth: '1400px',
                         margin: '0 auto'
                     }}>
                         <Box sx={{ display: 'flex', alignItems: 'center', gap: '12px', cursor: 'pointer' }} onClick={() => navigate('/')}>
                             <Box sx={{
-                                width: '40px',
-                                height: '40px',
+                                width: '38px',
+                                height: '38px',
                                 borderRadius: '12px',
-                                background: 'linear-gradient(135deg, #009688 0%, #4CAF50 100%)',
+                                background: 'linear-gradient(135deg, #FF6B35 0%, #FFB347 100%)',
                                 display: 'flex',
                                 alignItems: 'center',
                                 justifyContent: 'center'
                             }}>
-                                <LockIcon sx={{ color: 'white', fontSize: 24 }} />
+                                <LockIcon sx={{ color: 'white', fontSize: 22 }} />
                             </Box>
                             <Typography variant="h6" sx={{
-                                fontWeight: 700,
-                                background: 'linear-gradient(135deg, #009688 0%, #4CAF50 100%)',
+                                fontWeight: 800,
+                                background: 'linear-gradient(135deg, #FF6B35 0%, #FFB347 100%)',
                                 WebkitBackgroundClip: 'text',
-                                WebkitTextFillColor: 'transparent'
+                                WebkitTextFillColor: 'transparent',
+                                letterSpacing: '-0.5px'
                             }}>
                                 VeilVision
                             </Typography>
                         </Box>
 
-                        <Box sx={{ display: 'flex', alignItems: 'center', gap: '32px' }}>
-                            <Button onClick={() => navigate('/')} sx={{ fontWeight: 500, color: '#FFFFFF' }}>Home</Button>
-                            <Button onClick={handleAboutClick} sx={{ fontWeight: 500, color: '#FFFFFF' }}>About Us</Button>
-                            <Button onClick={() => navigate('/services')} sx={{ fontWeight: 500, color: '#4CAF50', borderBottom: '2px solid #4CAF50', borderRadius: 0 }}>
-                                Services
-                            </Button>
+                        <Box sx={{ display: 'flex', alignItems: 'center', gap: '28px' }}>
+                            <Button onClick={() => navigate('/')} sx={{ fontWeight: 500, color: '#4A4A4A', '&:hover': { color: '#FF6B35' } }}>Home</Button>
+                            <Button onClick={handleAboutClick} sx={{ fontWeight: 500, color: '#4A4A4A', '&:hover': { color: '#FF6B35' } }}>About Us</Button>
+                            <Button onClick={() => navigate('/services')} sx={{ fontWeight: 500, color: '#FF6B35', borderBottom: '2px solid #FF6B35', borderRadius: 0 }}>Services</Button>
                             {userIsAdmin && (
                                 <Button onClick={handleAdminPanel} sx={{ fontWeight: 500, color: '#FF9800' }}>Admin</Button>
                             )}
                         </Box>
 
-                        <Box sx={{ display: 'flex', alignItems: 'center', gap: '16px' }}>
+                        <Box sx={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
                             <Tooltip title="My Bucket">
-                                <IconButton onClick={handleCartClick} sx={{ color: '#FFFFFF', position: 'relative' }}>
+                                <IconButton onClick={handleCartClick} sx={{ color: '#4A4A4A', position: 'relative' }}>
                                     <CartIcon />
                                     {cartCount > 0 && (
                                         <Box sx={{
                                             position: 'absolute',
                                             top: -5,
                                             right: -5,
-                                            bgcolor: '#4CAF50',
+                                            bgcolor: '#FF6B35',
                                             color: 'white',
                                             borderRadius: '50%',
                                             width: 20,
                                             height: 20,
-                                            fontSize: '12px',
+                                            fontSize: '11px',
                                             display: 'flex',
                                             alignItems: 'center',
-                                            justifyContent: 'center'
+                                            justifyContent: 'center',
+                                            fontWeight: 600
                                         }}>
                                             {cartCount}
                                         </Box>
@@ -541,20 +555,14 @@ const ServicesPage = () => {
                                 </IconButton>
                             </Tooltip>
 
-                            <Box sx={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
-                                <Typography sx={{ color: alpha('#FFFFFF', 0.8), fontWeight: 500, fontSize: '14px', display: { xs: 'none', md: 'block' } }}>
-                                    Welcome back,
-                                </Typography>
-                                <IconButton onClick={handleMenuOpen} sx={{
-                                    color: '#FFFFFF',
-                                    background: 'linear-gradient(135deg, #009688 0%, #4CAF50 100%)',
-                                    width: '40px',
-                                    height: '40px',
-                                    '&:hover': { transform: 'scale(1.05)' }
-                                }}>
-                                    {userInitial ? <Typography sx={{ fontWeight: 600 }}>{userInitial}</Typography> : <AccountCircleIcon />}
-                                </IconButton>
-                            </Box>
+                            <IconButton onClick={handleMenuOpen} sx={{
+                                background: 'linear-gradient(135deg, #FF6B35 0%, #FFB347 100%)',
+                                width: '38px',
+                                height: '38px',
+                                '&:hover': { transform: 'scale(1.05)' }
+                            }}>
+                                {userInitial ? <Typography sx={{ fontWeight: 600, color: 'white' }}>{userInitial}</Typography> : <AccountCircleIcon sx={{ color: 'white' }} />}
+                            </IconButton>
                         </Box>
                     </Box>
                 </Box>
@@ -562,44 +570,62 @@ const ServicesPage = () => {
 
             {/* Cart Dropdown */}
             <Menu anchorEl={cartAnchorEl} open={Boolean(cartAnchorEl)} onClose={handleCartClose}
-                  PaperProps={{ sx: { bgcolor: '#121212', color: '#FFFFFF', border: '1px solid #242424', minWidth: 320, maxWidth: 400 } }}>
-                <Box sx={{ p: 2 }}>
-                    <Typography variant="h6" sx={{ mb: 2 }}>My Bucket ({cartCount} items)</Typography>
+                  PaperProps={{ sx: { bgcolor: '#FFFFFF', color: '#1A1A1A', border: '1px solid #E0E0E0', minWidth: 340, maxWidth: 400, borderRadius: '20px', boxShadow: '0 8px 32px rgba(0,0,0,0.1)' } }}>
+                <Box sx={{ p: 2.5 }}>
+                    <Typography variant="h6" sx={{ fontWeight: 700, mb: 2 }}>My Bucket ({cartCount} items)</Typography>
                     {cartItems.length === 0 ? (
-                        <Typography sx={{ color: alpha('#FFFFFF', 0.7), textAlign: 'center', py: 3 }}>
+                        <Typography sx={{ color: '#8A8A8A', textAlign: 'center', py: 4 }}>
                             Your bucket is empty
                         </Typography>
                     ) : (
                         <>
                             {cartItems.map((item) => (
-                                <Box key={item.id} sx={{ display: 'flex', gap: 2, mb: 2, pb: 2, borderBottom: `1px solid ${alpha('#FFFFFF', 0.1)}` }}>
-                                    <Box sx={{ width: 60, height: 60, bgcolor: alpha('#009688', 0.2), borderRadius: 2, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+                                <Box key={item.id} sx={{ display: 'flex', gap: 2, mb: 2, pb: 2, borderBottom: '1px solid #F0E8E0' }}>
+                                    <Box sx={{
+                                        width: 60,
+                                        height: 60,
+                                        bgcolor: alpha('#FF6B35', 0.1),
+                                        borderRadius: '12px',
+                                        display: 'flex',
+                                        alignItems: 'center',
+                                        justifyContent: 'center'
+                                    }}>
                                         {item.service.imageUrls?.[0] ? (
-                                            <img src={item.service.imageUrls[0]} alt={item.service.name} style={{ width: '100%', height: '100%', objectFit: 'cover', borderRadius: 8 }} />
+                                            <img src={item.service.imageUrls[0]} alt={item.service.name} style={{ width: '100%', height: '100%', objectFit: 'cover', borderRadius: 12 }} />
                                         ) : (
-                                            <CartIcon sx={{ color: '#009688' }} />
+                                            <CartIcon sx={{ color: '#FF6B35' }} />
                                         )}
                                     </Box>
                                     <Box sx={{ flex: 1 }}>
                                         <Typography variant="body2" fontWeight={600}>{item.service.name}</Typography>
-                                        <Typography variant="caption" sx={{ color: alpha('#FFFFFF', 0.7) }}>{formatPriceAMD(item.service.price)}</Typography>
+                                        <Typography variant="caption" sx={{ color: '#8A8A8A' }}>{formatPriceAMD(item.service.price)}</Typography>
                                         <Box sx={{ display: 'flex', alignItems: 'center', gap: 1, mt: 1 }}>
-                                            <IconButton size="small" onClick={() => handleUpdateCartQuantity(item.service.id, Math.max(1, item.quantity - 1))} sx={{ color: '#009688' }}>-</IconButton>
-                                            <Typography variant="body2">{item.quantity}</Typography>
-                                            <IconButton size="small" onClick={() => handleUpdateCartQuantity(item.service.id, item.quantity + 1)} sx={{ color: '#009688' }}>+</IconButton>
-                                            <IconButton size="small" onClick={() => handleRemoveFromCart(item.service.id)} sx={{ color: '#f44336', ml: 'auto' }}>
+                                            <IconButton size="small" onClick={() => handleUpdateCartQuantity(item.service.id, Math.max(1, item.quantity - 1))} sx={{ color: '#FF6B35', bgcolor: alpha('#FF6B35', 0.1), '&:hover': { bgcolor: alpha('#FF6B35', 0.2) } }}>
+                                                -
+                                            </IconButton>
+                                            <Typography variant="body2" sx={{ minWidth: 24, textAlign: 'center' }}>{item.quantity}</Typography>
+                                            <IconButton size="small" onClick={() => handleUpdateCartQuantity(item.service.id, item.quantity + 1)} sx={{ color: '#FF6B35', bgcolor: alpha('#FF6B35', 0.1), '&:hover': { bgcolor: alpha('#FF6B35', 0.2) } }}>
+                                                +
+                                            </IconButton>
+                                            <IconButton size="small" onClick={() => handleRemoveFromCart(item.service.id)} sx={{ color: '#8A8A8A', ml: 'auto' }}>
                                                 <CloseIcon fontSize="small" />
                                             </IconButton>
                                         </Box>
                                     </Box>
                                 </Box>
                             ))}
-                            <Divider sx={{ borderColor: alpha('#FFFFFF', 0.1), my: 2 }} />
+                            <Divider sx={{ my: 2, borderColor: '#F0E8E0' }} />
                             <Box sx={{ display: 'flex', justifyContent: 'space-between', mb: 2 }}>
                                 <Typography fontWeight={600}>Total:</Typography>
-                                <Typography fontWeight={600} color="#4CAF50">{formatPriceAMD(cartTotal)}</Typography>
+                                <Typography fontWeight={700} color="#FF6B35" fontSize={20}>{formatPriceAMD(cartTotal)}</Typography>
                             </Box>
-                            <Button fullWidth variant="outlined" onClick={handleClearCart} sx={{ borderColor: '#f44336', color: '#f44336', mb: 1 }}>
+                            <Button fullWidth variant="outlined" onClick={handleClearCart} sx={{
+                                borderColor: '#FF6B35',
+                                color: '#FF6B35',
+                                borderRadius: '30px',
+                                textTransform: 'none',
+                                '&:hover': { bgcolor: alpha('#FF6B35', 0.05) }
+                            }}>
                                 Clear Bucket
                             </Button>
                         </>
@@ -609,36 +635,68 @@ const ServicesPage = () => {
 
             {/* User Menu */}
             <Menu anchorEl={anchorEl} open={Boolean(anchorEl)} onClose={handleMenuClose}
-                  PaperProps={{ sx: { bgcolor: '#121212', color: '#FFFFFF', border: '1px solid #242424', minWidth: 200 } }}>
-                <MenuItem onClick={handleProfile}><PersonIcon sx={{ mr: 2, fontSize: 20, color: '#009688' }} />Profile</MenuItem>
-                <MenuItem onClick={() => navigate('/services')}><CelebrationIcon sx={{ mr: 2, fontSize: 20, color: '#009688' }} />Services</MenuItem>
+                  PaperProps={{ sx: { bgcolor: '#FFFFFF', color: '#1A1A1A', border: '1px solid #E0E0E0', minWidth: 200, borderRadius: '16px', boxShadow: '0 4px 20px rgba(0,0,0,0.1)' } }}>
+                <MenuItem onClick={handleProfile}><PersonIcon sx={{ mr: 2, fontSize: 20, color: '#FF6B35' }} />Profile</MenuItem>
+                <MenuItem onClick={() => navigate('/services')}><CelebrationIcon sx={{ mr: 2, fontSize: 20, color: '#FF6B35' }} />Services</MenuItem>
                 {userIsAdmin && (
                     <MenuItem onClick={handleAdminPanel}><AdminIcon sx={{ mr: 2, fontSize: 20, color: '#FF9800' }} />Admin Panel</MenuItem>
                 )}
-                <Divider sx={{ borderColor: '#242424' }} />
-                <MenuItem onClick={handleLogout}><LogoutIcon sx={{ mr: 2, fontSize: 20, color: '#f44336' }} />Logout</MenuItem>
+                <Divider sx={{ borderColor: '#F0E8E0' }} />
+                <MenuItem onClick={handleLogout}><LogoutIcon sx={{ mr: 2, fontSize: 20, color: '#FF6B35' }} />Logout</MenuItem>
             </Menu>
 
             {/* Main Content */}
-            <Container maxWidth="xl" sx={{ position: 'relative', zIndex: 1, py: 4 }}>
+            <Container maxWidth="xl" sx={{ position: 'relative', zIndex: 1, py: 5 }}>
+                {/* Hero Section */}
                 <Box sx={{ textAlign: 'center', mb: 5 }}>
-                    <Typography variant="h2" sx={{
-                        fontSize: { xs: '36px', md: '48px' },
+                    <Typography variant="h1" sx={{
+                        fontSize: { xs: '36px', md: '56px' },
                         fontWeight: 800,
-                        background: 'linear-gradient(135deg, #009688, #4CAF50, #009688)',
+                        background: 'linear-gradient(135deg, #FF6B35 0%, #FFB347 50%, #FF6B35 100%)',
                         backgroundSize: '200% 200%',
                         WebkitBackgroundClip: 'text',
-                        WebkitTextFillColor: 'transparent'
+                        WebkitTextFillColor: 'transparent',
+                        mb: 2,
+                        letterSpacing: '-1px'
                     }}>
-                        Holiday Services
+                        Discover Amazing Events
                     </Typography>
-                    <Typography variant="h6" sx={{ color: alpha('#FFFFFF', 0.8), mt: 2 }}>
-                        Discover amazing parties, birthdays, and entertainment services in Armenia
+                    <Typography variant="h6" sx={{ color: '#6A6A6A', maxWidth: '600px', mx: 'auto' }}>
+                        Find the perfect parties, birthdays, and entertainment services in Armenia
                     </Typography>
                 </Box>
 
+                {/* Category Tabs */}
+                <Tabs
+                    value={activeTab}
+                    onChange={(e, newValue) => setActiveTab(newValue)}
+                    centered
+                    sx={{
+                        mb: 4,
+                        '& .MuiTab-root': {
+                            textTransform: 'none',
+                            fontWeight: 600,
+                            fontSize: '16px',
+                            color: '#8A8A8A',
+                            '&.Mui-selected': { color: '#FF6B35' }
+                        },
+                        '& .MuiTabs-indicator': { bgcolor: '#FF6B35', height: 3 }
+                    }}
+                >
+                    <Tab icon={<TrendingIcon />} iconPosition="start" label="All Services" />
+                    <Tab icon={<WhatshotIcon />} iconPosition="start" label="Popular" />
+                    <Tab icon={<NewIcon />} iconPosition="start" label="New Arrivals" />
+                </Tabs>
+
                 {/* Search Filters */}
-                <Card sx={{ background: alpha('#121212', 0.95), borderRadius: '20px', p: 3, mb: 4, border: `1px solid ${alpha('#FFFFFF', 0.1)}` }}>
+                <Paper elevation={0} sx={{
+                    background: '#FFFFFF',
+                    borderRadius: '24px',
+                    p: 3,
+                    mb: 4,
+                    boxShadow: '0 4px 20px rgba(0,0,0,0.04)',
+                    border: '1px solid #F0E8E0'
+                }}>
                     <Grid container spacing={2} alignItems="center">
                         <Grid item xs={12} md={4}>
                             <TextField
@@ -648,15 +706,21 @@ const ServicesPage = () => {
                                 onChange={(e) => setSearchQuery(e.target.value)}
                                 onKeyPress={(e) => e.key === 'Enter' && handleSearch()}
                                 InputProps={{
-                                    startAdornment: <InputAdornment position="start"><SearchIcon sx={{ color: alpha('#FFFFFF', 0.5) }} /></InputAdornment>
+                                    startAdornment: <InputAdornment position="start"><SearchIcon sx={{ color: '#B0B0B0' }} /></InputAdornment>,
+                                    sx: { borderRadius: '16px' }
                                 }}
-                                sx={{ '& .MuiOutlinedInput-root': { bgcolor: alpha('#1A1A1A', 0.8), color: '#FFFFFF' } }}
+                                sx={{ '& .MuiOutlinedInput-root': { bgcolor: '#FAFAFA' } }}
                             />
                         </Grid>
                         <Grid item xs={12} md={3}>
                             <FormControl fullWidth>
-                                <InputLabel sx={{ color: alpha('#FFFFFF', 0.7) }}>Category</InputLabel>
-                                <Select value={selectedCategory} onChange={(e) => setSelectedCategory(e.target.value)} label="Category" sx={{ bgcolor: alpha('#1A1A1A', 0.8), color: '#FFFFFF' }}>
+                                <InputLabel sx={{ color: '#8A8A8A' }}>Category</InputLabel>
+                                <Select
+                                    value={selectedCategory}
+                                    onChange={(e) => setSelectedCategory(e.target.value)}
+                                    label="Category"
+                                    sx={{ borderRadius: '16px', bgcolor: '#FAFAFA' }}
+                                >
                                     <MenuItem value="">All Categories</MenuItem>
                                     {categories.map((cat) => (
                                         <MenuItem key={cat} value={cat}>{cat}</MenuItem>
@@ -666,8 +730,13 @@ const ServicesPage = () => {
                         </Grid>
                         <Grid item xs={12} md={3}>
                             <FormControl fullWidth>
-                                <InputLabel sx={{ color: alpha('#FFFFFF', 0.7) }}>City</InputLabel>
-                                <Select value={location} onChange={(e) => setLocation(e.target.value)} label="City" sx={{ bgcolor: alpha('#1A1A1A', 0.8), color: '#FFFFFF' }}>
+                                <InputLabel sx={{ color: '#8A8A8A' }}>City</InputLabel>
+                                <Select
+                                    value={location}
+                                    onChange={(e) => setLocation(e.target.value)}
+                                    label="City"
+                                    sx={{ borderRadius: '16px', bgcolor: '#FAFAFA' }}
+                                >
                                     <MenuItem value="">All Cities</MenuItem>
                                     {ARMENIAN_CITIES.map((city) => (
                                         <MenuItem key={city.value} value={city.value}>{city.label}</MenuItem>
@@ -676,102 +745,197 @@ const ServicesPage = () => {
                             </FormControl>
                         </Grid>
                         <Grid item xs={12} md={2}>
-                            <Button fullWidth variant="contained" onClick={handleSearch} sx={{
-                                background: 'linear-gradient(135deg, #009688, #4CAF50)',
-                                height: '56px',
-                                '&:hover': { transform: 'translateY(-2px)' }
-                            }}>
+                            <Button
+                                fullWidth
+                                variant="contained"
+                                onClick={handleSearch}
+                                sx={{
+                                    background: 'linear-gradient(135deg, #FF6B35 0%, #FFB347 100%)',
+                                    height: '56px',
+                                    borderRadius: '30px',
+                                    textTransform: 'none',
+                                    fontWeight: 600,
+                                    fontSize: '15px',
+                                    boxShadow: '0 4px 12px rgba(255,107,53,0.25)',
+                                    '&:hover': { transform: 'translateY(-2px)', boxShadow: '0 6px 16px rgba(255,107,53,0.35)' }
+                                }}
+                            >
                                 Search
                             </Button>
                         </Grid>
                     </Grid>
-                </Card>
+                </Paper>
+
+                {/* Results Count */}
+                {!loading && services.length > 0 && (
+                    <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 3, flexWrap: 'wrap', gap: 1 }}>
+                        <Typography sx={{ color: '#8A8A8A' }}>
+                            Found <strong style={{ color: '#FF6B35' }}>{totalElements}</strong> {totalElements === 1 ? 'service' : 'services'}
+                        </Typography>
+                        <Box sx={{ display: 'flex', gap: 1 }}>
+                            <Chip label="Sort by: Recommended" size="small" sx={{ bgcolor: '#F0E8E0', color: '#4A4A4A' }} />
+                            <Chip label="Price: Low to High" size="small" sx={{ bgcolor: '#F0E8E0', color: '#4A4A4A' }} />
+                        </Box>
+                    </Box>
+                )}
 
                 {/* Services Grid */}
                 {loading ? (
                     <LoadingSkeleton />
                 ) : services.length === 0 ? (
                     <Box sx={{ textAlign: 'center', py: 8 }}>
-                        <Typography variant="h6" sx={{ color: alpha('#FFFFFF', 0.7) }}>No services found</Typography>
-                        <Typography variant="body2" sx={{ color: alpha('#FFFFFF', 0.5), mt: 1 }}>Try adjusting your search filters</Typography>
+                        <Typography variant="h6" sx={{ color: '#8A8A8A' }}>No services found</Typography>
+                        <Typography variant="body2" sx={{ color: '#B0B0B0', mt: 1 }}>Try adjusting your search filters</Typography>
                     </Box>
                 ) : (
                     <>
-                        <Typography sx={{ mb: 2, color: alpha('#FFFFFF', 0.7) }}>
-                            Found {totalElements} service{totalElements !== 1 ? 's' : ''}
-                        </Typography>
                         <Grid container spacing={3}>
                             {services.map((service, index) => (
                                 <Grid item xs={12} sm={6} md={4} lg={3} key={service.id}>
-                                    <Zoom in={true} style={{ transitionDelay: `${index * 50}ms` }}>
+                                    <Zoom in={true} style={{ transitionDelay: `${index * 30}ms` }}>
                                         <Card sx={{
-                                            background: alpha('#1A1A1A', 0.95),
+                                            background: '#FFFFFF',
                                             borderRadius: '20px',
-                                            border: `1px solid ${alpha('#FFFFFF', 0.1)}`,
                                             transition: 'all 0.3s ease',
                                             height: '100%',
                                             display: 'flex',
                                             flexDirection: 'column',
-                                            '&:hover': { transform: 'translateY(-5px)', borderColor: alpha('#4CAF50', 0.3) }
+                                            cursor: 'pointer',
+                                            boxShadow: '0 4px 12px rgba(0,0,0,0.05)',
+                                            '&:hover': {
+                                                transform: 'translateY(-6px)',
+                                                boxShadow: '0 20px 30px rgba(0,0,0,0.1)'
+                                            }
                                         }}>
                                             <Box sx={{ position: 'relative', height: 200, overflow: 'hidden', borderRadius: '20px 20px 0 0' }}>
                                                 {service.imageUrls && service.imageUrls[0] ? (
-                                                    <CardMedia component="img" image={service.imageUrls[0]} alt={service.name} sx={{ height: '100%', objectFit: 'cover' }} />
+                                                    <CardMedia
+                                                        component="img"
+                                                        image={service.imageUrls[0]}
+                                                        alt={service.name}
+                                                        sx={{ height: '100%', objectFit: 'cover', transition: 'transform 0.3s ease', '&:hover': { transform: 'scale(1.05)' } }}
+                                                    />
                                                 ) : (
-                                                    <Box sx={{ height: '100%', bgcolor: alpha('#009688', 0.2), display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-                                                        <CartIcon sx={{ fontSize: 60, color: alpha('#009688', 0.5) }} />
+                                                    <Box sx={{ height: '100%', bgcolor: alpha('#FF6B35', 0.1), display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+                                                        <CartIcon sx={{ fontSize: 50, color: alpha('#FF6B35', 0.3) }} />
                                                     </Box>
                                                 )}
-                                                <Chip label={service.category} size="small" sx={{
-                                                    position: 'absolute',
-                                                    top: 10,
-                                                    left: 10,
-                                                    bgcolor: alpha('#009688', 0.9),
-                                                    color: 'white'
-                                                }} />
-                                                <IconButton onClick={() => handleFavoriteToggle(service.id)} sx={{
-                                                    position: 'absolute',
-                                                    top: 10,
-                                                    right: 10,
-                                                    bgcolor: alpha('#000000', 0.5),
-                                                    '&:hover': { bgcolor: alpha('#000000', 0.8) }
-                                                }}>
-                                                    {favorites.has(service.id) ? <FavoriteIcon sx={{ color: '#f44336' }} /> : <FavoriteBorderIcon sx={{ color: 'white' }} />}
+                                                <Chip
+                                                    label={service.category}
+                                                    size="small"
+                                                    sx={{
+                                                        position: 'absolute',
+                                                        top: 12,
+                                                        left: 12,
+                                                        bgcolor: '#FF6B35',
+                                                        color: 'white',
+                                                        fontWeight: 500,
+                                                        borderRadius: '10px'
+                                                    }}
+                                                />
+                                                <IconButton
+                                                    onClick={(e) => { e.stopPropagation(); handleFavoriteToggle(service.id); }}
+                                                    sx={{
+                                                        position: 'absolute',
+                                                        top: 12,
+                                                        right: 12,
+                                                        bgcolor: alpha('#FFFFFF', 0.9),
+                                                        '&:hover': { bgcolor: '#FFFFFF', transform: 'scale(1.05)' }
+                                                    }}
+                                                >
+                                                    {favorites.has(service.id) ? <FavoriteIcon sx={{ color: '#FF6B35', fontSize: 20 }} /> : <FavoriteBorderIcon sx={{ color: '#4A4A4A', fontSize: 20 }} />}
                                                 </IconButton>
                                             </Box>
 
-                                            <CardContent sx={{ flex: 1 }}>
-                                                <Typography variant="h6" sx={{ fontWeight: 600, mb: 1 }}>{service.name}</Typography>
+                                            <CardContent sx={{ flex: 1, p: 2.5 }}>
+                                                <Typography variant="h6" sx={{ fontWeight: 700, fontSize: '18px', mb: 1, lineHeight: 1.3 }}>
+                                                    {service.name}
+                                                </Typography>
+
                                                 <Box sx={{ display: 'flex', alignItems: 'center', gap: 1, mb: 1 }}>
-                                                    <PriceIcon sx={{ fontSize: 16, color: '#4CAF50' }} />
-                                                    <Typography variant="body1" sx={{ color: '#4CAF50', fontWeight: 600 }}>{formatPriceAMD(service.price)}</Typography>
+                                                    <PriceIcon sx={{ fontSize: 16, color: '#FF6B35' }} />
+                                                    <Typography variant="body1" sx={{ color: '#FF6B35', fontWeight: 700 }}>
+                                                        {formatPriceAMD(service.price)}
+                                                    </Typography>
                                                 </Box>
+
                                                 <Box sx={{ display: 'flex', alignItems: 'center', gap: 1, mb: 1 }}>
-                                                    <LocationIcon sx={{ fontSize: 16, color: alpha('#FFFFFF', 0.5) }} />
-                                                    <Typography variant="body2" sx={{ color: alpha('#FFFFFF', 0.7) }}>{service.locationDisplayName || service.location}</Typography>
+                                                    <LocationIcon sx={{ fontSize: 14, color: '#B0B0B0' }} />
+                                                    <Typography variant="body2" sx={{ color: '#8A8A8A' }}>
+                                                        {service.locationDisplayName || service.location}
+                                                    </Typography>
                                                 </Box>
-                                                <Typography variant="body2" sx={{ color: alpha('#FFFFFF', 0.6), mt: 1, display: '-webkit-box', WebkitLineClamp: 2, WebkitBoxOrient: 'vertical', overflow: 'hidden' }}>
+
+                                                {service.duration && (
+                                                    <Box sx={{ display: 'flex', alignItems: 'center', gap: 1, mb: 1 }}>
+                                                        <TimeIcon sx={{ fontSize: 14, color: '#B0B0B0' }} />
+                                                        <Typography variant="body2" sx={{ color: '#8A8A8A' }}>
+                                                            {service.duration} {service.duration === 1 ? 'hour' : 'hours'}
+                                                        </Typography>
+                                                    </Box>
+                                                )}
+
+                                                {service.startDate && (
+                                                    <Box sx={{ display: 'flex', alignItems: 'center', gap: 1, mb: 1 }}>
+                                                        <EventIcon sx={{ fontSize: 14, color: '#B0B0B0' }} />
+                                                        <Typography variant="body2" sx={{ color: '#8A8A8A', fontSize: '12px' }}>
+                                                            {formatDate(service.startDate)}
+                                                            {service.startTime && ` at ${formatTime(service.startTime)}`}
+                                                        </Typography>
+                                                    </Box>
+                                                )}
+
+                                                <Typography variant="body2" sx={{
+                                                    color: '#6A6A6A',
+                                                    mt: 1.5,
+                                                    display: '-webkit-box',
+                                                    WebkitLineClamp: 2,
+                                                    WebkitBoxOrient: 'vertical',
+                                                    overflow: 'hidden',
+                                                    lineHeight: 1.5
+                                                }}>
                                                     {service.description}
                                                 </Typography>
                                             </CardContent>
 
-                                            <CardActions sx={{ p: 2, pt: 0, gap: 1 }}>
+                                            <CardActions sx={{ p: 2.5, pt: 0, gap: 1 }}>
                                                 <Tooltip title="Add to Bucket">
-                                                    <IconButton onClick={() => handleAddToCart(service.id)} sx={{ color: '#4CAF50' }}>
+                                                    <IconButton
+                                                        onClick={(e) => { e.stopPropagation(); handleAddToCart(service.id); }}
+                                                        sx={{
+                                                            color: '#FF6B35',
+                                                            bgcolor: alpha('#FF6B35', 0.1),
+                                                            '&:hover': { bgcolor: alpha('#FF6B35', 0.2) }
+                                                        }}
+                                                    >
                                                         <AddCartIcon />
                                                     </IconButton>
                                                 </Tooltip>
                                                 <Tooltip title="Inquire">
-                                                    <IconButton onClick={() => handleOpenInquiry(service)} sx={{ color: '#009688' }}>
+                                                    <IconButton
+                                                        onClick={(e) => { e.stopPropagation(); handleOpenInquiry(service); }}
+                                                        sx={{
+                                                            color: '#FFB347',
+                                                            bgcolor: alpha('#FFB347', 0.1),
+                                                            '&:hover': { bgcolor: alpha('#FFB347', 0.2) }
+                                                        }}
+                                                    >
                                                         <EmailIcon />
                                                     </IconButton>
                                                 </Tooltip>
-                                                <Button variant="outlined" size="small" onClick={() => navigate(`/services/${service.id}`)} sx={{
-                                                    ml: 'auto',
-                                                    borderColor: alpha('#4CAF50', 0.5),
-                                                    color: '#4CAF50',
-                                                    '&:hover': { borderColor: '#4CAF50', bgcolor: alpha('#4CAF50', 0.1) }
-                                                }}>
+                                                <Button
+                                                    variant="outlined"
+                                                    size="small"
+                                                    onClick={() => navigate(`/services/${service.id}`)}
+                                                    sx={{
+                                                        ml: 'auto',
+                                                        borderColor: alpha('#FF6B35', 0.5),
+                                                        color: '#FF6B35',
+                                                        borderRadius: '30px',
+                                                        textTransform: 'none',
+                                                        '&:hover': { borderColor: '#FF6B35', bgcolor: alpha('#FF6B35', 0.05) }
+                                                    }}
+                                                >
                                                     View Details
                                                 </Button>
                                             </CardActions>
@@ -783,10 +947,15 @@ const ServicesPage = () => {
 
                         {totalPages > 1 && (
                             <Box sx={{ display: 'flex', justifyContent: 'center', mt: 5 }}>
-                                <Pagination count={totalPages} page={page + 1} onChange={(e, newPage) => setPage(newPage - 1)} sx={{
-                                    '& .MuiPaginationItem-root': { color: '#FFFFFF' },
-                                    '& .Mui-selected': { bgcolor: '#4CAF50 !important', color: 'white' }
-                                }} />
+                                <Pagination
+                                    count={totalPages}
+                                    page={page + 1}
+                                    onChange={(e, newPage) => setPage(newPage - 1)}
+                                    sx={{
+                                        '& .MuiPaginationItem-root': { color: '#4A4A4A', borderRadius: '12px' },
+                                        '& .Mui-selected': { bgcolor: '#FF6B35 !important', color: 'white', '&:hover': { bgcolor: '#FF6B35' } }
+                                    }}
+                                />
                             </Box>
                         )}
                     </>
@@ -795,38 +964,107 @@ const ServicesPage = () => {
 
             {/* Inquiry Dialog */}
             <Dialog open={inquiryDialogOpen} onClose={() => setInquiryDialogOpen(false)} maxWidth="sm" fullWidth
-                    PaperProps={{ sx: { bgcolor: '#121212', color: '#FFFFFF', borderRadius: '20px' } }}>
-                <DialogTitle>
-                    Inquire about {selectedService?.name}
-                    <IconButton onClick={() => setInquiryDialogOpen(false)} sx={{ position: 'absolute', right: 8, top: 8, color: '#FFFFFF' }}>
+                    PaperProps={{ sx: { bgcolor: '#FFFFFF', borderRadius: '24px', boxShadow: '0 24px 48px rgba(0,0,0,0.15)' } }}>
+                <DialogTitle sx={{ borderBottom: '1px solid #F0E8E0', pb: 2 }}>
+                    <Typography variant="h6" fontWeight={700}>Inquire about {selectedService?.name}</Typography>
+                    <IconButton onClick={() => setInquiryDialogOpen(false)} sx={{ position: 'absolute', right: 12, top: 12, color: '#8A8A8A' }}>
                         <CloseIcon />
                     </IconButton>
                 </DialogTitle>
-                <DialogContent>
-                    <Box sx={{ display: 'flex', flexDirection: 'column', gap: 2, mt: 2 }}>
-                        <TextField fullWidth label="Subject" value={inquiryData.subject} onChange={(e) => setInquiryData({ ...inquiryData, subject: e.target.value })} required
-                                   sx={{ '& .MuiOutlinedInput-root': { bgcolor: alpha('#1A1A1A', 0.8), color: '#FFFFFF' }, '& .MuiInputLabel-root': { color: alpha('#FFFFFF', 0.7) } }} />
-                        <TextField fullWidth label="Email" value={inquiryData.email} onChange={(e) => setInquiryData({ ...inquiryData, email: e.target.value })} required
-                                   sx={{ '& .MuiOutlinedInput-root': { bgcolor: alpha('#1A1A1A', 0.8), color: '#FFFFFF' }, '& .MuiInputLabel-root': { color: alpha('#FFFFFF', 0.7) } }} />
-                        <TextField fullWidth label="Phone Number" value={inquiryData.phone} onChange={(e) => setInquiryData({ ...inquiryData, phone: e.target.value })} required placeholder="+374 XX XXX XXX"
-                                   sx={{ '& .MuiOutlinedInput-root': { bgcolor: alpha('#1A1A1A', 0.8), color: '#FFFFFF' }, '& .MuiInputLabel-root': { color: alpha('#FFFFFF', 0.7) } }} />
-                        <TextField fullWidth multiline rows={4} label="Message" value={inquiryData.message} onChange={(e) => setInquiryData({ ...inquiryData, message: e.target.value })} required
-                                   sx={{ '& .MuiOutlinedInput-root': { bgcolor: alpha('#1A1A1A', 0.8), color: '#FFFFFF' }, '& .MuiInputLabel-root': { color: alpha('#FFFFFF', 0.7) } }} />
+                <DialogContent sx={{ pt: 3 }}>
+                    <Box sx={{ display: 'flex', flexDirection: 'column', gap: 2.5 }}>
+                        <TextField
+                            fullWidth
+                            label="Subject"
+                            value={inquiryData.subject}
+                            onChange={(e) => setInquiryData({ ...inquiryData, subject: e.target.value })}
+                            required
+                            sx={{
+                                '& .MuiOutlinedInput-root': {
+                                    borderRadius: '12px',
+                                    bgcolor: '#FAFAFA',
+                                    '&:hover fieldset': { borderColor: '#FFB347' }
+                                }
+                            }}
+                        />
+                        <TextField
+                            fullWidth
+                            label="Email"
+                            type="email"
+                            value={inquiryData.email}
+                            onChange={(e) => setInquiryData({ ...inquiryData, email: e.target.value })}
+                            required
+                            sx={{
+                                '& .MuiOutlinedInput-root': {
+                                    borderRadius: '12px',
+                                    bgcolor: '#FAFAFA',
+                                    '&:hover fieldset': { borderColor: '#FFB347' }
+                                }
+                            }}
+                        />
+                        <TextField
+                            fullWidth
+                            label="Phone Number"
+                            value={inquiryData.phone}
+                            onChange={(e) => setInquiryData({ ...inquiryData, phone: e.target.value })}
+                            required
+                            placeholder="+374 XX XXX XXX"
+                            sx={{
+                                '& .MuiOutlinedInput-root': {
+                                    borderRadius: '12px',
+                                    bgcolor: '#FAFAFA',
+                                    '&:hover fieldset': { borderColor: '#FFB347' }
+                                }
+                            }}
+                        />
+                        <TextField
+                            fullWidth
+                            multiline
+                            rows={4}
+                            label="Message"
+                            value={inquiryData.message}
+                            onChange={(e) => setInquiryData({ ...inquiryData, message: e.target.value })}
+                            required
+                            sx={{
+                                '& .MuiOutlinedInput-root': {
+                                    borderRadius: '12px',
+                                    bgcolor: '#FAFAFA',
+                                    '&:hover fieldset': { borderColor: '#FFB347' }
+                                }
+                            }}
+                        />
                     </Box>
                 </DialogContent>
-                <DialogActions sx={{ p: 3 }}>
-                    <Button onClick={() => setInquiryDialogOpen(false)} sx={{ color: alpha('#FFFFFF', 0.7) }}>Cancel</Button>
-                    <Button onClick={handleSendInquiry} disabled={sendingInquiry} variant="contained" sx={{
-                        background: 'linear-gradient(135deg, #009688, #4CAF50)',
-                        '&:hover': { transform: 'translateY(-2px)' }
-                    }}>
-                        {sendingInquiry ? <CircularProgress size={24} /> : 'Send Inquiry'}
+                <DialogActions sx={{ p: 3, borderTop: '1px solid #F0E8E0', gap: 1 }}>
+                    <Button onClick={() => setInquiryDialogOpen(false)} sx={{ color: '#8A8A8A', borderRadius: '30px', px: 3, textTransform: 'none' }}>
+                        Cancel
+                    </Button>
+                    <Button
+                        onClick={handleSendInquiry}
+                        disabled={sendingInquiry}
+                        variant="contained"
+                        sx={{
+                            background: 'linear-gradient(135deg, #FF6B35 0%, #FFB347 100%)',
+                            borderRadius: '30px',
+                            px: 3,
+                            textTransform: 'none',
+                            fontWeight: 600,
+                            '&:hover': { transform: 'translateY(-1px)' }
+                        }}
+                    >
+                        {sendingInquiry ? <CircularProgress size={24} sx={{ color: 'white' }} /> : 'Send Inquiry'}
                     </Button>
                 </DialogActions>
             </Dialog>
 
             <Snackbar open={snackbar.open} autoHideDuration={4000} onClose={() => setSnackbar({ ...snackbar, open: false })} anchorOrigin={{ vertical: 'bottom', horizontal: 'center' }}>
-                <Alert severity={snackbar.severity} sx={{ bgcolor: '#121212', color: '#FFFFFF', border: `1px solid ${snackbar.severity === 'success' ? '#4CAF50' : '#f44336'}` }}>
+                <Alert severity={snackbar.severity} sx={{
+                    bgcolor: '#FFFFFF',
+                    color: '#1A1A1A',
+                    borderRadius: '16px',
+                    boxShadow: '0 4px 12px rgba(0,0,0,0.1)',
+                    borderLeft: `4px solid ${snackbar.severity === 'success' ? '#4CAF50' : '#FF6B35'}`
+                }}>
                     {snackbar.message}
                 </Alert>
             </Snackbar>

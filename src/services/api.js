@@ -414,7 +414,7 @@ export const serviceAPI = {
     }
 };
 
-// ==================== ADMIN API (Private) ====================
+// ==================== ADMIN API (Private) - UPDATED ====================
 export const adminAPI = {
     // ==================== Service Management ====================
     getAllServices: async (page = 0, size = 20) => {
@@ -427,10 +427,17 @@ export const adminAPI = {
         }
     },
 
-    // Create service with JSON only
+    // Create service with JSON only - UPDATED with date/time
     createServiceJSON: async (serviceData) => {
         try {
-            const response = await api.post('/api/private/admin/services', serviceData);
+            // Make sure date/time are in the correct format
+            const dataToSend = {
+                ...serviceData,
+                startDate: serviceData.startDate || null,
+                startTime: serviceData.startTime || null
+            };
+
+            const response = await api.post('/api/private/admin/services', dataToSend);
             return response;
         } catch (error) {
             console.error('Create service JSON error:', error);
@@ -438,7 +445,7 @@ export const adminAPI = {
         }
     },
 
-    // Create service with image upload
+    // Create service with image upload - UPDATED with date/time
     createService: async (serviceData, imageFiles = []) => {
         try {
             const formData = new FormData();
@@ -460,6 +467,16 @@ export const adminAPI = {
                 formData.append('tags', serviceData.tags);
             }
 
+            // ✅ ADD DATE AND TIME FIELDS
+            if (serviceData.startDate) {
+                formData.append('startDate', serviceData.startDate);
+                console.log('Adding startDate to formData:', serviceData.startDate);
+            }
+            if (serviceData.startTime) {
+                formData.append('startTime', serviceData.startTime);
+                console.log('Adding startTime to formData:', serviceData.startTime);
+            }
+
             // Add image files
             imageFiles.forEach((file) => {
                 formData.append('images', file);
@@ -477,10 +494,16 @@ export const adminAPI = {
         }
     },
 
-    // Update service with JSON only
+    // Update service with JSON only - UPDATED with date/time
     updateServiceJSON: async (serviceId, serviceData) => {
         try {
-            const response = await api.put(`/api/private/admin/services/${serviceId}`, serviceData);
+            const dataToSend = {
+                ...serviceData,
+                startDate: serviceData.startDate || null,
+                startTime: serviceData.startTime || null
+            };
+
+            const response = await api.put(`/api/private/admin/services/${serviceId}`, dataToSend);
             return response;
         } catch (error) {
             console.error('Update service JSON error:', error);
@@ -488,7 +511,7 @@ export const adminAPI = {
         }
     },
 
-    // Update service with images
+    // Update service with images - UPDATED with date/time
     updateService: async (serviceId, serviceData, imageFiles = [], existingImageUrls = []) => {
         try {
             const formData = new FormData();
@@ -508,6 +531,16 @@ export const adminAPI = {
             }
             if (serviceData.tags) {
                 formData.append('tags', serviceData.tags);
+            }
+
+            // ✅ ADD DATE AND TIME FIELDS
+            if (serviceData.startDate) {
+                formData.append('startDate', serviceData.startDate);
+                console.log('Adding startDate to formData:', serviceData.startDate);
+            }
+            if (serviceData.startTime) {
+                formData.append('startTime', serviceData.startTime);
+                console.log('Adding startTime to formData:', serviceData.startTime);
             }
 
             // Add existing image URLs

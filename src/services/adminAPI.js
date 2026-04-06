@@ -32,7 +32,7 @@ export const adminAPI = {
         }
     },
 
-    // Create service with image upload - FIXED
+    // Create service with image upload - UPDATED with date/time
     createService: async (serviceData, imageFiles = []) => {
         try {
             const formData = new FormData();
@@ -52,6 +52,16 @@ export const adminAPI = {
             }
             if (serviceData.tags) {
                 formData.append('tags', serviceData.tags);
+            }
+
+            // ✅ ADD DATE AND TIME FIELDS
+            if (serviceData.startDate) {
+                formData.append('startDate', serviceData.startDate);
+                console.log('Adding startDate to formData:', serviceData.startDate);
+            }
+            if (serviceData.startTime) {
+                formData.append('startTime', serviceData.startTime);
+                console.log('Adding startTime to formData:', serviceData.startTime);
             }
 
             // Add image files
@@ -76,7 +86,7 @@ export const adminAPI = {
         }
     },
 
-    // Update service with images - FIXED
+    // Update service with images - UPDATED with date/time
     updateService: async (serviceId, serviceData, imageFiles = [], existingImageUrls = []) => {
         try {
             const formData = new FormData();
@@ -96,6 +106,16 @@ export const adminAPI = {
             }
             if (serviceData.tags) {
                 formData.append('tags', serviceData.tags);
+            }
+
+            // ✅ ADD DATE AND TIME FIELDS
+            if (serviceData.startDate) {
+                formData.append('startDate', serviceData.startDate);
+                console.log('Adding startDate to formData:', serviceData.startDate);
+            }
+            if (serviceData.startTime) {
+                formData.append('startTime', serviceData.startTime);
+                console.log('Adding startTime to formData:', serviceData.startTime);
             }
 
             // Add existing image URLs
