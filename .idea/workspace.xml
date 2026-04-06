@@ -5,10 +5,7 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="52f9de53-701b-4b52-b101-40303d7b40ec" name="Changes" comment="">
-      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/pages/ServiceDetailPage.js" beforeDir="false" afterPath="$PROJECT_DIR$/src/pages/ServiceDetailPage.js" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/pages/ServicesPage.js" beforeDir="false" afterPath="$PROJECT_DIR$/src/pages/ServicesPage.js" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/services/serviceAPI.js" beforeDir="false" afterPath="$PROJECT_DIR$/src/services/serviceAPI.js" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -153,7 +150,7 @@
       <workItem from="1774949278122" duration="1021000" />
       <workItem from="1775398908333" duration="7763000" />
       <workItem from="1775455850562" duration="6825000" />
-      <workItem from="1775465287673" duration="3732000" />
+      <workItem from="1775465287673" duration="4703000" />
     </task>
     <task id="LOCAL-00001" summary="first commit">
       <created>1765462776214</created>
@@ -372,7 +369,14 @@
       <option name="project" value="LOCAL" />
       <updated>1775464636549</updated>
     </task>
-    <option name="localTasksCounter" value="32" />
+    <task id="LOCAL-00032" summary="Bugs fixe.">
+      <created>1775469445533</created>
+      <option name="number" value="00032" />
+      <option name="presentableId" value="LOCAL-00032" />
+      <option name="project" value="LOCAL" />
+      <updated>1775469445533</updated>
+    </task>
+    <option name="localTasksCounter" value="33" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">

@@ -1,4 +1,4 @@
-// src/pages/ServiceDetailPage.js - Without cart functionality
+// src/pages/ServiceDetailPage.js - Without cart, without suggested services, without reviews, without capacity
 
 import React, { useState, useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
@@ -51,7 +51,8 @@ import {
     Event as EventIcon,
     Star as StarIcon,
     Share as ShareIcon,
-    CheckCircle as CheckCircleIcon
+    CheckCircle as CheckCircleIcon,
+    ArrowBack as ArrowBackIcon
 } from '@mui/icons-material';
 import { useAuth } from '../context/AuthContext';
 import serviceAPI from '../services/serviceAPI';
@@ -293,6 +294,7 @@ const ServiceDetailPage = () => {
 
     const handleAboutClick = () => navigate('/about');
     const handleAdminPanel = () => navigate('/admin/dashboard');
+    const handleGoBack = () => navigate('/services');
 
     if (loading) {
         return (
@@ -329,7 +331,7 @@ const ServiceDetailPage = () => {
                 transition: 'background 0.3s ease-out'
             }} />
 
-            {/* Header */}
+            {/* Header - Removed Home, Services, About Us buttons */}
             <Box component="header" sx={{
                 position: 'sticky',
                 top: 0,
@@ -364,10 +366,8 @@ const ServiceDetailPage = () => {
                             </Typography>
                         </Box>
 
+                        {/* Removed Home, About Us, Services buttons - only Admin button remains if admin */}
                         <Box sx={{ display: 'flex', alignItems: 'center', gap: '28px' }}>
-                            <Button onClick={() => navigate('/')} sx={{ fontWeight: 500, color: '#4A4A4A', '&:hover': { color: '#FF6B35' } }}>Home</Button>
-                            <Button onClick={handleAboutClick} sx={{ fontWeight: 500, color: '#4A4A4A', '&:hover': { color: '#FF6B35' } }}>About Us</Button>
-                            <Button onClick={() => navigate('/services')} sx={{ fontWeight: 500, color: '#FF6B35', borderBottom: '2px solid #FF6B35', borderRadius: 0 }}>Services</Button>
                             {userIsAdmin && (
                                 <Button onClick={handleAdminPanel} sx={{ fontWeight: 500, color: '#FF9800' }}>Admin</Button>
                             )}
@@ -401,11 +401,7 @@ const ServiceDetailPage = () => {
 
             {/* Main Content */}
             <Container maxWidth="lg" sx={{ position: 'relative', zIndex: 1, py: 5 }}>
-                <Breadcrumbs sx={{ mb: 4, color: '#8A8A8A' }}>
-                    <Link color="inherit" href="/" sx={{ cursor: 'pointer', textDecoration: 'none', '&:hover': { color: '#FF6B35' } }} onClick={() => navigate('/')}>Home</Link>
-                    <Link color="inherit" href="/services" sx={{ cursor: 'pointer', textDecoration: 'none', '&:hover': { color: '#FF6B35' } }} onClick={() => navigate('/services')}>Services</Link>
-                    <Typography color="#FF6B35" fontWeight={500}>{service.name}</Typography>
-                </Breadcrumbs>
+                {/* Removed Breadcrumbs - Home, Services links removed */}
 
                 <Grid container spacing={4}>
                     {/* Image Gallery */}
@@ -455,16 +451,7 @@ const ServiceDetailPage = () => {
                         <Fade in={true} timeout={500} delay={200}>
                             <Box>
                                 <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', mb: 2 }}>
-                                    <Typography variant="h3" sx={{
-                                        fontWeight: 800,
-                                        fontSize: { xs: '28px', md: '36px' },
-                                        background: 'linear-gradient(135deg, #2C2C2C 0%, #4A4A4A 100%)',
-                                        WebkitBackgroundClip: 'text',
-                                        WebkitTextFillColor: 'transparent',
-                                        letterSpacing: '-0.5px'
-                                    }}>
-                                        {service.name}
-                                    </Typography>
+                                    {/* Removed service name/title */}
                                     <Box sx={{ display: 'flex', gap: 1 }}>
                                         <Tooltip title={isFavorited ? "Remove from favorites" : "Add to favorites"}>
                                             <IconButton onClick={handleFavoriteToggle} sx={{
@@ -475,11 +462,7 @@ const ServiceDetailPage = () => {
                                                 {isFavorited ? <FavoriteIcon sx={{ color: '#FF6B35' }} /> : <FavoriteBorderIcon sx={{ color: '#8A8A8A' }} />}
                                             </IconButton>
                                         </Tooltip>
-                                        <Tooltip title="Share">
-                                            <IconButton sx={{ bgcolor: '#FFFFFF', boxShadow: '0 2px 8px rgba(0,0,0,0.08)' }}>
-                                                <ShareIcon sx={{ color: '#8A8A8A' }} />
-                                            </IconButton>
-                                        </Tooltip>
+                                        {/* Removed Share button */}
                                     </Box>
                                 </Box>
 
@@ -490,10 +473,6 @@ const ServiceDetailPage = () => {
                                         fontWeight: 500,
                                         borderRadius: '12px'
                                     }} />
-                                    <Box sx={{ display: 'flex', alignItems: 'center', gap: 0.5 }}>
-                                        <StarIcon sx={{ fontSize: 18, color: '#FFB347' }} />
-                                        <Typography variant="body2" sx={{ color: '#6A6A6A' }}>4.9 (128 reviews)</Typography>
-                                    </Box>
                                     <Typography variant="caption" sx={{ color: '#9A9A9A' }}>
                                         ❤️ {favoriteCount} {favoriteCount === 1 ? 'person likes this' : 'people like this'}
                                     </Typography>
@@ -550,37 +529,26 @@ const ServiceDetailPage = () => {
                                     </Box>
                                 </Paper>
 
-                                {/* Details Grid */}
+                                {/* Details Grid - Duration and Start Date only */}
                                 <Grid container spacing={2} sx={{ mb: 3 }}>
                                     {service.duration && (
                                         <Grid item xs={6}>
                                             <Box sx={{ display: 'flex', alignItems: 'center', gap: 1.5, p: 1.5, bgcolor: '#FFFFFF', borderRadius: '16px' }}>
-                                                <TimeIcon sx={{ color: '#FFB347' }} />
+                                                <TimeIcon sx={{ color: '#4A4A4A' }} />
                                                 <Box>
-                                                    <Typography variant="caption" sx={{ color: '#8A8A8A', display: 'block' }}>Duration</Typography>
-                                                    <Typography variant="body2" fontWeight={500}>{service.duration} {service.duration === 1 ? 'hour' : 'hours'}</Typography>
-                                                </Box>
-                                            </Box>
-                                        </Grid>
-                                    )}
-                                    {service.maxParticipants && (
-                                        <Grid item xs={6}>
-                                            <Box sx={{ display: 'flex', alignItems: 'center', gap: 1.5, p: 1.5, bgcolor: '#FFFFFF', borderRadius: '16px' }}>
-                                                <PeopleIcon sx={{ color: '#FFB347' }} />
-                                                <Box>
-                                                    <Typography variant="caption" sx={{ color: '#8A8A8A', display: 'block' }}>Capacity</Typography>
-                                                    <Typography variant="body2" fontWeight={500}>Up to {service.maxParticipants} people</Typography>
+                                                    <Typography variant="caption" sx={{ color: '#6A6A6A', display: 'block' }}>Duration</Typography>
+                                                    <Typography variant="body2" fontWeight={500} sx={{ color: '#1A1A1A' }}>{service.duration} {service.duration === 1 ? 'hour' : 'hours'}</Typography>
                                                 </Box>
                                             </Box>
                                         </Grid>
                                     )}
                                     {service.startDate && (
-                                        <Grid item xs={12}>
+                                        <Grid item xs={6}>
                                             <Box sx={{ display: 'flex', alignItems: 'center', gap: 1.5, p: 1.5, bgcolor: '#FFFFFF', borderRadius: '16px' }}>
-                                                <EventIcon sx={{ color: '#FFB347' }} />
+                                                <EventIcon sx={{ color: '#4A4A4A' }} />
                                                 <Box>
-                                                    <Typography variant="caption" sx={{ color: '#8A8A8A', display: 'block' }}>Start Date & Time</Typography>
-                                                    <Typography variant="body2" fontWeight={500}>
+                                                    <Typography variant="caption" sx={{ color: '#6A6A6A', display: 'block' }}>Start Date & Time</Typography>
+                                                    <Typography variant="body2" fontWeight={500} sx={{ color: '#1A1A1A' }}>
                                                         {formattedStartDate}
                                                         {formattedStartTime && ` at ${formattedStartTime}`}
                                                     </Typography>
@@ -617,9 +585,30 @@ const ServiceDetailPage = () => {
                     </Grid>
                 </Grid>
 
-                {/* Action Buttons - Without Add to Bucket */}
+                {/* Action Buttons - Back button and Inquire Now */}
                 <Fade in={true} timeout={500} delay={400}>
                     <Box sx={{ display: 'flex', gap: 2, justifyContent: 'center', mt: 6 }}>
+                        <Button
+                            variant="outlined"
+                            onClick={handleGoBack}
+                            startIcon={<ArrowBackIcon />}
+                            sx={{
+                                borderColor: '#FF6B35',
+                                color: '#FF6B35',
+                                padding: '14px 40px',
+                                borderRadius: '40px',
+                                fontSize: '16px',
+                                fontWeight: 600,
+                                textTransform: 'none',
+                                '&:hover': {
+                                    borderColor: '#FF6B35',
+                                    bgcolor: alpha('#FF6B35', 0.05),
+                                    transform: 'translateY(-2px)'
+                                }
+                            }}
+                        >
+                            Back
+                        </Button>
                         <Button
                             variant="contained"
                             onClick={handleOpenInquiry}
@@ -642,42 +631,6 @@ const ServiceDetailPage = () => {
                         </Button>
                     </Box>
                 </Fade>
-
-                {/* Suggested Services Section */}
-                <Box sx={{ mt: 8 }}>
-                    <Divider sx={{ mb: 4, borderColor: '#E8E0D8' }}>
-                        <Typography variant="body2" sx={{ color: '#8A8A8A', px: 2 }}>You might also like</Typography>
-                    </Divider>
-                    <Typography variant="h5" sx={{ fontWeight: 700, mb: 3, textAlign: 'center', color: '#2C2C2C' }}>
-                        Similar Services
-                    </Typography>
-                    <Typography variant="body2" sx={{ textAlign: 'center', color: '#8A8A8A', mb: 4 }}>
-                        Discover more amazing experiences in Armenia
-                    </Typography>
-                    <Grid container spacing={3}>
-                        {[1, 2, 3].map((item) => (
-                            <Grid item xs={12} sm={6} md={4} key={item}>
-                                <Card sx={{
-                                    borderRadius: '20px',
-                                    bgcolor: '#FFFFFF',
-                                    boxShadow: '0 4px 12px rgba(0,0,0,0.05)',
-                                    transition: 'all 0.3s ease',
-                                    cursor: 'pointer',
-                                    '&:hover': {
-                                        transform: 'translateY(-4px)',
-                                        boxShadow: '0 12px 24px rgba(0,0,0,0.1)'
-                                    }
-                                }}>
-                                    <Box sx={{ height: 180, bgcolor: '#FAF6F0', borderRadius: '20px 20px 0 0' }} />
-                                    <CardContent>
-                                        <Typography variant="subtitle1" fontWeight={600}>Suggested Service {item}</Typography>
-                                        <Typography variant="body2" color="#8A8A8A">Discover amazing experiences</Typography>
-                                    </CardContent>
-                                </Card>
-                            </Grid>
-                        ))}
-                    </Grid>
-                </Box>
             </Container>
 
             {/* Inquiry Dialog */}
