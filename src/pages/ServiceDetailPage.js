@@ -1,3 +1,5 @@
+// src/pages/ServiceDetailPage.js - Without cart functionality
+
 import React, { useState, useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import {
@@ -34,7 +36,6 @@ import {
 import {
     Favorite as FavoriteIcon,
     FavoriteBorder as FavoriteBorderIcon,
-    ShoppingCart as CartIcon,
     Email as EmailIcon,
     LocationOn as LocationIcon,
     AttachMoney as PriceIcon,
@@ -235,24 +236,6 @@ const ServiceDetailPage = () => {
         }
     };
 
-    const handleAddToCart = async () => {
-        try {
-            await serviceAPI.addToCart(id, 1);
-            setSnackbar({
-                open: true,
-                message: 'Added to bucket',
-                severity: 'success'
-            });
-        } catch (error) {
-            console.error('Error adding to cart:', error);
-            setSnackbar({
-                open: true,
-                message: 'Failed to add to bucket',
-                severity: 'error'
-            });
-        }
-    };
-
     const handleOpenInquiry = () => {
         setInquiryData({
             subject: `Inquiry about ${service?.name}`,
@@ -391,9 +374,6 @@ const ServiceDetailPage = () => {
                         </Box>
 
                         <Box sx={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
-                            <IconButton onClick={() => navigate('/services')} sx={{ color: '#4A4A4A' }}>
-                                <CartIcon />
-                            </IconButton>
                             <IconButton onClick={handleMenuOpen} sx={{
                                 color: '#FFFFFF',
                                 background: 'linear-gradient(135deg, #FF6B35 0%, #FFB347 100%)',
@@ -401,7 +381,7 @@ const ServiceDetailPage = () => {
                                 height: '38px',
                                 '&:hover': { transform: 'scale(1.05)' }
                             }}>
-                                {userInitial ? <Typography sx={{ fontWeight: 600 }}>{userInitial}</Typography> : <AccountCircleIcon />}
+                                {userInitial ? <Typography sx={{ fontWeight: 600, color: 'white' }}>{userInitial}</Typography> : <AccountCircleIcon sx={{ color: 'white' }} />}
                             </IconButton>
                         </Box>
                     </Box>
@@ -449,7 +429,7 @@ const ServiceDetailPage = () => {
                                     {service.imageUrls && service.imageUrls[selectedImage] ? (
                                         <img src={service.imageUrls[selectedImage]} alt={service.name} style={{ width: '100%', height: '100%', objectFit: 'contain' }} />
                                     ) : (
-                                        <CartIcon sx={{ fontSize: 100, color: alpha('#FF6B35', 0.2) }} />
+                                        <CelebrationIcon sx={{ fontSize: 100, color: alpha('#FF6B35', 0.2) }} />
                                     )}
                                 </Box>
                                 {service.imageUrls && service.imageUrls.length > 1 && (
@@ -637,13 +617,13 @@ const ServiceDetailPage = () => {
                     </Grid>
                 </Grid>
 
-                {/* Action Buttons */}
+                {/* Action Buttons - Without Add to Bucket */}
                 <Fade in={true} timeout={500} delay={400}>
                     <Box sx={{ display: 'flex', gap: 2, justifyContent: 'center', mt: 6 }}>
                         <Button
                             variant="contained"
-                            onClick={handleAddToCart}
-                            startIcon={<CartIcon />}
+                            onClick={handleOpenInquiry}
+                            startIcon={<EmailIcon />}
                             sx={{
                                 background: 'linear-gradient(135deg, #FF6B35 0%, #FFB347 100%)',
                                 padding: '14px 40px',
@@ -655,28 +635,6 @@ const ServiceDetailPage = () => {
                                 '&:hover': {
                                     transform: 'translateY(-2px)',
                                     boxShadow: '0 12px 28px rgba(255,107,53,0.35)'
-                                }
-                            }}
-                        >
-                            Add to Bucket
-                        </Button>
-                        <Button
-                            variant="outlined"
-                            onClick={handleOpenInquiry}
-                            startIcon={<EmailIcon />}
-                            sx={{
-                                borderColor: '#FFB347',
-                                color: '#FFB347',
-                                padding: '14px 40px',
-                                borderRadius: '40px',
-                                fontSize: '16px',
-                                fontWeight: 600,
-                                textTransform: 'none',
-                                '&:hover': {
-                                    borderColor: '#FF6B35',
-                                    color: '#FF6B35',
-                                    bgcolor: alpha('#FF6B35', 0.05),
-                                    transform: 'translateY(-2px)'
                                 }
                             }}
                         >
