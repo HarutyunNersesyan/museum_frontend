@@ -378,7 +378,6 @@ const AdminDashboardPage = () => {
         setExistingImages(newExisting);
     };
 
-    // UPDATED handleSubmit with proper date/time handling and debugging
     const handleSubmit = async () => {
         if (!formData.name || !formData.description || !formData.price || !formData.category || !formData.location) {
             setSnackbar({
@@ -404,7 +403,6 @@ const AdminDashboardPage = () => {
                 startTime: formData.startTime ? formData.startTime.format('HH:mm') : null
             };
 
-            // Debug logs
             console.log('=== Submitting Service Data ===');
             console.log('Submit Data:', submitData);
             console.log('Start Date:', submitData.startDate);
@@ -577,9 +575,8 @@ const AdminDashboardPage = () => {
                                 </Box>
                             </Box>
 
+                            {/* Removed Home and Services buttons - only user menu remains */}
                             <Box sx={{ display: 'flex', alignItems: 'center', gap: 2 }}>
-                                <Button onClick={() => navigate('/')} sx={{ color: '#5A6874' }}>Home</Button>
-                                <Button onClick={() => navigate('/services')} sx={{ color: '#5A6874' }}>Services</Button>
                                 <IconButton onClick={handleMenuOpen} sx={{
                                     background: 'linear-gradient(135deg, #FF9800 0%, #FF5722 100%)',
                                     width: '45px',
@@ -610,9 +607,7 @@ const AdminDashboardPage = () => {
                     <MenuItem onClick={() => navigate('/profile')}>
                         <PersonIcon sx={{ mr: 2, color: '#FF9800' }} /> Profile
                     </MenuItem>
-                    <MenuItem onClick={() => navigate('/services')}>
-                        <CelebrationIcon sx={{ mr: 2, color: '#FF9800' }} /> Services
-                    </MenuItem>
+                    {/* Removed Services menu item */}
                     <Divider sx={{ borderColor: '#E8ECF0' }} />
                     <MenuItem onClick={handleLogout}>
                         <LogoutIcon sx={{ mr: 2, color: '#f44336' }} /> Logout
