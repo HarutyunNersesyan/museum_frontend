@@ -323,6 +323,7 @@ const AdminDashboardPage = () => {
             duration: service.duration || '',
             maxParticipants: service.maxParticipants || '',
             tags: service.tags || '',
+            // ✅ FIX: Only convert if values exist
             startDate: service.startDate ? dayjs(service.startDate) : null,
             startTime: service.startTime ? dayjs(service.startTime, 'HH:mm') : null
         });
@@ -378,6 +379,23 @@ const AdminDashboardPage = () => {
         setExistingImages(newExisting);
     };
 
+    // Helper functions to safely format date and time
+    const getValidDateString = (dateValue) => {
+        if (!dateValue) return null;
+        if (dayjs.isDayjs(dateValue) && dateValue.isValid()) {
+            return dateValue.format('YYYY-MM-DD');
+        }
+        return null;
+    };
+
+    const getValidTimeString = (timeValue) => {
+        if (!timeValue) return null;
+        if (dayjs.isDayjs(timeValue) && timeValue.isValid()) {
+            return timeValue.format('HH:mm');
+        }
+        return null;
+    };
+
     const handleSubmit = async () => {
         if (!formData.name || !formData.description || !formData.price || !formData.category || !formData.location) {
             setSnackbar({
@@ -399,8 +417,9 @@ const AdminDashboardPage = () => {
                 duration: formData.duration ? parseInt(formData.duration) : null,
                 maxParticipants: formData.maxParticipants ? parseInt(formData.maxParticipants) : null,
                 tags: formData.tags,
-                startDate: formData.startDate ? formData.startDate.format('YYYY-MM-DD') : null,
-                startTime: formData.startTime ? formData.startTime.format('HH:mm') : null
+                // ✅ FIX: Use helper functions to safely format dates
+                startDate: getValidDateString(formData.startDate),
+                startTime: getValidTimeString(formData.startTime)
             };
 
             console.log('=== Submitting Service Data ===');
