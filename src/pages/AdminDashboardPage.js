@@ -43,9 +43,7 @@ import {
     ImageListItem,
     Fade,
     Grow,
-    GlobalStyles,
-    MobileStepper,
-    CardMedia
+    GlobalStyles
 } from '@mui/material';
 import { LocalizationProvider } from '@mui/x-date-pickers/LocalizationProvider';
 import { DatePicker } from '@mui/x-date-pickers/DatePicker';
@@ -627,7 +625,7 @@ const AdminDashboardPage = () => {
     const handleNextImage = (serviceId, totalImages) => {
         setActiveImageIndex(prev => ({
             ...prev,
-            [serviceId]: (prev[serviceId] + 1) % totalImages
+            [serviceId]: ((prev[serviceId] || 0) + 1) % totalImages
         }));
     };
 
@@ -635,7 +633,7 @@ const AdminDashboardPage = () => {
     const handlePrevImage = (serviceId, totalImages) => {
         setActiveImageIndex(prev => ({
             ...prev,
-            [serviceId]: (prev[serviceId] - 1 + totalImages) % totalImages
+            [serviceId]: ((prev[serviceId] || 0) - 1 + totalImages) % totalImages
         }));
     };
 
@@ -825,8 +823,8 @@ const AdminDashboardPage = () => {
                         </Grid>
                     </Grid>
 
-                    {/* Tabs */}
-                    <Paper sx={{
+                    {/* Tabs Section - Direct Box without extra Paper wrapper */}
+                    <Box sx={{
                         background: '#FFFFFF',
                         borderRadius: '20px',
                         overflow: 'hidden',
@@ -1016,12 +1014,12 @@ const AdminDashboardPage = () => {
                                                                 </Box>
                                                             </Grid>
 
-                                                            {/* Right side - Image Carousel */}
+                                                            {/* Right side - Image Carousel with White Background */}
                                                             <Grid item xs={12} md={5}>
                                                                 <Box sx={{
                                                                     height: '100%',
                                                                     minHeight: '364px',
-                                                                    background: `linear-gradient(135deg, ${alpha('#FF9800', 0.05)} 0%, ${alpha('#FF5722', 0.02)} 100%)`,
+                                                                    background: '#FFFFFF', // Changed from gradient to pure white
                                                                     display: 'flex',
                                                                     flexDirection: 'column',
                                                                     alignItems: 'center',
@@ -1038,7 +1036,7 @@ const AdminDashboardPage = () => {
                                                                                 display: 'flex',
                                                                                 alignItems: 'center',
                                                                                 justifyContent: 'center',
-                                                                                backgroundColor: '#fafafa',
+                                                                                backgroundColor: '#FFFFFF', // Changed to white
                                                                                 borderRadius: '12px',
                                                                                 overflow: 'hidden',
                                                                                 position: 'relative',
@@ -1245,10 +1243,10 @@ const AdminDashboardPage = () => {
                                 )}
                             </Box>
                         )}
-                    </Paper>
+                    </Box>
                 </Container>
 
-                {/* Create/Edit Service Dialog - Enlarged and flat design */}
+                {/* Create/Edit Service Dialog */}
                 <Dialog
                     open={dialogOpen}
                     onClose={handleCloseDialog}
