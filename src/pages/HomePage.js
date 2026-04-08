@@ -1023,7 +1023,7 @@ function HomePage() {
 
             {/* Modals */}
             <Modal open={loginModalOpen} onClose={handleCloseLoginModal} sx={{ display: 'flex', alignItems: 'center', justifyContent: 'center', backdropFilter: 'blur(8px)' }}>
-                <Box sx={{ width: '90%', maxWidth: 800, maxHeight: '90vh', bgcolor: '#FFFFFF', borderRadius: '24px', border: '1px solid #F0E8E0', position: 'relative', overflow: 'hidden', boxShadow: '0 24px 48px rgba(0,0,0,0.15)' }}>
+                <Box sx={{ width: '90%', maxWidth: 470, maxHeight: '90vh', bgcolor: '#FFFFFF', borderRadius: '24px', border: '1px solid #F0E8E0', position: 'relative', overflow: 'hidden', boxShadow: '0 24px 48px rgba(0,0,0,0.15)' }}>
                     <IconButton onClick={handleCloseLoginModal} sx={{ position: 'absolute', top: 16, right: 16, zIndex: 10, backgroundColor: alpha('#000000', 0.5), color: '#FFFFFF', '&:hover': { backgroundColor: alpha('#000000', 0.7) } }}>
                         <CloseIcon />
                     </IconButton>
@@ -1032,7 +1032,7 @@ function HomePage() {
             </Modal>
 
             <Modal open={signupModalOpen} onClose={handleCloseSignupModal} sx={{ display: 'flex', alignItems: 'center', justifyContent: 'center', backdropFilter: 'blur(8px)' }}>
-                <Box sx={{ width: '90%', maxWidth: 800, maxHeight: '90vh', bgcolor: '#FFFFFF', borderRadius: '24px', border: '1px solid #F0E8E0', position: 'relative', overflow: 'hidden', boxShadow: '0 24px 48px rgba(0,0,0,0.15)' }}>
+                <Box sx={{ width: '90%', maxWidth: 470, maxHeight: '90vh', bgcolor: '#FFFFFF', borderRadius: '24px', border: '1px solid #F0E8E0', position: 'relative', overflow: 'hidden', boxShadow: '0 24px 48px rgba(0,0,0,0.15)' }}>
                     <IconButton onClick={handleCloseSignupModal} sx={{ position: 'absolute', top: 16, right: 16, zIndex: 10, backgroundColor: alpha('#000000', 0.5), color: '#FFFFFF', '&:hover': { backgroundColor: alpha('#000000', 0.7) } }}>
                         <CloseIcon />
                     </IconButton>
