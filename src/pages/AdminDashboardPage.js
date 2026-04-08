@@ -323,7 +323,6 @@ const AdminDashboardPage = () => {
             duration: service.duration || '',
             maxParticipants: service.maxParticipants || '',
             tags: service.tags || '',
-            // ✅ FIX: Only convert if values exist
             startDate: service.startDate ? dayjs(service.startDate) : null,
             startTime: service.startTime ? dayjs(service.startTime, 'HH:mm') : null
         });
@@ -396,11 +395,28 @@ const AdminDashboardPage = () => {
         return null;
     };
 
+    // Validation function to check if date is not in the past
+    const isDateValid = (date) => {
+        if (!date) return true;
+        const today = dayjs().startOf('day');
+        return dayjs(date).isSameOrAfter(today, 'day');
+    };
+
     const handleSubmit = async () => {
         if (!formData.name || !formData.description || !formData.price || !formData.category || !formData.location) {
             setSnackbar({
                 open: true,
                 message: 'Please fill all required fields',
+                severity: 'warning'
+            });
+            return;
+        }
+
+        // Validate that start date is not in the past
+        if (formData.startDate && !isDateValid(formData.startDate)) {
+            setSnackbar({
+                open: true,
+                message: 'Start date cannot be in the past. Please select today or a future date.',
                 severity: 'warning'
             });
             return;
@@ -417,7 +433,6 @@ const AdminDashboardPage = () => {
                 duration: formData.duration ? parseInt(formData.duration) : null,
                 maxParticipants: formData.maxParticipants ? parseInt(formData.maxParticipants) : null,
                 tags: formData.tags,
-                // ✅ FIX: Use helper functions to safely format dates
                 startDate: getValidDateString(formData.startDate),
                 startTime: getValidTimeString(formData.startTime)
             };
@@ -594,7 +609,6 @@ const AdminDashboardPage = () => {
                                 </Box>
                             </Box>
 
-                            {/* Removed Home and Services buttons - only user menu remains */}
                             <Box sx={{ display: 'flex', alignItems: 'center', gap: 2 }}>
                                 <IconButton onClick={handleMenuOpen} sx={{
                                     background: 'linear-gradient(135deg, #FF9800 0%, #FF5722 100%)',
@@ -626,7 +640,6 @@ const AdminDashboardPage = () => {
                     <MenuItem onClick={() => navigate('/profile')}>
                         <PersonIcon sx={{ mr: 2, color: '#FF9800' }} /> Profile
                     </MenuItem>
-                    {/* Removed Services menu item */}
                     <Divider sx={{ borderColor: '#E8ECF0' }} />
                     <MenuItem onClick={handleLogout}>
                         <LogoutIcon sx={{ mr: 2, color: '#f44336' }} /> Logout
@@ -1147,12 +1160,17 @@ const AdminDashboardPage = () => {
                             </Typography>
 
                             <Grid container spacing={2}>
-                                {/* Start Date */}
+                                {/* Start Date - with validation to prevent past dates */}
                                 <Grid item xs={12} sm={6}>
                                     <DatePicker
                                         label="Start Date"
                                         value={formData.startDate}
                                         onChange={(newValue) => handleDateChange('startDate', newValue)}
+                                        minDate={dayjs()} // ✅ Prevents selecting past dates
+                                        shouldDisableDate={(date) => {
+                                            // Disable any date that is before today
+                                            return dayjs(date).isBefore(dayjs(), 'day');
+                                        }}
                                         sx={{
                                             width: '100%',
                                             '& .MuiOutlinedInput-root': {
@@ -1166,6 +1184,7 @@ const AdminDashboardPage = () => {
                                         slotProps={{
                                             textField: {
                                                 fullWidth: true,
+                                                helperText: "Cannot select past dates",
                                                 sx: {
                                                     '& .MuiOutlinedInput-root': {
                                                         bgcolor: '#FFFFFF',
