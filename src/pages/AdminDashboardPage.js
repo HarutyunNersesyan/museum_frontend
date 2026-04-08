@@ -365,6 +365,25 @@ const AdminDashboardPage = () => {
 
     const handleOpenEditDialog = (service) => {
         setEditingService(service);
+
+        // Safely parse dates - only if they exist
+        let startDateValue = null;
+        let startTimeValue = null;
+
+        if (service.startDate) {
+            const parsedDate = dayjs(service.startDate);
+            if (parsedDate.isValid()) {
+                startDateValue = parsedDate;
+            }
+        }
+
+        if (service.startTime) {
+            const parsedTime = dayjs(service.startTime, 'HH:mm');
+            if (parsedTime.isValid()) {
+                startTimeValue = parsedTime;
+            }
+        }
+
         setFormData({
             name: service.name,
             description: service.description,
@@ -374,8 +393,8 @@ const AdminDashboardPage = () => {
             duration: service.duration || '',
             maxParticipants: service.maxParticipants || '',
             tags: service.tags || '',
-            startDate: service.startDate ? dayjs(service.startDate) : null,
-            startTime: service.startTime ? dayjs(service.startTime, 'HH:mm') : null
+            startDate: startDateValue,
+            startTime: startTimeValue
         });
         setExistingImages(service.imageUrls || []);
         setImageFiles([]);
@@ -441,6 +460,18 @@ const AdminDashboardPage = () => {
 
         setLoading(true);
         try {
+            // Properly format date and time - only if they exist and are valid
+            let formattedStartDate = null;
+            let formattedStartTime = null;
+
+            if (formData.startDate && dayjs(formData.startDate).isValid()) {
+                formattedStartDate = dayjs(formData.startDate).format('YYYY-MM-DD');
+            }
+
+            if (formData.startTime && dayjs(formData.startTime).isValid()) {
+                formattedStartTime = dayjs(formData.startTime).format('HH:mm');
+            }
+
             const submitData = {
                 name: formData.name,
                 description: formData.description,
@@ -449,9 +480,9 @@ const AdminDashboardPage = () => {
                 location: formData.location,
                 duration: formData.duration ? parseInt(formData.duration) : null,
                 maxParticipants: formData.maxParticipants ? parseInt(formData.maxParticipants) : null,
-                tags: formData.tags,
-                startDate: formData.startDate ? formData.startDate.format('YYYY-MM-DD') : null,
-                startTime: formData.startTime ? formData.startTime.format('HH:mm') : null
+                tags: formData.tags || '',
+                startDate: formattedStartDate,
+                startTime: formattedStartTime
             };
 
             if (editingService) {
