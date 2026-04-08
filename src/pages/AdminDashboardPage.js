@@ -42,7 +42,10 @@ import {
     ImageList,
     ImageListItem,
     Fade,
-    Grow
+    Grow,
+    GlobalStyles,
+    MobileStepper,
+    CardMedia
 } from '@mui/material';
 import { LocalizationProvider } from '@mui/x-date-pickers/LocalizationProvider';
 import { DatePicker } from '@mui/x-date-pickers/DatePicker';
@@ -70,7 +73,9 @@ import {
     CloudUpload as UploadIcon,
     DeleteOutline as DeleteOutlineIcon,
     AccessTime as AccessTimeIcon,
-    Event as EventIcon
+    Event as EventIcon,
+    ChevronLeft as ChevronLeftIcon,
+    ChevronRight as ChevronRightIcon
 } from '@mui/icons-material';
 import { useAuth } from '../context/AuthContext';
 import { alpha, styled } from '@mui/material/styles';
@@ -251,6 +256,9 @@ const AdminDashboardPage = () => {
     const [imagePreviews, setImagePreviews] = useState([]);
     const [existingImages, setExistingImages] = useState([]);
     const fileInputRef = useRef(null);
+
+    // State for image carousel
+    const [activeImageIndex, setActiveImageIndex] = useState({});
 
     const [formData, setFormData] = useState({
         name: '',
@@ -609,6 +617,28 @@ const AdminDashboardPage = () => {
         }
     };
 
+    // Function to disable today and past dates (only allow tomorrow and future)
+    const disablePastAndTodayDates = (date) => {
+        const today = dayjs().startOf('day');
+        return date && date.isBefore(today.add(1, 'day'));
+    };
+
+    // Handle next image
+    const handleNextImage = (serviceId, totalImages) => {
+        setActiveImageIndex(prev => ({
+            ...prev,
+            [serviceId]: (prev[serviceId] + 1) % totalImages
+        }));
+    };
+
+    // Handle previous image
+    const handlePrevImage = (serviceId, totalImages) => {
+        setActiveImageIndex(prev => ({
+            ...prev,
+            [serviceId]: (prev[serviceId] - 1 + totalImages) % totalImages
+        }));
+    };
+
     if (!user) {
         return (
             <Backdrop open={true} sx={{ zIndex: 9999, backgroundColor: 'rgba(255, 255, 255, 0.9)' }}>
@@ -619,6 +649,30 @@ const AdminDashboardPage = () => {
 
     return (
         <LocalizationProvider dateAdapter={AdapterDayjs}>
+            {/* Global styles for orange scrollbars */}
+            <GlobalStyles
+                styles={{
+                    '*::-webkit-scrollbar': {
+                        width: '10px',
+                        height: '10px',
+                    },
+                    '*::-webkit-scrollbar-track': {
+                        background: '#F5F5F5',
+                        borderRadius: '10px',
+                    },
+                    '*::-webkit-scrollbar-thumb': {
+                        background: '#FF9800',
+                        borderRadius: '10px',
+                        '&:hover': {
+                            background: '#FF5722',
+                        },
+                    },
+                    '*': {
+                        scrollbarWidth: 'thin',
+                        scrollbarColor: '#FF9800 #F5F5F5',
+                    },
+                }}
+            />
             <Box sx={{
                 minHeight: '100vh',
                 background: '#F5F7FA',
@@ -791,7 +845,7 @@ const AdminDashboardPage = () => {
                             <Tab label="✉️ Customer Inquiries" icon={<EmailIcon />} iconPosition="start" />
                         </Tabs>
 
-                        {/* Services Tab - Vertical Layout with Image on Right */}
+                        {/* Services Tab - Vertical Layout with Image Carousel */}
                         {activeTab === 0 && (
                             <Box sx={{ p: 3 }}>
                                 <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 3, flexWrap: 'wrap', gap: 2 }}>
@@ -818,6 +872,9 @@ const AdminDashboardPage = () => {
                                     <Box sx={{ display: 'flex', flexDirection: 'column', gap: 4 }}>
                                         {services.map((service, index) => {
                                             const eventDate = formatEventDate(service.startDate, service.startTime);
+                                            const images = service.imageUrls || [];
+                                            const currentIndex = activeImageIndex[service.id] || 0;
+
                                             return (
                                                 <Grow in={true} style={{ transitionDelay: `${index * 50}ms` }} key={service.id}>
                                                     <Paper sx={{
@@ -959,20 +1016,21 @@ const AdminDashboardPage = () => {
                                                                 </Box>
                                                             </Grid>
 
-                                                            {/* Right side - Image with proper aspect ratio and contain */}
+                                                            {/* Right side - Image Carousel */}
                                                             <Grid item xs={12} md={5}>
                                                                 <Box sx={{
                                                                     height: '100%',
                                                                     minHeight: '364px',
                                                                     background: `linear-gradient(135deg, ${alpha('#FF9800', 0.05)} 0%, ${alpha('#FF5722', 0.02)} 100%)`,
                                                                     display: 'flex',
+                                                                    flexDirection: 'column',
                                                                     alignItems: 'center',
                                                                     justifyContent: 'center',
                                                                     position: 'relative',
                                                                     overflow: 'hidden',
                                                                     p: 2
                                                                 }}>
-                                                                    {service.imageUrls && service.imageUrls[0] ? (
+                                                                    {images.length > 0 ? (
                                                                         <>
                                                                             <Box sx={{
                                                                                 width: '100%',
@@ -982,28 +1040,102 @@ const AdminDashboardPage = () => {
                                                                                 justifyContent: 'center',
                                                                                 backgroundColor: '#fafafa',
                                                                                 borderRadius: '12px',
-                                                                                overflow: 'hidden'
+                                                                                overflow: 'hidden',
+                                                                                position: 'relative',
+                                                                                flex: 1
                                                                             }}>
                                                                                 <ServiceImage
-                                                                                    src={service.imageUrls[0]}
-                                                                                    alt={service.name}
+                                                                                    src={images[currentIndex]}
+                                                                                    alt={`${service.name} - ${currentIndex + 1}`}
                                                                                 />
                                                                             </Box>
-                                                                            {service.imageUrls.length > 1 && (
-                                                                                <Chip
-                                                                                    label={`+${service.imageUrls.length - 1} more`}
-                                                                                    size="medium"
-                                                                                    sx={{
+
+                                                                            {/* Navigation Arrows - Only show if more than 1 image */}
+                                                                            {images.length > 1 && (
+                                                                                <>
+                                                                                    <IconButton
+                                                                                        onClick={() => handlePrevImage(service.id, images.length)}
+                                                                                        sx={{
+                                                                                            position: 'absolute',
+                                                                                            left: 16,
+                                                                                            top: '50%',
+                                                                                            transform: 'translateY(-50%)',
+                                                                                            backgroundColor: alpha('#000000', 0.5),
+                                                                                            color: 'white',
+                                                                                            '&:hover': {
+                                                                                                backgroundColor: alpha('#000000', 0.7),
+                                                                                            },
+                                                                                            zIndex: 1
+                                                                                        }}
+                                                                                    >
+                                                                                        <ChevronLeftIcon />
+                                                                                    </IconButton>
+                                                                                    <IconButton
+                                                                                        onClick={() => handleNextImage(service.id, images.length)}
+                                                                                        sx={{
+                                                                                            position: 'absolute',
+                                                                                            right: 16,
+                                                                                            top: '50%',
+                                                                                            transform: 'translateY(-50%)',
+                                                                                            backgroundColor: alpha('#000000', 0.5),
+                                                                                            color: 'white',
+                                                                                            '&:hover': {
+                                                                                                backgroundColor: alpha('#000000', 0.7),
+                                                                                            },
+                                                                                            zIndex: 1
+                                                                                        }}
+                                                                                    >
+                                                                                        <ChevronRightIcon />
+                                                                                    </IconButton>
+
+                                                                                    {/* Image indicators */}
+                                                                                    <Box sx={{
                                                                                         position: 'absolute',
                                                                                         bottom: 16,
-                                                                                        right: 16,
-                                                                                        bgcolor: alpha('#000000', 0.7),
-                                                                                        color: 'white',
-                                                                                        fontWeight: 500,
-                                                                                        fontSize: '0.85rem',
-                                                                                        zIndex: 1
-                                                                                    }}
-                                                                                />
+                                                                                        left: '50%',
+                                                                                        transform: 'translateX(-50%)',
+                                                                                        display: 'flex',
+                                                                                        gap: 1,
+                                                                                        zIndex: 1,
+                                                                                        backgroundColor: alpha('#000000', 0.5),
+                                                                                        padding: '4px 8px',
+                                                                                        borderRadius: '20px'
+                                                                                    }}>
+                                                                                        {images.map((_, idx) => (
+                                                                                            <Box
+                                                                                                key={idx}
+                                                                                                onClick={() => setActiveImageIndex(prev => ({ ...prev, [service.id]: idx }))}
+                                                                                                sx={{
+                                                                                                    width: 8,
+                                                                                                    height: 8,
+                                                                                                    borderRadius: '50%',
+                                                                                                    backgroundColor: idx === currentIndex ? '#FF9800' : 'white',
+                                                                                                    cursor: 'pointer',
+                                                                                                    transition: 'all 0.3s ease',
+                                                                                                    '&:hover': {
+                                                                                                        transform: 'scale(1.2)'
+                                                                                                    }
+                                                                                                }}
+                                                                                            />
+                                                                                        ))}
+                                                                                    </Box>
+
+                                                                                    {/* Image counter */}
+                                                                                    <Chip
+                                                                                        label={`${currentIndex + 1} / ${images.length}`}
+                                                                                        size="small"
+                                                                                        sx={{
+                                                                                            position: 'absolute',
+                                                                                            top: 16,
+                                                                                            right: 16,
+                                                                                            bgcolor: alpha('#000000', 0.7),
+                                                                                            color: 'white',
+                                                                                            fontWeight: 500,
+                                                                                            fontSize: '0.75rem',
+                                                                                            zIndex: 1
+                                                                                        }}
+                                                                                    />
+                                                                                </>
                                                                             )}
                                                                         </>
                                                                     ) : (
@@ -1013,7 +1145,7 @@ const AdminDashboardPage = () => {
                                                                         }}>
                                                                             <ImageIcon sx={{ fontSize: 100, color: alpha('#FF9800', 0.3), mb: 2 }} />
                                                                             <Typography variant="body1" sx={{ color: '#8A99A8', fontSize: '1rem' }}>
-                                                                                No image available
+                                                                                No images available
                                                                             </Typography>
                                                                         </Box>
                                                                     )}
@@ -1208,29 +1340,44 @@ const AdminDashboardPage = () => {
                                 </Grid>
                             </Grid>
 
-                            {/* Location */}
-                            <FormControl fullWidth required variant="outlined">
-                                <InputLabel sx={{ color: '#8A99A8' }}>City</InputLabel>
-                                <FlatSelect
-                                    name="location"
-                                    value={formData.location}
-                                    onChange={handleInputChange}
-                                    label="City"
-                                >
-                                    <MenuItem value="">Select City</MenuItem>
-                                    {ARMENIAN_CITIES.map((city) => (
-                                        <MenuItem key={city.value} value={city.value}>
-                                            <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
-                                                <LocationIcon sx={{ fontSize: 16, color: '#FF9800' }} />
-                                                <span>{city.label}</span>
-                                                <Typography variant="caption" sx={{ color: '#8A99A8', ml: 1 }}>
-                                                    ({city.region})
-                                                </Typography>
-                                            </Box>
-                                        </MenuItem>
-                                    ))}
-                                </FlatSelect>
-                            </FormControl>
+                            {/* Location and Tags - Now in the same row */}
+                            <Grid container spacing={3}>
+                                <Grid item xs={6}>
+                                    <FormControl fullWidth required variant="outlined">
+                                        <InputLabel sx={{ color: '#8A99A8' }}>City</InputLabel>
+                                        <FlatSelect
+                                            name="location"
+                                            value={formData.location}
+                                            onChange={handleInputChange}
+                                            label="City"
+                                        >
+                                            <MenuItem value="">Select City</MenuItem>
+                                            {ARMENIAN_CITIES.map((city) => (
+                                                <MenuItem key={city.value} value={city.value}>
+                                                    <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
+                                                        <LocationIcon sx={{ fontSize: 16, color: '#FF9800' }} />
+                                                        <span>{city.label}</span>
+                                                        <Typography variant="caption" sx={{ color: '#8A99A8', ml: 1 }}>
+                                                            ({city.region})
+                                                        </Typography>
+                                                    </Box>
+                                                </MenuItem>
+                                            ))}
+                                        </FlatSelect>
+                                    </FormControl>
+                                </Grid>
+                                <Grid item xs={6}>
+                                    <FlatTextField
+                                        fullWidth
+                                        label="Tags (comma separated)"
+                                        name="tags"
+                                        value={formData.tags}
+                                        onChange={handleInputChange}
+                                        placeholder="e.g., premium, outdoor, family-friendly"
+                                        variant="outlined"
+                                    />
+                                </Grid>
+                            </Grid>
 
                             {/* Duration and Max Participants */}
                             <Grid container spacing={3}>
@@ -1258,29 +1405,20 @@ const AdminDashboardPage = () => {
                                 </Grid>
                             </Grid>
 
-                            {/* Tags */}
-                            <FlatTextField
-                                fullWidth
-                                label="Tags (comma separated)"
-                                name="tags"
-                                value={formData.tags}
-                                onChange={handleInputChange}
-                                placeholder="e.g., premium, outdoor, family-friendly"
-                                variant="outlined"
-                            />
-
                             {/* Date and Time Section */}
                             <Typography variant="subtitle1" sx={{ mt: 1, color: '#FF9800', display: 'flex', alignItems: 'center', gap: 1, fontWeight: 600 }}>
                                 <EventIcon sx={{ fontSize: 22 }} /> Event Schedule
                             </Typography>
 
                             <Grid container spacing={3}>
-                                {/* Start Date */}
+                                {/* Start Date - Only future dates (tomorrow and after) */}
                                 <Grid item xs={12} sm={6}>
                                     <DatePicker
                                         label="Start Date"
                                         value={formData.startDate}
                                         onChange={(newValue) => handleDateChange('startDate', newValue)}
+                                        shouldDisableDate={disablePastAndTodayDates}
+                                        minDate={dayjs().add(1, 'day').startOf('day')}
                                         sx={{
                                             width: '100%',
                                             '& .MuiOutlinedInput-root': {
@@ -1338,7 +1476,8 @@ const AdminDashboardPage = () => {
                             </Grid>
 
                             <Typography variant="caption" sx={{ color: '#8A99A8', textAlign: 'center' }}>
-                                ⏰ Time is displayed in 24-hour format (e.g., 14:30 for 2:30 PM)
+                                ⏰ Time is displayed in 24-hour format (e.g., 14:30 for 2:30 PM)<br/>
+                                📅 Only future dates (from tomorrow onwards) can be selected
                             </Typography>
 
                             {/* Image Upload Section */}
