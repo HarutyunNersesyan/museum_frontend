@@ -173,6 +173,17 @@ const FlatSelect = styled(Select)(({ theme }) => ({
     }
 }));
 
+// Styled image for consistent display
+const ServiceImage = styled('img')({
+    maxWidth: '100%',
+    maxHeight: '100%',
+    width: 'auto',
+    height: 'auto',
+    objectFit: 'contain',
+    display: 'block',
+    borderRadius: '12px'
+});
+
 // Armenian cities
 const ARMENIAN_CITIES = [
     { value: 'YEREVAN', label: 'Yerevan', region: 'Central' },
@@ -784,7 +795,7 @@ const AdminDashboardPage = () => {
                                                         border: 'none',
                                                         boxShadow: '0 2px 8px rgba(0, 0, 0, 0.04)',
                                                         transition: 'all 0.3s ease',
-                                                        minHeight: '364px', // 280px * 1.3
+                                                        minHeight: '364px',
                                                         '&:hover': {
                                                             transform: 'translateY(-2px)',
                                                             boxShadow: '0 8px 20px rgba(255, 152, 0, 0.12)'
@@ -793,7 +804,7 @@ const AdminDashboardPage = () => {
                                                         <Grid container sx={{ minHeight: '364px' }}>
                                                             {/* Left side - Information */}
                                                             <Grid item xs={12} md={7}>
-                                                                <Box sx={{ p: '31px' }}> {/* 24px * 1.3 ≈ 31px */}
+                                                                <Box sx={{ p: '31px' }}>
                                                                     <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', mb: '26px' }}>
                                                                         <Typography variant="h5" sx={{ fontWeight: 700, color: '#1A2733', fontSize: '1.8rem' }}>
                                                                             {service.name}
@@ -917,7 +928,7 @@ const AdminDashboardPage = () => {
                                                                 </Box>
                                                             </Grid>
 
-                                                            {/* Right side - Image */}
+                                                            {/* Right side - Image with proper aspect ratio and contain */}
                                                             <Grid item xs={12} md={5}>
                                                                 <Box sx={{
                                                                     height: '100%',
@@ -927,22 +938,26 @@ const AdminDashboardPage = () => {
                                                                     alignItems: 'center',
                                                                     justifyContent: 'center',
                                                                     position: 'relative',
-                                                                    overflow: 'hidden'
+                                                                    overflow: 'hidden',
+                                                                    p: 2
                                                                 }}>
                                                                     {service.imageUrls && service.imageUrls[0] ? (
                                                                         <>
-                                                                            <img
-                                                                                src={service.imageUrls[0]}
-                                                                                alt={service.name}
-                                                                                style={{
-                                                                                    width: '100%',
-                                                                                    height: '100%',
-                                                                                    objectFit: 'cover',
-                                                                                    position: 'absolute',
-                                                                                    top: 0,
-                                                                                    left: 0
-                                                                                }}
-                                                                            />
+                                                                            <Box sx={{
+                                                                                width: '100%',
+                                                                                height: '100%',
+                                                                                display: 'flex',
+                                                                                alignItems: 'center',
+                                                                                justifyContent: 'center',
+                                                                                backgroundColor: '#fafafa',
+                                                                                borderRadius: '12px',
+                                                                                overflow: 'hidden'
+                                                                            }}>
+                                                                                <ServiceImage
+                                                                                    src={service.imageUrls[0]}
+                                                                                    alt={service.name}
+                                                                                />
+                                                                            </Box>
                                                                             {service.imageUrls.length > 1 && (
                                                                                 <Chip
                                                                                     label={`+${service.imageUrls.length - 1} more`}
