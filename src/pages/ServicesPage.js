@@ -1,4 +1,4 @@
-// src/pages/ServicesPage.js - Without cart functionality
+// src/pages/ServicesPage.js - Fixed version
 
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
@@ -35,12 +35,13 @@ import {
     Tooltip,
     Backdrop,
     Paper,
-    Fade,
     Tabs,
     Tab,
     Collapse,
     Slider,
-    Stack
+    Stack,
+    Avatar,
+    GlobalStyles
 } from '@mui/material';
 import {
     Favorite as FavoriteIcon,
@@ -64,7 +65,9 @@ import {
     TrendingUp as TrendingIcon,
     FilterList as FilterIcon,
     Clear as ClearIcon,
-    CalendarToday as CalendarIcon
+    CalendarToday as CalendarIcon,
+    Info as InfoIcon,
+    HowToReg as HowToRegIcon
 } from '@mui/icons-material';
 import { DatePicker } from '@mui/x-date-pickers/DatePicker';
 import { LocalizationProvider } from '@mui/x-date-pickers/LocalizationProvider';
@@ -73,7 +76,6 @@ import dayjs from 'dayjs';
 import { useAuth } from '../context/AuthContext';
 import { serviceAPI } from '../services/serviceAPI';
 import { alpha } from '@mui/material/styles';
-import { isAdmin } from '../utils/jwtUtils';
 
 const formatPriceAMD = (price) => {
     if (!price && price !== 0) return '֏0';
@@ -133,9 +135,32 @@ const CATEGORIES = [
     'DECORATION', 'PHOTOGRAPHY', 'MUSIC', 'VENUE', 'OTHER'
 ];
 
+// Global scrollbar styles
+const scrollbarStyles = {
+    '*::-webkit-scrollbar': {
+        width: '10px',
+        height: '10px',
+    },
+    '*::-webkit-scrollbar-track': {
+        background: '#F5F0E8',
+        borderRadius: '10px',
+    },
+    '*::-webkit-scrollbar-thumb': {
+        background: '#FF6B35',
+        borderRadius: '10px',
+        '&:hover': {
+            background: '#E55A2B',
+        },
+    },
+    '*': {
+        scrollbarColor: '#FF6B35 #F5F0E8',
+        scrollbarWidth: 'thin',
+    },
+};
+
 const ServicesPage = () => {
     const navigate = useNavigate();
-    const { user, logout } = useAuth();
+    const { user, logout, isAdmin } = useAuth(); // isAdmin is a boolean from useAuth
 
     const [services, setServices] = useState([]);
     const [loading, setLoading] = useState(true);
@@ -159,9 +184,7 @@ const ServicesPage = () => {
         severity: 'success'
     });
     const [anchorEl, setAnchorEl] = useState(null);
-    const [userInitial, setUserInitial] = useState('');
     const [backgroundPosition, setBackgroundPosition] = useState({ x: 0, y: 0 });
-    const [userIsAdmin, setUserIsAdmin] = useState(false);
     const [activeTab, setActiveTab] = useState(0);
     const [showAdvancedFilters, setShowAdvancedFilters] = useState(false);
     const [isSearching, setIsSearching] = useState(false);
@@ -180,15 +203,16 @@ const ServicesPage = () => {
     const [startDateFrom, setStartDateFrom] = useState(null);
     const [startDateTo, setStartDateTo] = useState(null);
 
+    // Mouse move effect for animated background
     useEffect(() => {
-        if (user && user.userName) {
-            setUserInitial(user.userName.charAt(0).toUpperCase());
-        }
-        const token = localStorage.getItem('token');
-        if (token) {
-            setUserIsAdmin(isAdmin(token));
-        }
-    }, [user]);
+        const handleMouseMove = (e) => {
+            const x = e.clientX / window.innerWidth;
+            const y = e.clientY / window.innerHeight;
+            setBackgroundPosition({ x, y });
+        };
+        window.addEventListener('mousemove', handleMouseMove);
+        return () => window.removeEventListener('mousemove', handleMouseMove);
+    }, []);
 
     // Load initial data on mount
     useEffect(() => {
@@ -236,23 +260,18 @@ const ServicesPage = () => {
                 sortDirection: 'DESC'
             };
 
-            // Add price filters if provided
             if (minPrice && minPrice !== '') {
                 searchParams.minPrice = parseFloat(minPrice);
             }
             if (maxPrice && maxPrice !== '') {
                 searchParams.maxPrice = parseFloat(maxPrice);
             }
-
-            // Add date filters if provided
             if (startDateFrom) {
                 searchParams.startDateFrom = startDateFrom.format('YYYY-MM-DD');
             }
             if (startDateTo) {
                 searchParams.startDateTo = startDateTo.format('YYYY-MM-DD');
             }
-
-            console.log('Searching with params:', searchParams);
 
             const response = await serviceAPI.searchServices(searchParams);
             setServices(response.data.content);
@@ -307,7 +326,6 @@ const ServicesPage = () => {
         setStartDateTo(null);
         setPage(0);
         setIsSearching(false);
-        // Trigger search after clearing
         setTimeout(() => performSearch(), 100);
     };
 
@@ -403,6 +421,7 @@ const ServicesPage = () => {
     const handleLogout = async () => {
         await logout();
         handleMenuClose();
+        setSnackbar({ open: true, message: 'Logged out successfully!', severity: 'success' });
         navigate('/');
     };
 
@@ -419,6 +438,18 @@ const ServicesPage = () => {
         handleMenuClose();
         navigate('/admin/dashboard');
     };
+
+    const handleHowItWorks = () => {
+        navigate('/');
+        setTimeout(() => {
+            const element = document.getElementById('how-it-works');
+            if (element) {
+                element.scrollIntoView({ behavior: 'smooth' });
+            }
+        }, 100);
+    };
+
+    const userInitial = user?.userName ? user.userName.charAt(0).toUpperCase() : '';
 
     const LoadingSkeleton = () => (
         <Grid container spacing={3}>
@@ -437,7 +468,6 @@ const ServicesPage = () => {
         </Grid>
     );
 
-    // Count active filters
     const activeFiltersCount = [
         searchQuery ? 1 : 0,
         selectedCategory ? 1 : 0,
@@ -463,6 +493,9 @@ const ServicesPage = () => {
                 fontFamily: "'Inter', sans-serif",
                 position: 'relative'
             }}>
+                {/* Global Scrollbar Styles */}
+                <GlobalStyles styles={scrollbarStyles} />
+
                 {/* Animated Background */}
                 <Box sx={{
                     position: 'fixed',
@@ -472,48 +505,41 @@ const ServicesPage = () => {
                     height: '100%',
                     zIndex: 0,
                     background: `
-                        radial-gradient(circle at ${backgroundPosition.x * 100}% ${backgroundPosition.y * 100}%, rgba(255,107,53,0.06) 0%, transparent 50%),
-                        radial-gradient(circle at ${100 - backgroundPosition.x * 100}% ${100 - backgroundPosition.y * 100}%, rgba(255,193,7,0.06) 0%, transparent 50%)
+                        radial-gradient(circle at ${backgroundPosition.x * 100}% ${backgroundPosition.y * 100}%, rgba(255,107,53,0.08) 0%, transparent 50%),
+                        radial-gradient(circle at ${100 - backgroundPosition.x * 100}% ${100 - backgroundPosition.y * 100}%, rgba(255,193,7,0.08) 0%, transparent 50%)
                     `,
                     transition: 'background 0.3s ease-out'
                 }} />
 
-                <style>{`
-                    @keyframes float {
-                        0%, 100% { transform: translateY(0) translateX(0); }
-                        25% { transform: translateY(-10px) translateX(5px); }
-                        50% { transform: translateY(-20px) translateX(-5px); }
-                        75% { transform: translateY(-10px) translateX(5px); }
-                    }
-                    @keyframes pulse {
-                        0%, 100% { opacity: 0.5; transform: scale(1); }
-                        50% { opacity: 0.8; transform: scale(1.05); }
-                    }
-                `}</style>
-
-                {/* Header */}
-                <Box component="header" sx={{
+                {/* Header - Same as HomePage */}
+                <Box sx={{
                     position: 'sticky',
                     top: 0,
-                    zIndex: 1000,
+                    zIndex: 100,
                     backgroundColor: alpha('#FFFFFF', 0.95),
                     backdropFilter: 'blur(10px)',
                     borderBottom: '1px solid rgba(0,0,0,0.08)',
                     boxShadow: '0 2px 20px rgba(0,0,0,0.03)'
                 }}>
-                    <Box sx={{ padding: '0 24px' }}>
+                    <Container maxWidth="xl">
                         <Box sx={{
                             display: 'flex',
                             alignItems: 'center',
                             justifyContent: 'space-between',
-                            height: '70px',
-                            maxWidth: '1400px',
-                            margin: '0 auto'
+                            height: 70,
                         }}>
-                            <Box sx={{ display: 'flex', alignItems: 'center', gap: '12px', cursor: 'pointer' }} onClick={() => navigate('/')}>
+                            <Box
+                                onClick={() => navigate('/')}
+                                sx={{
+                                    display: 'flex',
+                                    alignItems: 'center',
+                                    gap: 1.5,
+                                    cursor: 'pointer'
+                                }}
+                            >
                                 <Box sx={{
-                                    width: '38px',
-                                    height: '38px',
+                                    width: 38,
+                                    height: 38,
                                     borderRadius: '12px',
                                     background: 'linear-gradient(135deg, #FF6B35 0%, #FFB347 100%)',
                                     display: 'flex',
@@ -529,44 +555,107 @@ const ServicesPage = () => {
                                     WebkitTextFillColor: 'transparent',
                                     letterSpacing: '-0.5px'
                                 }}>
-                                    VeilVision
+                                    Festivy
                                 </Typography>
                             </Box>
 
-                            <Box sx={{ display: 'flex', alignItems: 'center', gap: '28px' }}>
-                                <Button onClick={() => navigate('/')} sx={{ fontWeight: 500, color: '#4A4A4A', '&:hover': { color: '#FF6B35' } }}>Home</Button>
-                                <Button onClick={handleAboutClick} sx={{ fontWeight: 500, color: '#4A4A4A', '&:hover': { color: '#FF6B35' } }}>About Us</Button>
-                                <Button onClick={() => navigate('/services')} sx={{ fontWeight: 500, color: '#FF6B35', borderBottom: '2px solid #FF6B35', borderRadius: 0 }}>Services</Button>
-                                {userIsAdmin && (
-                                    <Button onClick={handleAdminPanel} sx={{ fontWeight: 500, color: '#FF9800' }}>Admin</Button>
+                            <Box sx={{ display: { xs: 'none', md: 'flex' }, alignItems: 'center', gap: 3 }}>
+                                <Button
+                                    startIcon={<InfoIcon />}
+                                    sx={{ fontWeight: 500, color: '#4A4A4A', '&:hover': { color: '#FF6B35' } }}
+                                    onClick={handleAboutClick}
+                                >
+                                    About Us
+                                </Button>
+                                <Button
+                                    startIcon={<HowToRegIcon />}
+                                    sx={{ fontWeight: 500, color: '#4A4A4A', '&:hover': { color: '#FF6B35' } }}
+                                    onClick={handleHowItWorks}
+                                >
+                                    How It Works
+                                </Button>
+                                <Button
+                                    startIcon={<CelebrationIcon />}
+                                    sx={{ fontWeight: 500, color: '#FF6B35', borderBottom: '2px solid #FF6B35', borderRadius: 0 }}
+                                    onClick={() => navigate('/services')}
+                                >
+                                    Services
+                                </Button>
+                            </Box>
+
+                            <Box sx={{ display: 'flex', alignItems: 'center', gap: 2 }}>
+                                {user ? (
+                                    <>
+                                        <Chip
+                                            label={`Welcome, ${user.userName}`}
+                                            size="small"
+                                            sx={{
+                                                display: { xs: 'none', sm: 'flex' },
+                                                bgcolor: alpha('#FF6B35', 0.1),
+                                                color: '#FF6B35',
+                                                border: `1px solid ${alpha('#FF6B35', 0.2)}`
+                                            }}
+                                        />
+                                        <IconButton
+                                            onClick={handleMenuOpen}
+                                            sx={{
+                                                background: 'linear-gradient(135deg, #FF6B35 0%, #FFB347 100%)',
+                                                width: 38,
+                                                height: 38,
+                                                '&:hover': { transform: 'scale(1.05)' }
+                                            }}
+                                        >
+                                            <Avatar sx={{ width: 38, height: 38, bgcolor: 'transparent', color: 'white' }}>
+                                                {userInitial || <AccountCircleIcon />}
+                                            </Avatar>
+                                        </IconButton>
+                                        <Menu
+                                            anchorEl={anchorEl}
+                                            open={Boolean(anchorEl)}
+                                            onClose={handleMenuClose}
+                                            PaperProps={{
+                                                sx: {
+                                                    bgcolor: '#FFFFFF',
+                                                    color: '#1A1A1A',
+                                                    border: '1px solid #E0E0E0',
+                                                    minWidth: 200,
+                                                    borderRadius: '16px',
+                                                    boxShadow: '0 4px 20px rgba(0,0,0,0.1)'
+                                                }
+                                            }}
+                                        >
+                                            <MenuItem onClick={handleProfile}><PersonIcon sx={{ mr: 2, fontSize: 20, color: '#FF6B35' }} />Profile</MenuItem>
+                                            {isAdmin && (
+                                                <MenuItem onClick={handleAdminPanel}><AdminIcon sx={{ mr: 2, fontSize: 20, color: '#FF9800' }} />Admin Panel</MenuItem>
+                                            )}
+                                            <Divider />
+                                            <MenuItem onClick={handleLogout}><LogoutIcon sx={{ mr: 2, fontSize: 20, color: '#FF6B35' }} />Logout</MenuItem>
+                                        </Menu>
+                                    </>
+                                ) : (
+                                    <>
+                                        <Button sx={{ fontWeight: 500, color: '#4A4A4A', '&:hover': { color: '#FF6B35' } }} onClick={() => navigate('/login')}>
+                                            Sign In
+                                        </Button>
+                                        <Button
+                                            variant="contained"
+                                            sx={{
+                                                fontWeight: 600,
+                                                borderRadius: '12px',
+                                                background: 'linear-gradient(135deg, #FF6B35 0%, #FFB347 100%)',
+                                                boxShadow: '0 4px 12px rgba(255,107,53,0.25)',
+                                                '&:hover': { transform: 'translateY(-2px)', boxShadow: '0 6px 16px rgba(255,107,53,0.35)' }
+                                            }}
+                                            onClick={() => navigate('/signup')}
+                                        >
+                                            Get Started
+                                        </Button>
+                                    </>
                                 )}
                             </Box>
-
-                            <Box sx={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
-                                <IconButton onClick={handleMenuOpen} sx={{
-                                    background: 'linear-gradient(135deg, #FF6B35 0%, #FFB347 100%)',
-                                    width: '38px',
-                                    height: '38px',
-                                    '&:hover': { transform: 'scale(1.05)' }
-                                }}>
-                                    {userInitial ? <Typography sx={{ fontWeight: 600, color: 'white' }}>{userInitial}</Typography> : <AccountCircleIcon sx={{ color: 'white' }} />}
-                                </IconButton>
-                            </Box>
                         </Box>
-                    </Box>
+                    </Container>
                 </Box>
-
-                {/* User Menu */}
-                <Menu anchorEl={anchorEl} open={Boolean(anchorEl)} onClose={handleMenuClose}
-                      PaperProps={{ sx: { bgcolor: '#FFFFFF', color: '#1A1A1A', border: '1px solid #E0E0E0', minWidth: 200, borderRadius: '16px', boxShadow: '0 4px 20px rgba(0,0,0,0.1)' } }}>
-                    <MenuItem onClick={handleProfile}><PersonIcon sx={{ mr: 2, fontSize: 20, color: '#FF6B35' }} />Profile</MenuItem>
-                    <MenuItem onClick={() => navigate('/services')}><CelebrationIcon sx={{ mr: 2, fontSize: 20, color: '#FF6B35' }} />Services</MenuItem>
-                    {userIsAdmin && (
-                        <MenuItem onClick={handleAdminPanel}><AdminIcon sx={{ mr: 2, fontSize: 20, color: '#FF9800' }} />Admin Panel</MenuItem>
-                    )}
-                    <Divider sx={{ borderColor: '#F0E8E0' }} />
-                    <MenuItem onClick={handleLogout}><LogoutIcon sx={{ mr: 2, fontSize: 20, color: '#FF6B35' }} />Logout</MenuItem>
-                </Menu>
 
                 {/* Main Content */}
                 <Container maxWidth="xl" sx={{ position: 'relative', zIndex: 1, py: 5 }}>
@@ -620,7 +709,6 @@ const ServicesPage = () => {
                         boxShadow: '0 4px 20px rgba(0,0,0,0.04)',
                         border: '1px solid #F0E8E0'
                     }}>
-                        {/* Basic Search Row */}
                         <Grid container spacing={2} alignItems="center">
                             <Grid item xs={12} md={4}>
                                 <TextField
@@ -628,6 +716,7 @@ const ServicesPage = () => {
                                     placeholder="Search services..."
                                     value={searchQuery}
                                     onChange={(e) => setSearchQuery(e.target.value)}
+                                    onKeyPress={(e) => e.key === 'Enter' && handleSearch()}
                                     InputProps={{
                                         startAdornment: <InputAdornment position="start"><SearchIcon sx={{ color: '#B0B0B0' }} /></InputAdornment>,
                                         sx: { borderRadius: '16px' }
@@ -705,14 +794,12 @@ const ServicesPage = () => {
                             </Grid>
                         </Grid>
 
-                        {/* Advanced Filters - Collapsible */}
+                        {/* Advanced Filters */}
                         <Collapse in={showAdvancedFilters}>
                             <Box sx={{ mt: 3, pt: 3, borderTop: '1px solid #F0E8E0' }}>
                                 <Typography variant="subtitle1" sx={{ fontWeight: 600, mb: 2, display: 'flex', alignItems: 'center', gap: 1 }}>
                                     <PriceIcon sx={{ color: '#FF6B35' }} /> Price Range
                                 </Typography>
-
-                                {/* Price Range Slider */}
                                 <Box sx={{ px: 2, mb: 3 }}>
                                     <Slider
                                         value={priceRange}
@@ -765,8 +852,6 @@ const ServicesPage = () => {
                                 <Typography variant="subtitle1" sx={{ fontWeight: 600, mb: 2, display: 'flex', alignItems: 'center', gap: 1 }}>
                                     <CalendarIcon sx={{ color: '#FF6B35' }} /> Event Date
                                 </Typography>
-
-                                {/* Date Range Filters */}
                                 <Grid container spacing={2} sx={{ mb: 3 }}>
                                     <Grid item xs={12} sm={6}>
                                         <DatePicker
@@ -798,7 +883,6 @@ const ServicesPage = () => {
                                     </Grid>
                                 </Grid>
 
-                                {/* Clear Filters Button */}
                                 {activeFiltersCount > 0 && (
                                     <Box sx={{ display: 'flex', justifyContent: 'flex-end', mt: 2 }}>
                                         <Button

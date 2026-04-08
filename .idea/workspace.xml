@@ -6,8 +6,10 @@
   <component name="ChangeListManager">
     <list default="true" id="52f9de53-701b-4b52-b101-40303d7b40ec" name="Changes" comment="">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/pages/LoginPage.js" beforeDir="false" afterPath="$PROJECT_DIR$/src/pages/LoginPage.js" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/pages/SignUpPage.js" beforeDir="false" afterPath="$PROJECT_DIR$/src/pages/SignUpPage.js" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/pages/HomePage.js" beforeDir="false" afterPath="$PROJECT_DIR$/src/pages/HomePage.js" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/pages/ProfilePage.js" beforeDir="false" afterPath="$PROJECT_DIR$/src/pages/ProfilePage.js" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/pages/ServicesPage.js" beforeDir="false" afterPath="$PROJECT_DIR$/src/pages/ServicesPage.js" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/pages/VerifyCodePage.js" beforeDir="false" afterPath="$PROJECT_DIR$/src/pages/VerifyCodePage.js" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -155,7 +157,7 @@
       <workItem from="1775465287673" duration="4785000" />
       <workItem from="1775472046108" duration="3443000" />
       <workItem from="1775567169323" duration="8170000" />
-      <workItem from="1775630632404" duration="1286000" />
+      <workItem from="1775630632404" duration="7525000" />
     </task>
     <task id="LOCAL-00001" summary="first commit">
       <created>1765462776214</created>
@@ -402,7 +404,14 @@
       <option name="project" value="LOCAL" />
       <updated>1775575017286</updated>
     </task>
-    <option name="localTasksCounter" value="36" />
+    <task id="LOCAL-00036" summary="Bugs fix.">
+      <created>1775632187108</created>
+      <option name="number" value="00036" />
+      <option name="presentableId" value="LOCAL-00036" />
+      <option name="project" value="LOCAL" />
+      <updated>1775632187108</updated>
+    </task>
+    <option name="localTasksCounter" value="37" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -422,6 +431,7 @@
     <MESSAGE value="Bugs fixes." />
     <MESSAGE value="Created Profile page." />
     <MESSAGE value="Bugs fixe." />
-    <option name="LAST_COMMIT_MESSAGE" value="Bugs fixe." />
+    <MESSAGE value="Bugs fix." />
+    <option name="LAST_COMMIT_MESSAGE" value="Bugs fix." />
   </component>
 </project>

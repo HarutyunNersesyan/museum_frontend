@@ -8,14 +8,45 @@ import {
     Alert,
     Fade,
     CircularProgress,
-    Backdrop
+    Backdrop,
+    Paper,
+    useMediaQuery,
+    useTheme,
+    GlobalStyles
 } from '@mui/material';
+import {
+    MarkEmailRead,
+    Refresh
+} from '@mui/icons-material';
 import { useAuth } from '../context/AuthContext';
+import { alpha, keyframes } from '@mui/material/styles';
 
-const VerifyCodePage = () => {
+const scrollbarStyles = {
+    '*::-webkit-scrollbar': {
+        width: '8px',
+    },
+    '*::-webkit-scrollbar-track': {
+        background: '#F5F0E8',
+        borderRadius: '10px',
+    },
+    '*::-webkit-scrollbar-thumb': {
+        background: '#FF6B35',
+        borderRadius: '10px',
+        '&:hover': { background: '#E55A2B' },
+    },
+};
+
+const pulse = keyframes`
+    0%, 100% { opacity: 0.6; transform: scale(1); }
+    50% { opacity: 1; transform: scale(1.05); }
+`;
+
+const VerifyCodePage = ({ isModal = false, onClose, email: propEmail }) => {
     const navigate = useNavigate();
     const location = useLocation();
     const { verifyEmail } = useAuth();
+    const theme = useTheme();
+    const isMobile = useMediaQuery(theme.breakpoints.down('md'));
 
     const [pin, setPin] = useState(['', '', '', '', '', '']);
     const [loading, setLoading] = useState(false);
@@ -26,9 +57,21 @@ const VerifyCodePage = () => {
     const [resendAttempts, setResendAttempts] = useState(0); // Track resend attempts
     const MAX_RESEND_ATTEMPTS = 3;
     const [isAutoResending, setIsAutoResending] = useState(false);
+    const [backgroundPosition, setBackgroundPosition] = useState({ x: 0, y: 0 });
 
-    // Get email from location state or localStorage
-    const email = location.state?.email || localStorage.getItem('verificationEmail') || '';
+    // Get email from props, location state or localStorage
+    const email = propEmail || location.state?.email || localStorage.getItem('verificationEmail') || '';
+
+    // Mouse move effect for background
+    useEffect(() => {
+        const handleMouseMove = (e) => {
+            const x = e.clientX / window.innerWidth;
+            const y = e.clientY / window.innerHeight;
+            setBackgroundPosition({ x, y });
+        };
+        window.addEventListener('mousemove', handleMouseMove);
+        return () => window.removeEventListener('mousemove', handleMouseMove);
+    }, []);
 
     // Load saved resend attempts from localStorage
     useEffect(() => {
@@ -47,9 +90,9 @@ const VerifyCodePage = () => {
     }, [email]);
 
     useEffect(() => {
-        if (!email) {
+        if (!email && !isModal) {
             navigate('/signup');
-        } else {
+        } else if (email) {
             localStorage.setItem('verificationEmail', email);
         }
 
@@ -85,6 +128,9 @@ const VerifyCodePage = () => {
 
         // Auto redirect to signup after 2 seconds
         setTimeout(() => {
+            if (isModal && onClose) {
+                onClose();
+            }
             navigate('/signup', {
                 state: {
                     message: 'Maximum verification attempts reached. Please sign up again.'
@@ -201,6 +247,9 @@ const VerifyCodePage = () => {
 
                 // Redirect to login after delay
                 setTimeout(() => {
+                    if (isModal && onClose) {
+                        onClose();
+                    }
                     navigate('/login', {
                         state: {
                             message: 'Email verified successfully! Please login.',
@@ -255,345 +304,394 @@ const VerifyCodePage = () => {
         }
     };
 
-    const handleBackToSignup = () => {
-        // Clear stored data
-        localStorage.removeItem('verificationEmail');
-        localStorage.removeItem(`resendAttempts_${email}`);
-        navigate('/signup');
-    };
-
-    if (!email) {
+    if (!email && !isModal) {
         return (
             <Box sx={{
                 minHeight: '100vh',
                 display: 'flex',
                 alignItems: 'center',
                 justifyContent: 'center',
-                background: '#0A0A0A'
+                background: 'linear-gradient(135deg, #FFF9F0 0%, #F5F0E8 100%)'
             }}>
-                <CircularProgress />
+                <CircularProgress sx={{ color: '#FF6B35' }} />
             </Box>
         );
     }
 
-    return (
-        <Box sx={{
-            minHeight: '100vh',
-            display: 'flex',
-            alignItems: 'center',
-            justifyContent: 'center',
-            background: '#0A0A0A',
-            fontFamily: "'Inter', sans-serif",
-            padding: '20px'
-        }}>
-            {/* Backdrop for loading */}
-            <Backdrop
-                sx={{ color: '#fff', zIndex: (theme) => theme.zIndex.drawer + 1 }}
-                open={loading || isAutoResending}
-            >
-                <CircularProgress color="inherit" />
-            </Backdrop>
-
-            {/* VerifyEmail Block */}
-            <Box sx={{
-                width: '100%',
-                maxWidth: '500px',
-                background: '#121212',
-                borderRadius: '16px',
-                padding: { xs: '30px 20px', sm: '40px 30px', md: '50px 40px' },
-                boxShadow: '0 8px 32px rgba(0, 0, 0, 0.4)',
+    // Content for modal or standalone page
+    const content = (
+        <>
+            <GlobalStyles styles={scrollbarStyles} />
+            <Box sx={isModal ? {} : {
+                minHeight: '100vh',
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+                background: 'linear-gradient(135deg, #FFF9F0 0%, #F5F0E8 100%)',
+                fontFamily: "'Inter', sans-serif",
+                padding: '20px',
                 position: 'relative',
-                border: '1px solid #2A2A2A'
+                '&::before': {
+                    content: '""',
+                    position: 'absolute',
+                    width: '100%',
+                    height: '100%',
+                    background: `radial-gradient(circle at ${backgroundPosition.x * 100}% ${backgroundPosition.y * 100}%, rgba(255,107,53,0.03) 0%, transparent 50%)`,
+                    pointerEvents: 'none'
+                }
             }}>
-                {/* Close button */}
-                <Box
-                    onClick={handleBackToSignup}
-                    sx={{
-                        position: 'absolute',
-                        top: '20px',
-                        right: '20px',
-                        width: '32px',
-                        height: '32px',
-                        display: 'flex',
-                        alignItems: 'center',
-                        justifyContent: 'center',
-                        borderRadius: '50%',
-                        background: '#1A1A1A',
-                        cursor: 'pointer',
-                        border: '1px solid #2A2A2A',
-                        '&:hover': {
-                            background: '#2A2A2A',
-                            borderColor: '#4ADE80'
-                        }
-                    }}
+                {/* Backdrop for loading */}
+                <Backdrop
+                    sx={{ color: '#fff', zIndex: (theme) => theme.zIndex.drawer + 1 }}
+                    open={loading || isAutoResending}
                 >
-                    <Typography sx={{
-                        color: '#9CA3AF',
-                        fontSize: '20px',
-                        fontWeight: 300,
-                        lineHeight: 1,
-                        '&:hover': {
-                            color: '#4ADE80'
-                        }
-                    }}>
-                        ×
-                    </Typography>
-                </Box>
+                    <CircularProgress sx={{ color: '#FF6B35' }} />
+                </Backdrop>
 
-                {/* Header */}
-                <Typography variant="h4" sx={{
-                    fontSize: { xs: '28px', sm: '32px', md: '36px' },
-                    fontWeight: 700,
-                    color: '#F3F4F6',
-                    marginBottom: '8px',
-                    textAlign: 'center'
-                }}>
-                    Verify Your Email
-                </Typography>
-
-                <Typography sx={{
-                    fontSize: '16px',
-                    color: '#9CA3AF',
-                    marginBottom: '30px',
-                    textAlign: 'center'
-                }}>
-                    Enter the 6-digit code sent to
-                    <br />
-                    <Typography component="span" sx={{
-                        color: '#4ADE80',
-                        fontWeight: 600,
-                        textShadow: '0 0 10px rgba(74, 222, 128, 0.3)'
-                    }}>
-                        {email}
-                    </Typography>
-                </Typography>
-
-                {/* Attempts counter and auto-resend info */}
+                {/* VerifyEmail Block */}
                 <Box sx={{
-                    display: 'flex',
-                    flexDirection: 'column',
-                    alignItems: 'center',
-                    gap: '8px',
-                    marginBottom: '20px'
+                    width: '100%',
+                    maxWidth: isModal ? '100%' : '520px',
+                    margin: isModal ? 0 : '0 auto',
+                    position: 'relative',
+                    background: isModal ? 'transparent' : 'linear-gradient(135deg, #FFF9F0 0%, #F5F0E8 100%)',
+                    borderRadius: isModal ? 0 : '32px',
+                    overflow: 'hidden',
+                    fontFamily: 'Inter, sans-serif'
                 }}>
-                    <Typography sx={{
-                        color: '#9CA3AF',
-                        fontSize: '14px',
-                        padding: '4px 12px',
-                        background: '#1A1A1A',
-                        borderRadius: '16px',
-                        border: '1px solid #2A2A2A'
-                    }}>
-                        Attempts: {resendAttempts}/{MAX_RESEND_ATTEMPTS}
-                    </Typography>
-
-                    {resendAttempts < MAX_RESEND_ATTEMPTS && countdown > 0 && (
-                        <Typography sx={{
-                            color: '#4ADE80',
-                            fontSize: '13px',
-                            fontStyle: 'italic',
-                            textShadow: '0 0 8px rgba(74, 222, 128, 0.3)'
+                    <Box sx={{ position: 'relative', zIndex: 2 }}>
+                        <Paper elevation={0} sx={{
+                            borderRadius: isModal ? 0 : '32px',
+                            background: alpha('#FFFFFF', 0.95),
+                            backdropFilter: 'blur(10px)',
+                            boxShadow: isModal ? 'none' : '0 20px 40px rgba(0,0,0,0.08)',
+                            border: isModal ? 'none' : '1px solid rgba(255,107,53,0.15)',
+                            overflow: 'hidden',
+                            padding: isModal ? '0' : { xs: '30px 20px', sm: '40px 30px', md: '50px 40px' }
                         }}>
-                            Next code will be sent automatically in {Math.floor(countdown / 60)}:{String(countdown % 60).padStart(2, '0')}
-                        </Typography>
-                    )}
-                </Box>
+                            {/* Header with logo */}
+                            <Box sx={{
+                                textAlign: 'center',
+                                mb: 3
+                            }}>
+                                <Box sx={{
+                                    display: 'inline-flex',
+                                    alignItems: 'center',
+                                    gap: 1.5,
+                                    mb: 2
+                                }}>
+                                    <Box sx={{
+                                        width: 42,
+                                        height: 42,
+                                        borderRadius: '12px',
+                                        background: 'linear-gradient(135deg, #FF6B35 0%, #FFB347 100%)',
+                                        display: 'flex',
+                                        alignItems: 'center',
+                                        justifyContent: 'center',
+                                        animation: `${pulse} 2s ease-in-out infinite`
+                                    }}>
+                                        <MarkEmailRead sx={{ color: 'white', fontSize: 24 }} />
+                                    </Box>
+                                    <Typography variant="h5" sx={{
+                                        fontWeight: 800,
+                                        background: 'linear-gradient(135deg, #FF6B35 0%, #FFB347 100%)',
+                                        WebkitBackgroundClip: 'text',
+                                        WebkitTextFillColor: 'transparent',
+                                        letterSpacing: '-0.5px'
+                                    }}>
+                                        Festivy
+                                    </Typography>
+                                </Box>
+                                <Typography variant="h4" sx={{
+                                    fontSize: { xs: '28px', sm: '32px' },
+                                    fontWeight: 700,
+                                    color: '#2C2C2C',
+                                    mb: 1
+                                }}>
+                                    Verify Your Email
+                                </Typography>
+                                <Typography sx={{
+                                    color: '#6B6B6B',
+                                    fontSize: '14px',
+                                    mb: 2
+                                }}>
+                                    Enter the 6-digit code sent to
+                                </Typography>
+                                <Typography sx={{
+                                    color: '#FF6B35',
+                                    fontSize: '15px',
+                                    fontWeight: 600,
+                                    mb: 2,
+                                    padding: '6px 16px',
+                                    background: alpha('#FF6B35', 0.05),
+                                    borderRadius: '20px',
+                                    display: 'inline-block'
+                                }}>
+                                    {email}
+                                </Typography>
+                                <Box sx={{
+                                    width: 50,
+                                    height: 3,
+                                    background: 'linear-gradient(90deg, #FF6B35, #FFB347)',
+                                    borderRadius: 2,
+                                    mx: 'auto',
+                                    mt: 1
+                                }} />
+                            </Box>
 
-                {/* Alerts */}
-                {error && (
-                    <Fade in={!!error}>
-                        <Alert
-                            severity="error"
-                            sx={{
-                                marginBottom: '20px',
-                                borderRadius: '8px',
-                                fontSize: '14px',
-                                padding: '8px 16px',
-                                backgroundColor: 'rgba(239, 68, 68, 0.1)',
-                                color: '#FCA5A5',
-                                border: '1px solid rgba(239, 68, 68, 0.3)',
-                                '& .MuiAlert-icon': {
-                                    color: '#EF4444'
-                                }
-                            }}
-                        >
-                            {error}
-                        </Alert>
-                    </Fade>
-                )}
+                            {/* Attempts counter and auto-resend info */}
+                            <Box sx={{
+                                display: 'flex',
+                                flexDirection: 'column',
+                                alignItems: 'center',
+                                gap: '8px',
+                                marginBottom: '24px'
+                            }}>
+                                <Typography sx={{
+                                    color: '#6B6B6B',
+                                    fontSize: '13px',
+                                    padding: '4px 16px',
+                                    background: alpha('#FF6B35', 0.05),
+                                    borderRadius: '20px',
+                                    border: '1px solid rgba(255,107,53,0.15)',
+                                    fontWeight: 500
+                                }}>
+                                    Attempts: <span style={{ color: '#FF6B35', fontWeight: 700 }}>{resendAttempts}</span>/{MAX_RESEND_ATTEMPTS}
+                                </Typography>
 
-                {success && (
-                    <Fade in={!!success}>
-                        <Alert
-                            severity="success"
-                            sx={{
-                                marginBottom: '20px',
-                                borderRadius: '8px',
-                                fontSize: '14px',
-                                padding: '8px 16px',
-                                backgroundColor: 'rgba(74, 222, 128, 0.1)',
-                                color: '#4ADE80',
-                                border: '1px solid rgba(74, 222, 128, 0.3)',
-                                '& .MuiAlert-icon': {
-                                    color: '#4ADE80'
-                                }
-                            }}
-                        >
-                            {success}
-                        </Alert>
-                    </Fade>
-                )}
+                                {resendAttempts < MAX_RESEND_ATTEMPTS && countdown > 0 && (
+                                    <Typography sx={{
+                                        color: '#FF6B35',
+                                        fontSize: '13px',
+                                        fontStyle: 'italic',
+                                        fontWeight: 500,
+                                        animation: `${pulse} 2s ease-in-out infinite`
+                                    }}>
+                                        Next code will be sent automatically in {Math.floor(countdown / 60)}:{String(countdown % 60).padStart(2, '0')}
+                                    </Typography>
+                                )}
+                            </Box>
 
-                {/* PIN Input Form */}
-                <Box component="form" onSubmit={handleSubmit} sx={{
-                    display: 'flex',
-                    flexDirection: 'column',
-                    gap: '24px'
-                }}>
-                    {/* PIN Inputs */}
-                    <Box sx={{
-                        display: 'flex',
-                        justifyContent: 'center',
-                        gap: '12px',
-                        marginBottom: '10px'
-                    }}>
-                        {pin.map((digit, index) => (
-                            <TextField
-                                key={index}
-                                id={`pin-input-${index}`}
-                                type="text"
-                                inputMode="numeric"
-                                value={digit}
-                                onChange={(e) => handlePinChange(index, e.target.value)}
-                                onKeyDown={(e) => handleKeyDown(index, e)}
-                                onPaste={index === 0 ? handlePaste : undefined}
-                                disabled={resendAttempts >= MAX_RESEND_ATTEMPTS}
-                                inputProps={{
-                                    maxLength: 1,
-                                    style: {
-                                        textAlign: 'center',
-                                        fontSize: '24px',
-                                        fontWeight: 600,
-                                        padding: '12px',
-                                        color: '#4ADE80'
-                                    }
-                                }}
-                                sx={{
-                                    width: '56px',
-                                    height: '56px',
-                                    '& .MuiOutlinedInput-root': {
-                                        background: '#1A1A1A',
-                                        borderRadius: '8px',
-                                        border: '1px solid #2A2A2A',
-                                        '&:hover .MuiOutlinedInput-notchedOutline': {
-                                            borderColor: '#4ADE80',
-                                        },
-                                        '&.Mui-focused .MuiOutlinedInput-notchedOutline': {
-                                            borderColor: '#4ADE80',
-                                            borderWidth: '2px',
-                                            boxShadow: '0 0 10px rgba(74, 222, 128, 0.3)'
-                                        }
-                                    }
-                                }}
-                            />
-                        ))}
-                    </Box>
-
-                    {/* Submit Button */}
-                    <Button
-                        type="submit"
-                        variant="contained"
-                        disabled={loading || pin.join('').length !== 6 || resendAttempts >= MAX_RESEND_ATTEMPTS}
-                        sx={{
-                            background: 'linear-gradient(90deg, #22C55E 0%, #4ADE80 100%)',
-                            color: '#FFFFFF',
-                            padding: '12px',
-                            borderRadius: '8px',
-                            fontSize: '16px',
-                            fontWeight: 700,
-                            textTransform: 'none',
-                            height: '48px',
-                            boxShadow: '0 4px 15px rgba(74, 222, 128, 0.3)',
-                            '&:hover': {
-                                background: 'linear-gradient(90deg, #16A34A 0%, #22C55E 100%)',
-                                boxShadow: '0 6px 20px rgba(74, 222, 128, 0.4)',
-                            },
-                            '&:disabled': {
-                                background: '#374151',
-                                color: '#9CA3AF',
-                                boxShadow: 'none'
-                            }
-                        }}
-                    >
-                        {loading ? (
-                            <CircularProgress size={24} sx={{ color: '#FFFFFF' }} />
-                        ) : (
-                            'Verify Email'
-                        )}
-                    </Button>
-
-                    {/* Manual Resend Button */}
-                    <Box sx={{
-                        display: 'flex',
-                        flexDirection: 'column',
-                        alignItems: 'center',
-                        gap: '12px',
-                        marginTop: '10px'
-                    }}>
-                        <Button
-                            onClick={handleManualResendCode}
-                            disabled={resendLoading || resendAttempts >= MAX_RESEND_ATTEMPTS}
-                            sx={{
-                                color: '#4ADE80',
-                                textTransform: 'none',
-                                fontSize: '14px',
-                                fontWeight: 600,
-                                padding: '4px 12px',
-                                border: '1px solid rgba(74, 222, 128, 0.3)',
-                                borderRadius: '20px',
-                                '&:hover': {
-                                    backgroundColor: 'rgba(74, 222, 128, 0.1)',
-                                    borderColor: '#4ADE80',
-                                },
-                                '&:disabled': {
-                                    color: '#6B7280',
-                                    borderColor: '#374151'
-                                }
-                            }}
-                        >
-                            {resendLoading ? (
-                                <CircularProgress size={16} sx={{ color: '#4ADE80' }} />
-                            ) : resendAttempts >= MAX_RESEND_ATTEMPTS ? (
-                                'Max attempts reached'
-                            ) : (
-                                'Manual Resend'
+                            {/* Alerts */}
+                            {error && (
+                                <Fade in={!!error}>
+                                    <Alert
+                                        severity="error"
+                                        sx={{
+                                            marginBottom: '20px',
+                                            borderRadius: '16px',
+                                            fontSize: '13px',
+                                            padding: '8px 16px',
+                                            bgcolor: alpha('#D32F2F', 0.05),
+                                            color: '#D32F2F',
+                                            border: '1px solid rgba(211, 47, 47, 0.15)',
+                                            '& .MuiAlert-icon': {
+                                                color: '#D32F2F'
+                                            }
+                                        }}
+                                    >
+                                        {error}
+                                    </Alert>
+                                </Fade>
                             )}
-                        </Button>
-                    </Box>
-                </Box>
 
-                {/* Info Message */}
-                <Box sx={{
-                    marginTop: '30px',
-                    padding: '16px',
-                    background: 'rgba(74, 222, 128, 0.05)',
-                    borderRadius: '8px',
-                    borderLeft: '4px solid #4ADE80',
-                    border: '1px solid rgba(74, 222, 128, 0.2)'
-                }}>
-                    <Typography sx={{
-                        color: '#D1D5DB',
-                        fontSize: '13px',
-                        lineHeight: 1.5
-                    }}>
-                        <strong style={{ color: '#4ADE80' }}>Auto-Resend Active:</strong> A new code will be automatically sent every 2 minutes.
-                        You have <span style={{ color: '#4ADE80', fontWeight: 600 }}>{MAX_RESEND_ATTEMPTS - resendAttempts}</span> attempts remaining.
-                        {resendAttempts === MAX_RESEND_ATTEMPTS - 1 && ' This is your last attempt!'}
-                    </Typography>
+                            {success && (
+                                <Fade in={!!success}>
+                                    <Alert
+                                        severity="success"
+                                        sx={{
+                                            marginBottom: '20px',
+                                            borderRadius: '16px',
+                                            fontSize: '13px',
+                                            padding: '8px 16px',
+                                            bgcolor: alpha('#4CAF50', 0.05),
+                                            color: '#2E7D32',
+                                            border: '1px solid rgba(46, 125, 50, 0.15)',
+                                            '& .MuiAlert-icon': {
+                                                color: '#2E7D32'
+                                            }
+                                        }}
+                                    >
+                                        {success}
+                                    </Alert>
+                                </Fade>
+                            )}
+
+                            {/* PIN Input Form */}
+                            <Box component="form" onSubmit={handleSubmit} sx={{
+                                display: 'flex',
+                                flexDirection: 'column',
+                                gap: '24px'
+                            }}>
+                                {/* PIN Inputs */}
+                                <Box sx={{
+                                    display: 'flex',
+                                    justifyContent: 'center',
+                                    gap: { xs: '8px', sm: '12px' },
+                                    marginBottom: '10px'
+                                }}>
+                                    {pin.map((digit, index) => (
+                                        <TextField
+                                            key={index}
+                                            id={`pin-input-${index}`}
+                                            type="text"
+                                            inputMode="numeric"
+                                            value={digit}
+                                            onChange={(e) => handlePinChange(index, e.target.value)}
+                                            onKeyDown={(e) => handleKeyDown(index, e)}
+                                            onPaste={index === 0 ? handlePaste : undefined}
+                                            disabled={resendAttempts >= MAX_RESEND_ATTEMPTS}
+                                            inputProps={{
+                                                maxLength: 1,
+                                                style: {
+                                                    textAlign: 'center',
+                                                    fontSize: '24px',
+                                                    fontWeight: 600,
+                                                    padding: '12px',
+                                                    color: '#FF6B35'
+                                                }
+                                            }}
+                                            sx={{
+                                                width: { xs: '45px', sm: '56px' },
+                                                height: { xs: '45px', sm: '56px' },
+                                                '& .MuiOutlinedInput-root': {
+                                                    background: '#FAFAFA',
+                                                    borderRadius: '12px',
+                                                    '& fieldset': {
+                                                        borderColor: 'rgba(255,107,53,0.15)',
+                                                        borderWidth: '1px',
+                                                    },
+                                                    '&:hover fieldset': {
+                                                        borderColor: '#FFB347 !important',
+                                                    },
+                                                    '&.Mui-focused fieldset': {
+                                                        borderColor: '#FF6B35 !important',
+                                                        borderWidth: '2px',
+                                                    },
+                                                    '&.Mui-focused': {
+                                                        boxShadow: '0 0 10px rgba(255,107,53,0.15)',
+                                                    }
+                                                },
+                                                '& .MuiOutlinedInput-notchedOutline': {
+                                                    borderColor: 'rgba(255,107,53,0.15)',
+                                                },
+                                                '&:hover .MuiOutlinedInput-notchedOutline': {
+                                                    borderColor: '#FFB347',
+                                                },
+                                                '& .Mui-focused .MuiOutlinedInput-notchedOutline': {
+                                                    borderColor: '#FF6B35',
+                                                }
+                                            }}
+                                        />
+                                    ))}
+                                </Box>
+
+                                {/* Submit Button */}
+                                <Button
+                                    type="submit"
+                                    variant="contained"
+                                    disabled={loading || pin.join('').length !== 6 || resendAttempts >= MAX_RESEND_ATTEMPTS}
+                                    sx={{
+                                        background: 'linear-gradient(135deg, #FF6B35 0%, #FFB347 100%)',
+                                        color: '#FFFFFF',
+                                        padding: '12px',
+                                        borderRadius: '12px',
+                                        fontSize: '16px',
+                                        fontWeight: 700,
+                                        textTransform: 'none',
+                                        height: '48px',
+                                        boxShadow: '0 4px 12px rgba(255,107,53,0.25)',
+                                        '&:hover': {
+                                            transform: 'translateY(-2px)',
+                                            boxShadow: '0 6px 16px rgba(255,107,53,0.35)',
+                                            background: 'linear-gradient(135deg, #E55A2B 0%, #FFA040 100%)'
+                                        },
+                                        '&:disabled': {
+                                            background: '#E0E0E0',
+                                            color: '#9E9E9E',
+                                            boxShadow: 'none',
+                                            transform: 'none'
+                                        },
+                                        transition: 'all 0.3s'
+                                    }}
+                                >
+                                    {loading ? (
+                                        <CircularProgress size={24} sx={{ color: '#FFFFFF' }} />
+                                    ) : (
+                                        'Verify Email'
+                                    )}
+                                </Button>
+
+                                {/* Manual Resend Button */}
+                                <Box sx={{
+                                    display: 'flex',
+                                    flexDirection: 'column',
+                                    alignItems: 'center',
+                                    gap: '12px',
+                                    marginTop: '10px'
+                                }}>
+                                    <Button
+                                        onClick={handleManualResendCode}
+                                        disabled={resendLoading || resendAttempts >= MAX_RESEND_ATTEMPTS}
+                                        startIcon={<Refresh />}
+                                        sx={{
+                                            color: '#FF6B35',
+                                            textTransform: 'none',
+                                            fontSize: '14px',
+                                            fontWeight: 600,
+                                            padding: '6px 20px',
+                                            border: '1px solid rgba(255,107,53,0.3)',
+                                            borderRadius: '40px',
+                                            '&:hover': {
+                                                backgroundColor: alpha('#FF6B35', 0.05),
+                                                borderColor: '#FF6B35',
+                                                transform: 'translateY(-1px)'
+                                            },
+                                            '&:disabled': {
+                                                color: '#BDBDBD',
+                                                borderColor: '#E0E0E0'
+                                            },
+                                            transition: 'all 0.3s'
+                                        }}
+                                    >
+                                        {resendLoading ? (
+                                            <CircularProgress size={16} sx={{ color: '#FF6B35' }} />
+                                        ) : resendAttempts >= MAX_RESEND_ATTEMPTS ? (
+                                            'Max attempts reached'
+                                        ) : (
+                                            'Manual Resend'
+                                        )}
+                                    </Button>
+                                </Box>
+                            </Box>
+
+                            {/* Info Message */}
+                            <Box sx={{
+                                marginTop: '30px',
+                                padding: '16px',
+                                background: alpha('#FF6B35', 0.03),
+                                borderRadius: '16px',
+                                border: '1px solid rgba(255,107,53,0.15)',
+                                borderLeft: '4px solid #FF6B35',
+                            }}>
+                                <Typography sx={{
+                                    color: '#6B6B6B',
+                                    fontSize: '13px',
+                                    lineHeight: 1.6
+                                }}>
+                                    <strong style={{ color: '#FF6B35' }}>Auto-Resend Active:</strong> A new code will be automatically sent every 2 minutes.
+                                    You have <span style={{ color: '#FF6B35', fontWeight: 700 }}>{MAX_RESEND_ATTEMPTS - resendAttempts}</span> attempts remaining.
+                                    {resendAttempts === MAX_RESEND_ATTEMPTS - 1 && ' This is your last attempt!'}
+                                </Typography>
+                            </Box>
+                        </Paper>
+                    </Box>
                 </Box>
             </Box>
-        </Box>
+        </>
     );
+
+    return content;
 };
 
 export default VerifyCodePage;

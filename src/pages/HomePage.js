@@ -54,7 +54,7 @@ import ArrowForwardIcon from '@mui/icons-material/ArrowForward';
 import InfoIcon from '@mui/icons-material/Info';
 import HowToRegIcon from '@mui/icons-material/HowToReg';
 import SearchIcon from '@mui/icons-material/Search';
-import WhatshotIcon from '@mui/icons-material/Whatshot'; // Changed from VisibilityIcon
+import WhatshotIcon from '@mui/icons-material/Whatshot';
 import { alpha, keyframes } from '@mui/material/styles';
 import LoginPage from './LoginPage';
 import SignUpPage from './SignUpPage';
@@ -532,16 +532,12 @@ function HomePage() {
                             </Button>
                             <Button
                                 startIcon={<CelebrationIcon />}
-                                sx={{ fontWeight: 500, color: '#FF6B35' }}
+                                sx={{ fontWeight: 500, color: '#4A4A4A', '&:hover': { color: '#FF6B35' } }}
                                 onClick={() => handleServicesClick()}
                             >
                                 Services
                             </Button>
-                            {isAdmin && (
-                                <Button sx={{ fontWeight: 500, color: '#FF9800' }} onClick={handleAdminPanel}>
-                                    Admin
-                                </Button>
-                            )}
+                            {/* Admin button removed as requested */}
                         </Box>
 
                         <Box sx={{ display: 'flex', alignItems: 'center', gap: 2 }}>
@@ -586,7 +582,6 @@ function HomePage() {
                                         }}
                                     >
                                         <MenuItem onClick={handleProfile}><PersonIcon sx={{ mr: 2, fontSize: 20, color: '#FF6B35' }} />Profile</MenuItem>
-                                        <MenuItem onClick={() => handleServicesClick()}><CelebrationIcon sx={{ mr: 2, fontSize: 20, color: '#FF6B35' }} />Services</MenuItem>
                                         {isAdmin && (
                                             <MenuItem onClick={handleAdminPanel}><AdminPanelSettingsIcon sx={{ mr: 2, fontSize: 20, color: '#FF9800' }} />Admin Panel</MenuItem>
                                         )}
@@ -610,7 +605,7 @@ function HomePage() {
                                         }}
                                         onClick={handleOpenSignupModal}
                                     >
-                                        Get Started
+                                        Sign Up
                                     </Button>
                                 </>
                             )}
@@ -1041,7 +1036,7 @@ function HomePage() {
             </Modal>
 
             <Modal open={verifyModalOpen} onClose={handleCloseVerifyModal} sx={{ display: 'flex', alignItems: 'center', justifyContent: 'center', backdropFilter: 'blur(8px)' }}>
-                <Box sx={{ width: '90%', maxWidth: 500, bgcolor: '#FFFFFF', borderRadius: '24px', border: '1px solid #F0E8E0', position: 'relative', overflow: 'hidden', boxShadow: '0 24px 48px rgba(0,0,0,0.15)' }}>
+                <Box sx={{ width: '90%', maxWidth: 470, bgcolor: '#FFFFFF', borderRadius: '24px', border: '1px solid #F0E8E0', position: 'relative', overflow: 'hidden', boxShadow: '0 24px 48px rgba(0,0,0,0.15)' }}>
                     <IconButton onClick={handleCloseVerifyModal} sx={{ position: 'absolute', top: 16, right: 16, zIndex: 10, backgroundColor: alpha('#000000', 0.5), color: '#FFFFFF', '&:hover': { backgroundColor: alpha('#000000', 0.7) } }}>
                         <CloseIcon />
                     </IconButton>

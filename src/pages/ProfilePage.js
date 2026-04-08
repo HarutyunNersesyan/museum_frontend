@@ -40,14 +40,16 @@ import {
     KeyboardArrowDown as KeyboardArrowDownIcon,
     Email as EmailIcon,
     Shield as ShieldIcon,
-    VerifiedUser as VerifiedUserIcon
+    VerifiedUser as VerifiedUserIcon,
+    HowToReg as HowToRegIcon,
+    AdminPanelSettings as AdminPanelSettingsIcon
 } from '@mui/icons-material';
-import { useAuth } from '../context/AuthContext';
 import { alpha } from '@mui/material/styles';
+import { useAuth } from '../context/AuthContext';
 
 const ProfilePage = () => {
     const navigate = useNavigate();
-    const { user, logout } = useAuth();
+    const { user, logout, isAdmin } = useAuth();
 
     const [loading, setLoading] = useState(false);
     const [error, setError] = useState('');
@@ -133,6 +135,21 @@ const ProfilePage = () => {
 
     const handleAboutClick = () => {
         navigate('/about');
+    };
+
+    const handleHowItWorksClick = () => {
+        navigate('/');
+        setTimeout(() => {
+            const element = document.getElementById('how-it-works');
+            if (element) {
+                element.scrollIntoView({ behavior: 'smooth' });
+            }
+        }, 100);
+    };
+
+    const handleAdminPanel = () => {
+        handleMenuClose();
+        navigate('/admin/dashboard');
     };
 
     const handleInputChange = (e) => {
@@ -322,29 +339,35 @@ const ProfilePage = () => {
                 }
             `}</style>
 
-            {/* Header */}
-            <Box component="header" sx={{
+            {/* Header - Navbar identical to HomePage */}
+            <Box sx={{
                 position: 'sticky',
                 top: 0,
-                zIndex: 1000,
+                zIndex: 100,
                 backgroundColor: alpha('#FFFFFF', 0.95),
                 backdropFilter: 'blur(10px)',
                 borderBottom: '1px solid rgba(0,0,0,0.08)',
                 boxShadow: '0 2px 20px rgba(0,0,0,0.03)'
             }}>
-                <Box sx={{ padding: '0 24px' }}>
+                <Container maxWidth="xl">
                     <Box sx={{
                         display: 'flex',
                         alignItems: 'center',
                         justifyContent: 'space-between',
-                        height: '70px',
-                        maxWidth: '1400px',
-                        margin: '0 auto'
+                        height: 70,
                     }}>
-                        <Box sx={{ display: 'flex', alignItems: 'center', gap: '12px', cursor: 'pointer' }} onClick={handleHomeClick}>
+                        <Box
+                            onClick={handleHomeClick}
+                            sx={{
+                                display: 'flex',
+                                alignItems: 'center',
+                                gap: 1.5,
+                                cursor: 'pointer'
+                            }}
+                        >
                             <Box sx={{
-                                width: '38px',
-                                height: '38px',
+                                width: 38,
+                                height: 38,
                                 borderRadius: '12px',
                                 background: 'linear-gradient(135deg, #FF6B35 0%, #FFB347 100%)',
                                 display: 'flex',
@@ -360,38 +383,93 @@ const ProfilePage = () => {
                                 WebkitTextFillColor: 'transparent',
                                 letterSpacing: '-0.5px'
                             }}>
-                                VeilVision
+                                Festivy
                             </Typography>
                         </Box>
 
-                        <Box sx={{ display: 'flex', alignItems: 'center', gap: '28px' }}>
-                            <Button onClick={handleHomeClick} sx={{ fontWeight: 500, color: '#4A4A4A', '&:hover': { color: '#FF6B35' } }}>Home</Button>
-                            <Button onClick={handleAboutClick} sx={{ fontWeight: 500, color: '#4A4A4A', '&:hover': { color: '#FF6B35' } }}>About Us</Button>
-                            <Button onClick={handleServicesClick} sx={{ fontWeight: 500, color: '#FF6B35', borderBottom: '2px solid #FF6B35', borderRadius: 0 }}>Services</Button>
+                        <Box sx={{ display: { xs: 'none', md: 'flex' }, alignItems: 'center', gap: 3 }}>
+                            <Button
+                                startIcon={<InfoIcon />}
+                                sx={{ fontWeight: 500, color: '#4A4A4A', '&:hover': { color: '#FF6B35' } }}
+                                onClick={handleAboutClick}
+                            >
+                                About Us
+                            </Button>
+                            <Button
+                                startIcon={<HowToRegIcon />}
+                                sx={{ fontWeight: 500, color: '#4A4A4A', '&:hover': { color: '#FF6B35' } }}
+                                onClick={handleHowItWorksClick}
+                            >
+                                How It Works
+                            </Button>
+                            <Button
+                                startIcon={<CelebrationIcon />}
+                                sx={{ fontWeight: 500, color: '#4A4A4A', '&:hover': { color: '#FF6B35' }  }}
+                                onClick={handleServicesClick}
+                            >
+                                Services
+                            </Button>
                         </Box>
 
-                        <Box sx={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
-                            <IconButton onClick={handleMenuOpen} sx={{
-                                background: 'linear-gradient(135deg, #FF6B35 0%, #FFB347 100%)',
-                                width: '38px',
-                                height: '38px',
-                                '&:hover': { transform: 'scale(1.05)' }
-                            }}>
-                                {userInitial ? <Typography sx={{ fontWeight: 600, color: 'white' }}>{userInitial}</Typography> : <AccountCircleIcon sx={{ color: 'white' }} />}
+                        <Box sx={{ display: 'flex', alignItems: 'center', gap: 2 }}>
+                            <Chip
+                                label={`Welcome, ${user.userName}`}
+                                size="small"
+                                sx={{
+                                    display: { xs: 'none', sm: 'flex' },
+                                    bgcolor: alpha('#FF6B35', 0.1),
+                                    color: '#FF6B35',
+                                    border: `1px solid ${alpha('#FF6B35', 0.2)}`
+                                }}
+                            />
+                            <IconButton
+                                onClick={handleMenuOpen}
+                                sx={{
+                                    background: 'linear-gradient(135deg, #FF6B35 0%, #FFB347 100%)',
+                                    width: 38,
+                                    height: 38,
+                                    '&:hover': { transform: 'scale(1.05)' }
+                                }}
+                            >
+                                <Avatar sx={{ width: 38, height: 38, bgcolor: 'transparent', color: 'white' }}>
+                                    {userInitial || <AccountCircleIcon />}
+                                </Avatar>
                             </IconButton>
+                            <Menu
+                                anchorEl={anchorEl}
+                                open={Boolean(anchorEl)}
+                                onClose={handleMenuClose}
+                                PaperProps={{
+                                    sx: {
+                                        bgcolor: '#FFFFFF',
+                                        color: '#1A1A1A',
+                                        border: '1px solid #E0E0E0',
+                                        minWidth: 200,
+                                        borderRadius: '16px',
+                                        boxShadow: '0 4px 20px rgba(0,0,0,0.1)'
+                                    }
+                                }}
+                            >
+                                <MenuItem onClick={() => { handleMenuClose(); navigate('/profile'); }}>
+                                    <PersonIcon sx={{ mr: 2, fontSize: 20, color: '#FF6B35' }} />
+                                    Profile
+                                </MenuItem>
+                                {isAdmin && (
+                                    <MenuItem onClick={handleAdminPanel}>
+                                        <AdminPanelSettingsIcon sx={{ mr: 2, fontSize: 20, color: '#FF9800' }} />
+                                        Admin Panel
+                                    </MenuItem>
+                                )}
+                                <Divider />
+                                <MenuItem onClick={handleLogout}>
+                                    <LogoutIcon sx={{ mr: 2, fontSize: 20, color: '#FF6B35' }} />
+                                    Logout
+                                </MenuItem>
+                            </Menu>
                         </Box>
                     </Box>
-                </Box>
+                </Container>
             </Box>
-
-            {/* User Menu */}
-            <Menu anchorEl={anchorEl} open={Boolean(anchorEl)} onClose={handleMenuClose}
-                  PaperProps={{ sx: { bgcolor: '#FFFFFF', color: '#1A1A1A', border: '1px solid #E0E0E0', minWidth: 200, borderRadius: '16px', boxShadow: '0 4px 20px rgba(0,0,0,0.1)' } }}>
-                <MenuItem onClick={() => navigate('/profile')}><PersonIcon sx={{ mr: 2, fontSize: 20, color: '#FF6B35' }} />Profile</MenuItem>
-                <MenuItem onClick={handleServicesClick}><CelebrationIcon sx={{ mr: 2, fontSize: 20, color: '#FF6B35' }} />Services</MenuItem>
-                <Divider sx={{ borderColor: '#F0E8E0' }} />
-                <MenuItem onClick={handleLogout}><LogoutIcon sx={{ mr: 2, fontSize: 20, color: '#FF6B35' }} />Logout</MenuItem>
-            </Menu>
 
             {/* Main Content */}
             <Container maxWidth="md" sx={{ position: 'relative', zIndex: 1, py: 5 }}>
