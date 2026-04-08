@@ -42,8 +42,7 @@ import {
     ImageList,
     ImageListItem,
     Fade,
-    Grow,
-    Zoom
+    Grow
 } from '@mui/material';
 import { LocalizationProvider } from '@mui/x-date-pickers/LocalizationProvider';
 import { DatePicker } from '@mui/x-date-pickers/DatePicker';
@@ -83,12 +82,11 @@ import { formatPriceAMD } from '../services/serviceAPI';
 const GlassCard = styled(Card)(({ theme }) => ({
     background: '#FFFFFF',
     borderRadius: '24px',
-    border: '1px solid #E8ECF0',
+    border: 'none',
     transition: 'all 0.3s ease',
-    boxShadow: '0 2px 8px rgba(0, 0, 0, 0.04)',
+    boxShadow: 'none',
     '&:hover': {
         transform: 'translateY(-4px)',
-        borderColor: '#FF9800',
         boxShadow: '0 12px 28px rgba(255, 152, 0, 0.12)'
     }
 }));
@@ -112,7 +110,7 @@ const OutlinedButton = styled(Button)(({ theme }) => ({
     padding: '10px 24px',
     fontWeight: 600,
     textTransform: 'none',
-    borderColor: '#E8ECF0',
+    border: '1px solid #E8ECF0',
     color: '#5A6874',
     '&:hover': {
         borderColor: '#FF9800',
@@ -124,12 +122,54 @@ const StatCard = styled(Paper)(({ theme, color }) => ({
     background: '#FFFFFF',
     borderRadius: '20px',
     padding: '24px',
-    border: `1px solid ${color}20`,
+    border: 'none',
     transition: 'all 0.3s ease',
     boxShadow: '0 2px 8px rgba(0, 0, 0, 0.04)',
     '&:hover': {
         transform: 'translateY(-4px)',
         boxShadow: `0 12px 28px ${color}15`
+    }
+}));
+
+// Flat TextField without borders
+const FlatTextField = styled(TextField)(({ theme }) => ({
+    '& .MuiOutlinedInput-root': {
+        backgroundColor: '#F5F7FA',
+        borderRadius: '8px',
+        border: 'none',
+        '& fieldset': {
+            border: 'none',
+        },
+        '&:hover': {
+            backgroundColor: '#EEF0F2',
+        },
+        '&.Mui-focused': {
+            backgroundColor: '#EEF0F2',
+            boxShadow: '0 0 0 2px rgba(255, 152, 0, 0.2)',
+        }
+    },
+    '& .MuiInputLabel-root': {
+        color: '#8A99A8',
+        '&.Mui-focused': {
+            color: '#FF9800',
+        }
+    }
+}));
+
+// Flat Select without borders
+const FlatSelect = styled(Select)(({ theme }) => ({
+    backgroundColor: '#F5F7FA',
+    borderRadius: '8px',
+    border: 'none',
+    '&:hover': {
+        backgroundColor: '#EEF0F2',
+    },
+    '&.Mui-focused': {
+        backgroundColor: '#EEF0F2',
+        boxShadow: '0 0 0 2px rgba(255, 152, 0, 0.2)',
+    },
+    '& .MuiOutlinedInput-notchedOutline': {
+        border: 'none',
     }
 }));
 
@@ -378,45 +418,11 @@ const AdminDashboardPage = () => {
         setExistingImages(newExisting);
     };
 
-    // Helper functions to safely format date and time
-    const getValidDateString = (dateValue) => {
-        if (!dateValue) return null;
-        if (dayjs.isDayjs(dateValue) && dateValue.isValid()) {
-            return dateValue.format('YYYY-MM-DD');
-        }
-        return null;
-    };
-
-    const getValidTimeString = (timeValue) => {
-        if (!timeValue) return null;
-        if (dayjs.isDayjs(timeValue) && timeValue.isValid()) {
-            return timeValue.format('HH:mm');
-        }
-        return null;
-    };
-
-    // Validation function to check if date is from tomorrow or future (not today)
-    const isDateValidForFuture = (date) => {
-        if (!date) return true;
-        const tomorrow = dayjs().add(1, 'day').startOf('day');
-        return dayjs(date).isSameOrAfter(tomorrow, 'day');
-    };
-
     const handleSubmit = async () => {
         if (!formData.name || !formData.description || !formData.price || !formData.category || !formData.location) {
             setSnackbar({
                 open: true,
                 message: 'Please fill all required fields',
-                severity: 'warning'
-            });
-            return;
-        }
-
-        // Validate that start date is from tomorrow or future (not today)
-        if (formData.startDate && !isDateValidForFuture(formData.startDate)) {
-            setSnackbar({
-                open: true,
-                message: 'Start date must be tomorrow or a future date. Today and past dates are not allowed.',
                 severity: 'warning'
             });
             return;
@@ -433,39 +439,21 @@ const AdminDashboardPage = () => {
                 duration: formData.duration ? parseInt(formData.duration) : null,
                 maxParticipants: formData.maxParticipants ? parseInt(formData.maxParticipants) : null,
                 tags: formData.tags,
-                startDate: getValidDateString(formData.startDate),
-                startTime: getValidTimeString(formData.startTime)
+                startDate: formData.startDate ? formData.startDate.format('YYYY-MM-DD') : null,
+                startTime: formData.startTime ? formData.startTime.format('HH:mm') : null
             };
 
-            console.log('=== Submitting Service Data ===');
-            console.log('Submit Data:', submitData);
-            console.log('Start Date:', submitData.startDate);
-            console.log('Start Time:', submitData.startTime);
-            console.log('Image Files Count:', imageFiles.length);
-            console.log('Existing Images Count:', existingImages.length);
-            console.log('Editing Mode:', !!editingService);
-
             if (editingService) {
-                console.log('Updating service ID:', editingService.id);
-                const response = await adminAPI.updateService(editingService.id, submitData, imageFiles, existingImages);
-                console.log('Update Response:', response.data);
+                await adminAPI.updateService(editingService.id, submitData, imageFiles, existingImages);
                 setSnackbar({ open: true, message: 'Service updated successfully', severity: 'success' });
             } else {
-                console.log('Creating new service');
-                const response = await adminAPI.createService(submitData, imageFiles);
-                console.log('Create Response:', response.data);
+                await adminAPI.createService(submitData, imageFiles);
                 setSnackbar({ open: true, message: 'Service created successfully', severity: 'success' });
             }
             handleCloseDialog();
             await loadServices();
             await loadStats();
         } catch (error) {
-            console.error('=== Error Saving Service ===');
-            console.error('Error:', error);
-            console.error('Error Response:', error.response?.data);
-            console.error('Error Status:', error.response?.status);
-            console.error('Error Headers:', error.response?.headers);
-
             let errorMessage = 'Failed to save service';
             if (error.response?.data) {
                 if (typeof error.response.data === 'string') {
@@ -560,6 +548,25 @@ const AdminDashboardPage = () => {
         return new Date(dateString).toLocaleString();
     };
 
+    // Helper function to safely format date
+    const formatEventDate = (startDate, startTime) => {
+        if (!startDate) return null;
+        try {
+            const date = dayjs(startDate);
+            if (!date.isValid()) return null;
+            let formatted = date.format('MMMM D, YYYY');
+            if (startTime) {
+                const time = dayjs(startTime, 'HH:mm');
+                if (time.isValid()) {
+                    formatted += ` at ${time.format('HH:mm')}`;
+                }
+            }
+            return formatted;
+        } catch (error) {
+            return null;
+        }
+    };
+
     if (!user) {
         return (
             <Backdrop open={true} sx={{ zIndex: 9999, backgroundColor: 'rgba(255, 255, 255, 0.9)' }}>
@@ -582,7 +589,7 @@ const AdminDashboardPage = () => {
                     top: 0,
                     zIndex: 1000,
                     backgroundColor: '#FFFFFF',
-                    borderBottom: '1px solid #E8ECF0',
+                    borderBottom: 'none',
                     boxShadow: '0 1px 4px rgba(0, 0, 0, 0.04)'
                 }}>
                     <Container maxWidth="xl" sx={{ py: 1.5 }}>
@@ -630,7 +637,7 @@ const AdminDashboardPage = () => {
                         sx: {
                             bgcolor: '#FFFFFF',
                             color: '#1A2733',
-                            border: '1px solid #E8ECF0',
+                            border: 'none',
                             minWidth: '200px',
                             borderRadius: '12px',
                             boxShadow: '0 4px 12px rgba(0, 0, 0, 0.08)'
@@ -670,61 +677,55 @@ const AdminDashboardPage = () => {
                     {/* Stats Cards */}
                     <Grid container spacing={3} sx={{ mb: 5 }}>
                         <Grid item xs={12} sm={6} md={4}>
-                            <Zoom in={true} style={{ transitionDelay: '100ms' }}>
-                                <StatCard color="#FF9800">
-                                    <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
-                                        <Box>
-                                            <Typography variant="body2" sx={{ color: '#8A99A8', mb: 1 }}>
-                                                Total Services
-                                            </Typography>
-                                            <Typography variant="h3" sx={{ fontWeight: 700, color: '#FF9800' }}>
-                                                {stats.totalServices}
-                                            </Typography>
-                                        </Box>
-                                        <Avatar sx={{ bgcolor: alpha('#FF9800', 0.1), width: 56, height: 56 }}>
-                                            <CelebrationIcon sx={{ fontSize: 32, color: '#FF9800' }} />
-                                        </Avatar>
+                            <StatCard color="#FF9800">
+                                <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
+                                    <Box>
+                                        <Typography variant="body2" sx={{ color: '#8A99A8', mb: 1 }}>
+                                            Total Services
+                                        </Typography>
+                                        <Typography variant="h3" sx={{ fontWeight: 700, color: '#FF9800' }}>
+                                            {stats.totalServices}
+                                        </Typography>
                                     </Box>
-                                </StatCard>
-                            </Zoom>
+                                    <Avatar sx={{ bgcolor: alpha('#FF9800', 0.1), width: 56, height: 56 }}>
+                                        <CelebrationIcon sx={{ fontSize: 32, color: '#FF9800' }} />
+                                    </Avatar>
+                                </Box>
+                            </StatCard>
                         </Grid>
                         <Grid item xs={12} sm={6} md={4}>
-                            <Zoom in={true} style={{ transitionDelay: '200ms' }}>
-                                <StatCard color="#4CAF50">
-                                    <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
-                                        <Box>
-                                            <Typography variant="body2" sx={{ color: '#8A99A8', mb: 1 }}>
-                                                Available Services
-                                            </Typography>
-                                            <Typography variant="h3" sx={{ fontWeight: 700, color: '#4CAF50' }}>
-                                                {stats.availableServices}
-                                            </Typography>
-                                        </Box>
-                                        <Avatar sx={{ bgcolor: alpha('#4CAF50', 0.1), width: 56, height: 56 }}>
-                                            <VisibilityIcon sx={{ fontSize: 32, color: '#4CAF50' }} />
-                                        </Avatar>
+                            <StatCard color="#4CAF50">
+                                <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
+                                    <Box>
+                                        <Typography variant="body2" sx={{ color: '#8A99A8', mb: 1 }}>
+                                            Available Services
+                                        </Typography>
+                                        <Typography variant="h3" sx={{ fontWeight: 700, color: '#4CAF50' }}>
+                                            {stats.availableServices}
+                                        </Typography>
                                     </Box>
-                                </StatCard>
-                            </Zoom>
+                                    <Avatar sx={{ bgcolor: alpha('#4CAF50', 0.1), width: 56, height: 56 }}>
+                                        <VisibilityIcon sx={{ fontSize: 32, color: '#4CAF50' }} />
+                                    </Avatar>
+                                </Box>
+                            </StatCard>
                         </Grid>
                         <Grid item xs={12} sm={6} md={4}>
-                            <Zoom in={true} style={{ transitionDelay: '300ms' }}>
-                                <StatCard color="#FF9800">
-                                    <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
-                                        <Box>
-                                            <Typography variant="body2" sx={{ color: '#8A99A8', mb: 1 }}>
-                                                Pending Inquiries
-                                            </Typography>
-                                            <Typography variant="h3" sx={{ fontWeight: 700, color: '#FF9800' }}>
-                                                {stats.pendingInquiries}
-                                            </Typography>
-                                        </Box>
-                                        <Avatar sx={{ bgcolor: alpha('#FF9800', 0.1), width: 56, height: 56 }}>
-                                            <EmailIcon sx={{ fontSize: 32, color: '#FF9800' }} />
-                                        </Avatar>
+                            <StatCard color="#FF9800">
+                                <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
+                                    <Box>
+                                        <Typography variant="body2" sx={{ color: '#8A99A8', mb: 1 }}>
+                                            Pending Inquiries
+                                        </Typography>
+                                        <Typography variant="h3" sx={{ fontWeight: 700, color: '#FF9800' }}>
+                                            {stats.pendingInquiries}
+                                        </Typography>
                                     </Box>
-                                </StatCard>
-                            </Zoom>
+                                    <Avatar sx={{ bgcolor: alpha('#FF9800', 0.1), width: 56, height: 56 }}>
+                                        <EmailIcon sx={{ fontSize: 32, color: '#FF9800' }} />
+                                    </Avatar>
+                                </Box>
+                            </StatCard>
                         </Grid>
                     </Grid>
 
@@ -733,11 +734,11 @@ const AdminDashboardPage = () => {
                         background: '#FFFFFF',
                         borderRadius: '20px',
                         overflow: 'hidden',
-                        border: '1px solid #E8ECF0',
+                        border: 'none',
                         boxShadow: '0 2px 8px rgba(0, 0, 0, 0.04)'
                     }}>
                         <Tabs value={activeTab} onChange={handleTabChange} sx={{
-                            borderBottom: '1px solid #E8ECF0',
+                            borderBottom: 'none',
                             '& .MuiTab-root': {
                                 color: '#8A99A8',
                                 py: 2,
@@ -748,7 +749,7 @@ const AdminDashboardPage = () => {
                             <Tab label="✉️ Customer Inquiries" icon={<EmailIcon />} iconPosition="start" />
                         </Tabs>
 
-                        {/* Services Tab */}
+                        {/* Services Tab - Vertical Layout with Image on Right */}
                         {activeTab === 0 && (
                             <Box sx={{ p: 3 }}>
                                 <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 3, flexWrap: 'wrap', gap: 2 }}>
@@ -772,101 +773,212 @@ const AdminDashboardPage = () => {
                                         </Button>
                                     </Box>
                                 ) : (
-                                    <Grid container spacing={3}>
-                                        {services.map((service, index) => (
-                                            <Grid item xs={12} sm={6} md={4} key={service.id}>
-                                                <Grow in={true} style={{ transitionDelay: `${index * 50}ms` }}>
-                                                    <GlassCard>
-                                                        <Box sx={{ position: 'relative', height: 180, overflow: 'hidden', borderRadius: '20px 20px 0 0' }}>
-                                                            {service.imageUrls && service.imageUrls[0] ? (
-                                                                <img src={service.imageUrls[0]} alt={service.name} style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
-                                                            ) : (
-                                                                <Box sx={{ height: '100%', bgcolor: alpha('#FF9800', 0.05), display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-                                                                    <ImageIcon sx={{ fontSize: 80, color: alpha('#FF9800', 0.3) }} />
-                                                                </Box>
-                                                            )}
-                                                            <Chip
-                                                                label={service.isAvailable ? '● Available' : '● Hidden'}
-                                                                size="small"
-                                                                sx={{
-                                                                    position: 'absolute',
-                                                                    top: 12,
-                                                                    right: 12,
-                                                                    bgcolor: service.isAvailable ? '#4CAF50' : '#f44336',
-                                                                    color: 'white',
-                                                                    fontWeight: 600
-                                                                }}
-                                                            />
-                                                        </Box>
-                                                        <CardContent>
-                                                            <Typography variant="h6" sx={{ fontWeight: 700, color: '#1A2733', mb: 1 }}>
-                                                                {service.name}
-                                                            </Typography>
-                                                            <Box sx={{ display: 'flex', alignItems: 'center', gap: 1, mb: 1 }}>
-                                                                <PriceIcon sx={{ fontSize: 18, color: '#4CAF50' }} />
-                                                                <Typography variant="body2" sx={{ color: '#4CAF50', fontWeight: 600 }}>
-                                                                    {formatPriceAMD(service.price)}
-                                                                </Typography>
-                                                            </Box>
-                                                            <Box sx={{ display: 'flex', alignItems: 'center', gap: 1, mb: 1 }}>
-                                                                <CategoryIcon sx={{ fontSize: 18, color: '#8A99A8' }} />
-                                                                <Typography variant="body2" sx={{ color: '#5A6874' }}>
-                                                                    {service.category}
-                                                                </Typography>
-                                                            </Box>
-                                                            <Box sx={{ display: 'flex', alignItems: 'center', gap: 1, mb: 1 }}>
-                                                                <LocationIcon sx={{ fontSize: 18, color: '#8A99A8' }} />
-                                                                <Typography variant="body2" sx={{ color: '#5A6874' }}>
-                                                                    {service.location}
-                                                                </Typography>
-                                                            </Box>
-                                                            {service.startDate && (
-                                                                <Box sx={{ display: 'flex', alignItems: 'center', gap: 1, mb: 2 }}>
-                                                                    <EventIcon sx={{ fontSize: 18, color: '#8A99A8' }} />
-                                                                    <Typography variant="body2" sx={{ color: '#5A6874' }}>
-                                                                        {dayjs(service.startDate).format('MMM D, YYYY')}
-                                                                        {service.startTime && ` at ${dayjs(service.startTime, 'HH:mm').format('HH:mm')}`}
-                                                                    </Typography>
-                                                                </Box>
-                                                            )}
-                                                            <Typography variant="body2" sx={{ color: '#8A99A8', mb: 2, display: '-webkit-box', WebkitLineClamp: 2, overflow: 'hidden' }}>
-                                                                {service.description}
-                                                            </Typography>
-                                                            <Divider sx={{ borderColor: '#E8ECF0', my: 2 }} />
-                                                            <Box sx={{ display: 'flex', gap: 1, justifyContent: 'space-between', alignItems: 'center' }}>
-                                                                <FormControlLabel
-                                                                    control={
-                                                                        <Switch
-                                                                            checked={service.isAvailable}
-                                                                            onChange={() => handleToggleAvailability(service.id, service.isAvailable)}
+                                    <Box sx={{ display: 'flex', flexDirection: 'column', gap: 4 }}>
+                                        {services.map((service, index) => {
+                                            const eventDate = formatEventDate(service.startDate, service.startTime);
+                                            return (
+                                                <Grow in={true} style={{ transitionDelay: `${index * 50}ms` }} key={service.id}>
+                                                    <Paper sx={{
+                                                        borderRadius: '20px',
+                                                        overflow: 'hidden',
+                                                        border: 'none',
+                                                        boxShadow: '0 2px 8px rgba(0, 0, 0, 0.04)',
+                                                        transition: 'all 0.3s ease',
+                                                        minHeight: '364px', // 280px * 1.3
+                                                        '&:hover': {
+                                                            transform: 'translateY(-2px)',
+                                                            boxShadow: '0 8px 20px rgba(255, 152, 0, 0.12)'
+                                                        }
+                                                    }}>
+                                                        <Grid container sx={{ minHeight: '364px' }}>
+                                                            {/* Left side - Information */}
+                                                            <Grid item xs={12} md={7}>
+                                                                <Box sx={{ p: '31px' }}> {/* 24px * 1.3 ≈ 31px */}
+                                                                    <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', mb: '26px' }}>
+                                                                        <Typography variant="h5" sx={{ fontWeight: 700, color: '#1A2733', fontSize: '1.8rem' }}>
+                                                                            {service.name}
+                                                                        </Typography>
+                                                                        <Chip
+                                                                            label={service.isAvailable ? '● Available' : '● Hidden'}
+                                                                            size="medium"
                                                                             sx={{
-                                                                                '& .MuiSwitch-switchBase.Mui-checked': { color: '#4CAF50' },
-                                                                                '& .MuiSwitch-switchBase.Mui-checked + .MuiSwitch-track': { bgcolor: '#4CAF50' }
+                                                                                bgcolor: service.isAvailable ? alpha('#4CAF50', 0.1) : alpha('#f44336', 0.1),
+                                                                                color: service.isAvailable ? '#4CAF50' : '#f44336',
+                                                                                fontWeight: 600,
+                                                                                fontSize: '0.9rem',
+                                                                                py: 1
                                                                             }}
                                                                         />
-                                                                    }
-                                                                    label="Visible"
-                                                                    sx={{ mr: 0 }}
-                                                                />
-                                                                <Box>
-                                                                    <Tooltip title="Edit">
-                                                                        <IconButton size="small" onClick={() => handleOpenEditDialog(service)} sx={{ color: '#FF9800' }}>
-                                                                            <EditIcon />
-                                                                        </IconButton>
-                                                                    </Tooltip>
-                                                                    <Tooltip title="Delete">
-                                                                        <IconButton size="small" onClick={() => handleDeleteService(service.id)} sx={{ color: '#f44336' }}>
-                                                                            <DeleteIcon />
-                                                                        </IconButton>
-                                                                    </Tooltip>
+                                                                    </Box>
+
+                                                                    <Typography variant="body1" sx={{ color: '#5A6874', mb: '26px', lineHeight: 1.6, fontSize: '1rem' }}>
+                                                                        {service.description}
+                                                                    </Typography>
+
+                                                                    <Grid container spacing={3} sx={{ mb: '26px' }}>
+                                                                        <Grid item xs={6} sm={4}>
+                                                                            <Box sx={{ display: 'flex', alignItems: 'center', gap: 1.5 }}>
+                                                                                <PriceIcon sx={{ fontSize: 22, color: '#4CAF50' }} />
+                                                                                <Box>
+                                                                                    <Typography variant="body2" sx={{ color: '#8A99A8', display: 'block', fontSize: '0.85rem' }}>Price</Typography>
+                                                                                    <Typography variant="body1" sx={{ color: '#4CAF50', fontWeight: 600, fontSize: '1.1rem' }}>
+                                                                                        {formatPriceAMD(service.price)}
+                                                                                    </Typography>
+                                                                                </Box>
+                                                                            </Box>
+                                                                        </Grid>
+                                                                        <Grid item xs={6} sm={4}>
+                                                                            <Box sx={{ display: 'flex', alignItems: 'center', gap: 1.5 }}>
+                                                                                <CategoryIcon sx={{ fontSize: 22, color: '#FF9800' }} />
+                                                                                <Box>
+                                                                                    <Typography variant="body2" sx={{ color: '#8A99A8', display: 'block', fontSize: '0.85rem' }}>Category</Typography>
+                                                                                    <Typography variant="body1" sx={{ color: '#1A2733', fontSize: '1rem' }}>
+                                                                                        {service.category}
+                                                                                    </Typography>
+                                                                                </Box>
+                                                                            </Box>
+                                                                        </Grid>
+                                                                        <Grid item xs={6} sm={4}>
+                                                                            <Box sx={{ display: 'flex', alignItems: 'center', gap: 1.5 }}>
+                                                                                <LocationIcon sx={{ fontSize: 22, color: '#FF9800' }} />
+                                                                                <Box>
+                                                                                    <Typography variant="body2" sx={{ color: '#8A99A8', display: 'block', fontSize: '0.85rem' }}>Location</Typography>
+                                                                                    <Typography variant="body1" sx={{ color: '#1A2733', fontSize: '1rem' }}>
+                                                                                        {service.location}
+                                                                                    </Typography>
+                                                                                </Box>
+                                                                            </Box>
+                                                                        </Grid>
+                                                                    </Grid>
+
+                                                                    {eventDate && (
+                                                                        <Box sx={{ display: 'flex', alignItems: 'center', gap: 1.5, mb: '26px' }}>
+                                                                            <EventIcon sx={{ fontSize: 22, color: '#8A99A8' }} />
+                                                                            <Typography variant="body1" sx={{ color: '#5A6874', fontSize: '1rem' }}>
+                                                                                {eventDate}
+                                                                            </Typography>
+                                                                        </Box>
+                                                                    )}
+
+                                                                    {service.duration && (
+                                                                        <Box sx={{ display: 'flex', alignItems: 'center', gap: 1.5, mb: '26px' }}>
+                                                                            <AccessTimeIcon sx={{ fontSize: 22, color: '#8A99A8' }} />
+                                                                            <Typography variant="body1" sx={{ color: '#5A6874', fontSize: '1rem' }}>
+                                                                                Duration: {service.duration} hours
+                                                                                {service.maxParticipants && ` | Max: ${service.maxParticipants} participants`}
+                                                                            </Typography>
+                                                                        </Box>
+                                                                    )}
+
+                                                                    <Divider sx={{ borderColor: '#E8ECF0', my: '26px' }} />
+
+                                                                    <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                                                                        <FormControlLabel
+                                                                            control={
+                                                                                <Switch
+                                                                                    checked={service.isAvailable}
+                                                                                    onChange={() => handleToggleAvailability(service.id, service.isAvailable)}
+                                                                                    sx={{
+                                                                                        '& .MuiSwitch-switchBase.Mui-checked': { color: '#4CAF50' },
+                                                                                        '& .MuiSwitch-switchBase.Mui-checked + .MuiSwitch-track': { bgcolor: '#4CAF50' }
+                                                                                    }}
+                                                                                />
+                                                                            }
+                                                                            label="Visible"
+                                                                            sx={{ mr: 0 }}
+                                                                        />
+                                                                        <Box>
+                                                                            <Tooltip title="Edit">
+                                                                                <IconButton
+                                                                                    size="medium"
+                                                                                    onClick={() => handleOpenEditDialog(service)}
+                                                                                    sx={{
+                                                                                        color: '#FF9800',
+                                                                                        '&:hover': { bgcolor: alpha('#FF9800', 0.1) }
+                                                                                    }}
+                                                                                >
+                                                                                    <EditIcon />
+                                                                                </IconButton>
+                                                                            </Tooltip>
+                                                                            <Tooltip title="Delete">
+                                                                                <IconButton
+                                                                                    size="medium"
+                                                                                    onClick={() => handleDeleteService(service.id)}
+                                                                                    sx={{
+                                                                                        color: '#f44336',
+                                                                                        '&:hover': { bgcolor: alpha('#f44336', 0.1) }
+                                                                                    }}
+                                                                                >
+                                                                                    <DeleteIcon />
+                                                                                </IconButton>
+                                                                            </Tooltip>
+                                                                        </Box>
+                                                                    </Box>
                                                                 </Box>
-                                                            </Box>
-                                                        </CardContent>
-                                                    </GlassCard>
+                                                            </Grid>
+
+                                                            {/* Right side - Image */}
+                                                            <Grid item xs={12} md={5}>
+                                                                <Box sx={{
+                                                                    height: '100%',
+                                                                    minHeight: '364px',
+                                                                    background: `linear-gradient(135deg, ${alpha('#FF9800', 0.05)} 0%, ${alpha('#FF5722', 0.02)} 100%)`,
+                                                                    display: 'flex',
+                                                                    alignItems: 'center',
+                                                                    justifyContent: 'center',
+                                                                    position: 'relative',
+                                                                    overflow: 'hidden'
+                                                                }}>
+                                                                    {service.imageUrls && service.imageUrls[0] ? (
+                                                                        <>
+                                                                            <img
+                                                                                src={service.imageUrls[0]}
+                                                                                alt={service.name}
+                                                                                style={{
+                                                                                    width: '100%',
+                                                                                    height: '100%',
+                                                                                    objectFit: 'cover',
+                                                                                    position: 'absolute',
+                                                                                    top: 0,
+                                                                                    left: 0
+                                                                                }}
+                                                                            />
+                                                                            {service.imageUrls.length > 1 && (
+                                                                                <Chip
+                                                                                    label={`+${service.imageUrls.length - 1} more`}
+                                                                                    size="medium"
+                                                                                    sx={{
+                                                                                        position: 'absolute',
+                                                                                        bottom: 16,
+                                                                                        right: 16,
+                                                                                        bgcolor: alpha('#000000', 0.7),
+                                                                                        color: 'white',
+                                                                                        fontWeight: 500,
+                                                                                        fontSize: '0.85rem',
+                                                                                        zIndex: 1
+                                                                                    }}
+                                                                                />
+                                                                            )}
+                                                                        </>
+                                                                    ) : (
+                                                                        <Box sx={{
+                                                                            textAlign: 'center',
+                                                                            p: 4
+                                                                        }}>
+                                                                            <ImageIcon sx={{ fontSize: 100, color: alpha('#FF9800', 0.3), mb: 2 }} />
+                                                                            <Typography variant="body1" sx={{ color: '#8A99A8', fontSize: '1rem' }}>
+                                                                                No image available
+                                                                            </Typography>
+                                                                        </Box>
+                                                                    )}
+                                                                </Box>
+                                                            </Grid>
+                                                        </Grid>
+                                                    </Paper>
                                                 </Grow>
-                                            </Grid>
-                                        ))}
-                                    </Grid>
+                                            );
+                                        })}
+                                    </Box>
                                 )}
                             </Box>
                         )}
@@ -887,7 +999,8 @@ const AdminDashboardPage = () => {
                                         background: '#FFFFFF',
                                         borderRadius: '16px',
                                         overflow: 'hidden',
-                                        border: '1px solid #E8ECF0'
+                                        border: 'none',
+                                        boxShadow: '0 2px 8px rgba(0, 0, 0, 0.04)'
                                     }}>
                                         <Table>
                                             <TableHead>
@@ -957,13 +1070,27 @@ const AdminDashboardPage = () => {
                     </Paper>
                 </Container>
 
-                {/* Create/Edit Service Dialog */}
-                <Dialog open={dialogOpen} onClose={handleCloseDialog} maxWidth="md" fullWidth
-                        PaperProps={{ sx: { bgcolor: '#FFFFFF', borderRadius: '24px', border: '1px solid #E8ECF0', boxShadow: '0 20px 40px rgba(0, 0, 0, 0.1)' } }}>
-                    <DialogTitle sx={{ borderBottom: '1px solid #E8ECF0', pb: 2 }}>
+                {/* Create/Edit Service Dialog - Enlarged and flat design */}
+                <Dialog
+                    open={dialogOpen}
+                    onClose={handleCloseDialog}
+                    maxWidth="lg"
+                    fullWidth
+                    PaperProps={{
+                        sx: {
+                            bgcolor: '#FFFFFF',
+                            borderRadius: '20px',
+                            border: 'none',
+                            boxShadow: '0 4px 12px rgba(0, 0, 0, 0.08)',
+                            width: '100%',
+                            maxWidth: '1144px',
+                        }
+                    }}
+                >
+                    <DialogTitle sx={{ borderBottom: 'none', pb: 2, pt: 3, px: 3, bgcolor: '#FFFFFF' }}>
                         <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
                             {editingService ? <EditIcon sx={{ color: '#FF9800' }} /> : <AddIcon sx={{ color: '#FF9800' }} />}
-                            <Typography variant="h6" sx={{ fontWeight: 600, color: '#1A2733' }}>
+                            <Typography variant="h5" sx={{ fontWeight: 600, color: '#1A2733' }}>
                                 {editingService ? 'Edit Service' : 'Create New Service'}
                             </Typography>
                         </Box>
@@ -971,52 +1098,37 @@ const AdminDashboardPage = () => {
                             <CloseIcon />
                         </IconButton>
                     </DialogTitle>
-                    <DialogContent sx={{ mt: 2 }}>
-                        <Box sx={{ display: 'flex', flexDirection: 'column', gap: 2.5 }}>
+                    <DialogContent sx={{ p: 3 }}>
+                        <Box sx={{ display: 'flex', flexDirection: 'column', gap: 3 }}>
                             {/* Service Name */}
-                            <TextField
+                            <FlatTextField
                                 fullWidth
                                 label="Service Name"
                                 name="name"
                                 value={formData.name}
                                 onChange={handleInputChange}
                                 required
-                                sx={{
-                                    '& .MuiOutlinedInput-root': {
-                                        bgcolor: '#FFFFFF',
-                                        borderRadius: '12px',
-                                        '&:hover fieldset': { borderColor: '#FF9800' },
-                                        '&.Mui-focused fieldset': { borderColor: '#FF9800' }
-                                    },
-                                    '& .MuiInputLabel-root': { color: '#8A99A8', '&.Mui-focused': { color: '#FF9800' } }
-                                }}
+                                variant="outlined"
+                                InputProps={{ style: { padding: '14px' } }}
                             />
 
                             {/* Description */}
-                            <TextField
+                            <FlatTextField
                                 fullWidth
                                 multiline
-                                rows={3}
+                                rows={4}
                                 label="Description"
                                 name="description"
                                 value={formData.description}
                                 onChange={handleInputChange}
                                 required
-                                sx={{
-                                    '& .MuiOutlinedInput-root': {
-                                        bgcolor: '#FFFFFF',
-                                        borderRadius: '12px',
-                                        '&:hover fieldset': { borderColor: '#FF9800' },
-                                        '&.Mui-focused fieldset': { borderColor: '#FF9800' }
-                                    },
-                                    '& .MuiInputLabel-root': { color: '#8A99A8', '&.Mui-focused': { color: '#FF9800' } }
-                                }}
+                                variant="outlined"
                             />
 
                             {/* Price and Category */}
-                            <Grid container spacing={2}>
+                            <Grid container spacing={3}>
                                 <Grid item xs={6}>
-                                    <TextField
+                                    <FlatTextField
                                         fullWidth
                                         type="number"
                                         label="Price (AMD)"
@@ -1024,59 +1136,40 @@ const AdminDashboardPage = () => {
                                         value={formData.price}
                                         onChange={handleInputChange}
                                         required
-                                        InputProps={{ startAdornment: <InputAdornment position="start">֏</InputAdornment> }}
-                                        sx={{
-                                            '& .MuiOutlinedInput-root': {
-                                                bgcolor: '#FFFFFF',
-                                                borderRadius: '12px',
-                                                '&:hover fieldset': { borderColor: '#FF9800' },
-                                                '&.Mui-focused fieldset': { borderColor: '#FF9800' }
-                                            },
-                                            '& .MuiInputLabel-root': { color: '#8A99A8', '&.Mui-focused': { color: '#FF9800' } }
+                                        variant="outlined"
+                                        InputProps={{
+                                            startAdornment: <InputAdornment position="start">֏</InputAdornment>,
+                                            style: { padding: '14px' }
                                         }}
                                     />
                                 </Grid>
                                 <Grid item xs={6}>
-                                    <FormControl fullWidth>
+                                    <FormControl fullWidth variant="outlined">
                                         <InputLabel sx={{ color: '#8A99A8' }}>Category</InputLabel>
-                                        <Select
+                                        <FlatSelect
                                             name="category"
                                             value={formData.category}
                                             onChange={handleInputChange}
                                             label="Category"
                                             required
-                                            sx={{
-                                                bgcolor: '#FFFFFF',
-                                                borderRadius: '12px',
-                                                color: '#1A2733',
-                                                '&:hover .MuiOutlinedInput-notchedOutline': { borderColor: '#FF9800' },
-                                                '&.Mui-focused .MuiOutlinedInput-notchedOutline': { borderColor: '#FF9800' }
-                                            }}
                                         >
                                             <MenuItem value="">Select Category</MenuItem>
                                             {categories.map((cat) => (
                                                 <MenuItem key={cat.value} value={cat.value}>{cat.label}</MenuItem>
                                             ))}
-                                        </Select>
+                                        </FlatSelect>
                                     </FormControl>
                                 </Grid>
                             </Grid>
 
                             {/* Location */}
-                            <FormControl fullWidth required>
+                            <FormControl fullWidth required variant="outlined">
                                 <InputLabel sx={{ color: '#8A99A8' }}>City</InputLabel>
-                                <Select
+                                <FlatSelect
                                     name="location"
                                     value={formData.location}
                                     onChange={handleInputChange}
                                     label="City"
-                                    sx={{
-                                        bgcolor: '#FFFFFF',
-                                        borderRadius: '12px',
-                                        color: '#1A2733',
-                                        '&:hover .MuiOutlinedInput-notchedOutline': { borderColor: '#FF9800' },
-                                        '&.Mui-focused .MuiOutlinedInput-notchedOutline': { borderColor: '#FF9800' }
-                                    }}
                                 >
                                     <MenuItem value="">Select City</MenuItem>
                                     {ARMENIAN_CITIES.map((city) => (
@@ -1090,109 +1183,76 @@ const AdminDashboardPage = () => {
                                             </Box>
                                         </MenuItem>
                                     ))}
-                                </Select>
+                                </FlatSelect>
                             </FormControl>
 
                             {/* Duration and Max Participants */}
-                            <Grid container spacing={2}>
+                            <Grid container spacing={3}>
                                 <Grid item xs={6}>
-                                    <TextField
+                                    <FlatTextField
                                         fullWidth
                                         type="number"
                                         label="Duration (hours)"
                                         name="duration"
                                         value={formData.duration}
                                         onChange={handleInputChange}
-                                        sx={{
-                                            '& .MuiOutlinedInput-root': {
-                                                bgcolor: '#FFFFFF',
-                                                borderRadius: '12px',
-                                                '&:hover fieldset': { borderColor: '#FF9800' },
-                                                '&.Mui-focused fieldset': { borderColor: '#FF9800' }
-                                            },
-                                            '& .MuiInputLabel-root': { color: '#8A99A8', '&.Mui-focused': { color: '#FF9800' } }
-                                        }}
+                                        variant="outlined"
                                     />
                                 </Grid>
                                 <Grid item xs={6}>
-                                    <TextField
+                                    <FlatTextField
                                         fullWidth
                                         type="number"
                                         label="Max Participants"
                                         name="maxParticipants"
                                         value={formData.maxParticipants}
                                         onChange={handleInputChange}
-                                        sx={{
-                                            '& .MuiOutlinedInput-root': {
-                                                bgcolor: '#FFFFFF',
-                                                borderRadius: '12px',
-                                                '&:hover fieldset': { borderColor: '#FF9800' },
-                                                '&.Mui-focused fieldset': { borderColor: '#FF9800' }
-                                            },
-                                            '& .MuiInputLabel-root': { color: '#8A99A8', '&.Mui-focused': { color: '#FF9800' } }
-                                        }}
+                                        variant="outlined"
                                     />
                                 </Grid>
                             </Grid>
 
                             {/* Tags */}
-                            <TextField
+                            <FlatTextField
                                 fullWidth
                                 label="Tags (comma separated)"
                                 name="tags"
                                 value={formData.tags}
                                 onChange={handleInputChange}
                                 placeholder="e.g., premium, outdoor, family-friendly"
-                                sx={{
-                                    '& .MuiOutlinedInput-root': {
-                                        bgcolor: '#FFFFFF',
-                                        borderRadius: '12px',
-                                        '&:hover fieldset': { borderColor: '#FF9800' },
-                                        '&.Mui-focused fieldset': { borderColor: '#FF9800' }
-                                    },
-                                    '& .MuiInputLabel-root': { color: '#8A99A8', '&.Mui-focused': { color: '#FF9800' } }
-                                }}
+                                variant="outlined"
                             />
 
-                            {/* Date and Time Section (24-hour format) */}
-                            <Typography variant="subtitle2" sx={{ mt: 1, color: '#FF9800', display: 'flex', alignItems: 'center', gap: 1 }}>
-                                <EventIcon sx={{ fontSize: 20 }} /> Event Schedule
+                            {/* Date and Time Section */}
+                            <Typography variant="subtitle1" sx={{ mt: 1, color: '#FF9800', display: 'flex', alignItems: 'center', gap: 1, fontWeight: 600 }}>
+                                <EventIcon sx={{ fontSize: 22 }} /> Event Schedule
                             </Typography>
 
-                            <Grid container spacing={2}>
-                                {/* Start Date - Disable today and past dates, but show them */}
+                            <Grid container spacing={3}>
+                                {/* Start Date */}
                                 <Grid item xs={12} sm={6}>
                                     <DatePicker
                                         label="Start Date"
                                         value={formData.startDate}
                                         onChange={(newValue) => handleDateChange('startDate', newValue)}
-                                        shouldDisableDate={(date) => {
-                                            // Disable today and any date before today
-                                            return dayjs(date).isBefore(dayjs().add(1, 'day'), 'day');
-                                        }}
                                         sx={{
                                             width: '100%',
                                             '& .MuiOutlinedInput-root': {
-                                                bgcolor: '#FFFFFF',
-                                                borderRadius: '12px',
-                                                '&:hover fieldset': { borderColor: '#FF9800' },
-                                                '&.Mui-focused fieldset': { borderColor: '#FF9800' }
-                                            },
-                                            '& .MuiInputLabel-root': { color: '#8A99A8', '&.Mui-focused': { color: '#FF9800' } }
+                                                backgroundColor: '#F5F7FA',
+                                                borderRadius: '8px',
+                                                border: 'none',
+                                                '& fieldset': { border: 'none' },
+                                                '&:hover': { backgroundColor: '#EEF0F2' },
+                                                '&.Mui-focused': {
+                                                    backgroundColor: '#EEF0F2',
+                                                    boxShadow: '0 0 0 2px rgba(255, 152, 0, 0.2)'
+                                                }
+                                            }
                                         }}
                                         slotProps={{
                                             textField: {
                                                 fullWidth: true,
-                                                helperText: "Today and past dates are disabled. Only future dates are selectable.",
-                                                sx: {
-                                                    '& .MuiOutlinedInput-root': {
-                                                        bgcolor: '#FFFFFF',
-                                                        borderRadius: '12px',
-                                                        '&:hover fieldset': { borderColor: '#FF9800' },
-                                                        '&.Mui-focused fieldset': { borderColor: '#FF9800' }
-                                                    },
-                                                    '& .MuiInputLabel-root': { color: '#8A99A8', '&.Mui-focused': { color: '#FF9800' } }
-                                                }
+                                                variant: 'outlined'
                                             }
                                         }}
                                     />
@@ -1209,26 +1269,22 @@ const AdminDashboardPage = () => {
                                         sx={{
                                             width: '100%',
                                             '& .MuiOutlinedInput-root': {
-                                                bgcolor: '#FFFFFF',
-                                                borderRadius: '12px',
-                                                '&:hover fieldset': { borderColor: '#FF9800' },
-                                                '&.Mui-focused fieldset': { borderColor: '#FF9800' }
-                                            },
-                                            '& .MuiInputLabel-root': { color: '#8A99A8', '&.Mui-focused': { color: '#FF9800' } }
+                                                backgroundColor: '#F5F7FA',
+                                                borderRadius: '8px',
+                                                border: 'none',
+                                                '& fieldset': { border: 'none' },
+                                                '&:hover': { backgroundColor: '#EEF0F2' },
+                                                '&.Mui-focused': {
+                                                    backgroundColor: '#EEF0F2',
+                                                    boxShadow: '0 0 0 2px rgba(255, 152, 0, 0.2)'
+                                                }
+                                            }
                                         }}
                                         slotProps={{
                                             textField: {
                                                 fullWidth: true,
                                                 placeholder: "14:30",
-                                                sx: {
-                                                    '& .MuiOutlinedInput-root': {
-                                                        bgcolor: '#FFFFFF',
-                                                        borderRadius: '12px',
-                                                        '&:hover fieldset': { borderColor: '#FF9800' },
-                                                        '&.Mui-focused fieldset': { borderColor: '#FF9800' }
-                                                    },
-                                                    '& .MuiInputLabel-root': { color: '#8A99A8', '&.Mui-focused': { color: '#FF9800' } }
-                                                }
+                                                variant: 'outlined'
                                             }
                                         }}
                                     />
@@ -1240,14 +1296,19 @@ const AdminDashboardPage = () => {
                             </Typography>
 
                             {/* Image Upload Section */}
-                            <Typography variant="subtitle2" sx={{ mt: 1, color: '#FF9800', display: 'flex', alignItems: 'center', gap: 1 }}>
-                                <ImageIcon sx={{ fontSize: 20 }} /> Service Images
+                            <Typography variant="subtitle1" sx={{ mt: 1, color: '#FF9800', display: 'flex', alignItems: 'center', gap: 1, fontWeight: 600 }}>
+                                <ImageIcon sx={{ fontSize: 22 }} /> Service Images
                             </Typography>
 
                             <OutlinedButton
                                 component="label"
                                 startIcon={<UploadIcon />}
-                                sx={{ borderColor: '#E8ECF0', color: '#5A6874' }}
+                                sx={{
+                                    borderColor: '#E0E4E8',
+                                    color: '#5A6874',
+                                    backgroundColor: '#F5F7FA',
+                                    '&:hover': { borderColor: '#FF9800', backgroundColor: '#EEF0F2' }
+                                }}
                             >
                                 Upload Images
                                 <input type="file" multiple accept="image/*" onChange={handleImageSelect} style={{ display: 'none' }} ref={fileInputRef} />
@@ -1310,7 +1371,7 @@ const AdminDashboardPage = () => {
                             </Typography>
                         </Box>
                     </DialogContent>
-                    <DialogActions sx={{ p: 3, borderTop: '1px solid #E8ECF0' }}>
+                    <DialogActions sx={{ p: 3, borderTop: 'none', bgcolor: '#FFFFFF' }}>
                         <OutlinedButton onClick={handleCloseDialog}>
                             Cancel
                         </OutlinedButton>
@@ -1322,20 +1383,20 @@ const AdminDashboardPage = () => {
 
                 {/* Respond to Inquiry Dialog */}
                 <Dialog open={inquiryDialogOpen} onClose={() => setInquiryDialogOpen(false)} maxWidth="md" fullWidth
-                        PaperProps={{ sx: { bgcolor: '#FFFFFF', borderRadius: '24px', border: '1px solid #E8ECF0' } }}>
-                    <DialogTitle sx={{ borderBottom: '1px solid #E8ECF0' }}>
+                        PaperProps={{ sx: { bgcolor: '#FFFFFF', borderRadius: '16px', border: 'none', boxShadow: '0 4px 12px rgba(0, 0, 0, 0.08)' } }}>
+                    <DialogTitle sx={{ borderBottom: 'none', bgcolor: '#FFFFFF', pt: 3, px: 3 }}>
                         <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
                             <ReplyIcon sx={{ color: '#FF9800' }} />
-                            <Typography variant="h6" sx={{ fontWeight: 600, color: '#1A2733' }}>Respond to Customer</Typography>
+                            <Typography variant="h5" sx={{ fontWeight: 600, color: '#1A2733' }}>Respond to Customer</Typography>
                         </Box>
                         <IconButton onClick={() => setInquiryDialogOpen(false)} sx={{ position: 'absolute', right: 16, top: 16, color: '#8A99A8' }}>
                             <CloseIcon />
                         </IconButton>
                     </DialogTitle>
-                    <DialogContent>
+                    <DialogContent sx={{ p: 3 }}>
                         {selectedInquiry && (
                             <Box sx={{ mt: 2 }}>
-                                <Paper sx={{ p: 2.5, mb: 3, bgcolor: alpha('#FF9800', 0.05), borderRadius: '16px' }}>
+                                <Paper sx={{ p: 2.5, mb: 3, bgcolor: alpha('#FF9800', 0.05), borderRadius: '12px', border: 'none' }}>
                                     <Grid container spacing={2}>
                                         <Grid item xs={6}>
                                             <Typography variant="caption" sx={{ color: '#8A99A8' }}>Customer</Typography>
@@ -1351,7 +1412,7 @@ const AdminDashboardPage = () => {
                                         </Grid>
                                     </Grid>
                                 </Paper>
-                                <TextField
+                                <FlatTextField
                                     fullWidth
                                     multiline
                                     rows={6}
@@ -1359,20 +1420,12 @@ const AdminDashboardPage = () => {
                                     value={responseText}
                                     onChange={(e) => setResponseText(e.target.value)}
                                     required
-                                    sx={{
-                                        '& .MuiOutlinedInput-root': {
-                                            bgcolor: '#FFFFFF',
-                                            borderRadius: '12px',
-                                            '&:hover fieldset': { borderColor: '#FF9800' },
-                                            '&.Mui-focused fieldset': { borderColor: '#FF9800' }
-                                        },
-                                        '& .MuiInputLabel-root': { color: '#8A99A8', '&.Mui-focused': { color: '#FF9800' } }
-                                    }}
+                                    variant="outlined"
                                 />
                             </Box>
                         )}
                     </DialogContent>
-                    <DialogActions sx={{ p: 3, borderTop: '1px solid #E8ECF0' }}>
+                    <DialogActions sx={{ p: 3, borderTop: 'none', bgcolor: '#FFFFFF' }}>
                         <OutlinedButton onClick={() => setInquiryDialogOpen(false)}>
                             Cancel
                         </OutlinedButton>
