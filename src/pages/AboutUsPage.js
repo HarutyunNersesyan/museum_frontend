@@ -21,7 +21,8 @@ import {
     useTheme,
     Tooltip,
     alpha,
-    keyframes
+    keyframes,
+    GlobalStyles
 } from '@mui/material';
 import {
     Security as SecurityIcon,
@@ -78,6 +79,29 @@ const AboutUsPage = () => {
     const [backgroundPosition, setBackgroundPosition] = useState({ x: 0, y: 0 });
     const [anchorEl, setAnchorEl] = useState(null);
     const [userInitial, setUserInitial] = useState('');
+
+    // Scrollbar styles
+    const scrollbarStyles = {
+        '*::-webkit-scrollbar': {
+            width: '10px',
+            height: '10px',
+        },
+        '*::-webkit-scrollbar-track': {
+            background: '#F5F0E8',
+            borderRadius: '10px',
+        },
+        '*::-webkit-scrollbar-thumb': {
+            background: '#FF6B35',
+            borderRadius: '10px',
+            '&:hover': {
+                background: '#E55A2B',
+            },
+        },
+        '*': {
+            scrollbarColor: '#FF6B35 #F5F0E8',
+            scrollbarWidth: 'thin',
+        },
+    };
 
     useEffect(() => {
         if (user && user.userName) {
@@ -158,6 +182,9 @@ const AboutUsPage = () => {
             overflowX: 'hidden',
             fontFamily: "'Inter', sans-serif"
         }}>
+            {/* Global Scrollbar Styles */}
+            <GlobalStyles styles={scrollbarStyles} />
+
             {/* Animated Background */}
             <Box sx={{
                 position: 'fixed',
@@ -237,7 +264,7 @@ const AboutUsPage = () => {
                                 alignItems: 'center',
                                 justifyContent: 'center'
                             }}>
-                                <LockIcon sx={{ color: 'white', fontSize: 22 }} />
+                                <CelebrationIcon sx={{ color: 'white', fontSize: 22 }} />
                             </Box>
                             <Typography variant="h6" sx={{
                                 fontWeight: 800,

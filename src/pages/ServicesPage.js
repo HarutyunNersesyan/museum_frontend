@@ -546,7 +546,7 @@ const ServicesPage = () => {
                                     alignItems: 'center',
                                     justifyContent: 'center'
                                 }}>
-                                    <LockIcon sx={{ color: 'white', fontSize: 22 }} />
+                                    <CelebrationIcon sx={{ color: 'white', fontSize: 22 }} />
                                 </Box>
                                 <Typography variant="h6" sx={{
                                     fontWeight: 800,
