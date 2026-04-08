@@ -395,11 +395,11 @@ const AdminDashboardPage = () => {
         return null;
     };
 
-    // Validation function to check if date is not in the past
-    const isDateValid = (date) => {
+    // Validation function to check if date is from tomorrow or future (not today)
+    const isDateValidForFuture = (date) => {
         if (!date) return true;
-        const today = dayjs().startOf('day');
-        return dayjs(date).isSameOrAfter(today, 'day');
+        const tomorrow = dayjs().add(1, 'day').startOf('day');
+        return dayjs(date).isSameOrAfter(tomorrow, 'day');
     };
 
     const handleSubmit = async () => {
@@ -412,11 +412,11 @@ const AdminDashboardPage = () => {
             return;
         }
 
-        // Validate that start date is not in the past
-        if (formData.startDate && !isDateValid(formData.startDate)) {
+        // Validate that start date is from tomorrow or future (not today)
+        if (formData.startDate && !isDateValidForFuture(formData.startDate)) {
             setSnackbar({
                 open: true,
-                message: 'Start date cannot be in the past. Please select today or a future date.',
+                message: 'Start date must be tomorrow or a future date. Today and past dates are not allowed.',
                 severity: 'warning'
             });
             return;
@@ -1160,16 +1160,15 @@ const AdminDashboardPage = () => {
                             </Typography>
 
                             <Grid container spacing={2}>
-                                {/* Start Date - with validation to prevent past dates */}
+                                {/* Start Date - Disable today and past dates, but show them */}
                                 <Grid item xs={12} sm={6}>
                                     <DatePicker
                                         label="Start Date"
                                         value={formData.startDate}
                                         onChange={(newValue) => handleDateChange('startDate', newValue)}
-                                        minDate={dayjs()} // ✅ Prevents selecting past dates
                                         shouldDisableDate={(date) => {
-                                            // Disable any date that is before today
-                                            return dayjs(date).isBefore(dayjs(), 'day');
+                                            // Disable today and any date before today
+                                            return dayjs(date).isBefore(dayjs().add(1, 'day'), 'day');
                                         }}
                                         sx={{
                                             width: '100%',
@@ -1184,7 +1183,7 @@ const AdminDashboardPage = () => {
                                         slotProps={{
                                             textField: {
                                                 fullWidth: true,
-                                                helperText: "Cannot select past dates",
+                                                helperText: "Today and past dates are disabled. Only future dates are selectable.",
                                                 sx: {
                                                     '& .MuiOutlinedInput-root': {
                                                         bgcolor: '#FFFFFF',
