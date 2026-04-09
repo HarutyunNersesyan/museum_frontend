@@ -1,4 +1,4 @@
-// src/pages/ServicesPage.js - Without Sort By
+// src/pages/ServicesPage.js
 
 import React, { useState, useEffect } from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
@@ -233,7 +233,7 @@ const ServicesPage = () => {
     const [isSearching, setIsSearching] = useState(false);
     const [activeImageIndex, setActiveImageIndex] = useState({});
 
-    // New state for tabs - "all" or "popular"
+    // Tab state - "all" or "popular"
     const [activeTab, setActiveTab] = useState('all');
 
     // Filter states
@@ -245,9 +245,6 @@ const ServicesPage = () => {
     const [priceRange, setPriceRange] = useState([0, 1000000]);
     const [startDateFrom, setStartDateFrom] = useState(null);
     const [startDateTo, setStartDateTo] = useState(null);
-    // sortBy is now determined by activeTab only
-    const sortBy = activeTab === 'popular' ? 'likeCount' : 'createdAt';
-    const sortDirection = 'DESC';
 
     // Mouse move effect for animated background
     useEffect(() => {
@@ -299,7 +296,9 @@ const ServicesPage = () => {
 
     // Load services when page changes or tab changes
     useEffect(() => {
-        if (page > 0 || isSearching) {
+        if (activeTab === 'popular') {
+            loadPopularServices();
+        } else if (page > 0 || isSearching) {
             performSearch();
         }
     }, [page, activeTab]);
@@ -307,7 +306,11 @@ const ServicesPage = () => {
     const loadInitialData = async () => {
         setLoading(true);
         try {
-            await performSearch();
+            if (activeTab === 'popular') {
+                await loadPopularServices();
+            } else {
+                await performSearch();
+            }
         } catch (error) {
             console.error('Error loading initial data:', error);
         } finally {
@@ -323,9 +326,7 @@ const ServicesPage = () => {
                 category: selectedCategory || null,
                 location: selectedLocation || null,
                 page: page,
-                size: 10,
-                sortBy: sortBy,
-                sortDirection: sortDirection
+                size: 10
             };
 
             if (minPrice && minPrice !== '') {
@@ -358,18 +359,24 @@ const ServicesPage = () => {
         }
     };
 
-    // Handle tab change
-    const handleTabChange = (event, newValue) => {
-        setActiveTab(newValue);
-        setPage(0);
-        setIsSearching(false);
-
-        // Update URL without reload
-        const urlParams = new URLSearchParams(location.search);
-        urlParams.set('tab', newValue);
-        navigate(`${location.pathname}?${urlParams.toString()}`, { replace: true });
-
-        setTimeout(() => performSearch(), 100);
+    const loadPopularServices = async () => {
+        setLoading(true);
+        try {
+            const response = await serviceAPI.getPopularServices(page, 10);
+            setServices(response.data.content);
+            setTotalPages(response.data.totalPages);
+            setTotalElements(response.data.totalElements);
+            setIsSearching(true);
+        } catch (error) {
+            console.error('Error loading popular services:', error);
+            setSnackbar({
+                open: true,
+                message: 'Failed to load popular services',
+                severity: 'error'
+            });
+        } finally {
+            setLoading(false);
+        }
     };
 
     const loadFavorites = async () => {
@@ -408,7 +415,31 @@ const ServicesPage = () => {
         setMaxPrice(newValue[1].toString());
     };
 
-    const handleFavoriteToggle = async (serviceId, e) => {
+    const handleTabChange = (event, newValue) => {
+        setActiveTab(newValue);
+        setPage(0);
+        setIsSearching(false);
+
+        // Clear filters when switching to popular tab
+        if (newValue === 'popular') {
+            setSearchQuery('');
+            setSelectedCategory('');
+            setSelectedLocation('');
+            setMinPrice('');
+            setMaxPrice('');
+            setPriceRange([0, 1000000]);
+            setStartDateFrom(null);
+            setStartDateTo(null);
+        }
+
+        // Update URL without reload
+        const urlParams = new URLSearchParams(location.search);
+        urlParams.set('tab', newValue);
+        navigate(`${location.pathname}?${urlParams.toString()}`, { replace: true });
+    };
+
+    // Single function to handle like/unlike with fire icon
+    const handleLikeToggle = async (serviceId, e) => {
         e.stopPropagation();
         try {
             if (favorites.has(serviceId)) {
@@ -418,25 +449,41 @@ const ServicesPage = () => {
                     newSet.delete(serviceId);
                     return newSet;
                 });
+                // Update like count in local state
+                setServices(prevServices =>
+                    prevServices.map(service =>
+                        service.id === serviceId
+                            ? { ...service, likeCount: Math.max(0, (service.likeCount || 0) - 1) }
+                            : service
+                    )
+                );
                 setSnackbar({
                     open: true,
-                    message: 'Removed from favorites',
+                    message: 'Removed like',
                     severity: 'info'
                 });
             } else {
                 await serviceAPI.addToFavorites(serviceId);
                 setFavorites(prev => new Set(prev).add(serviceId));
+                // Update like count in local state
+                setServices(prevServices =>
+                    prevServices.map(service =>
+                        service.id === serviceId
+                            ? { ...service, likeCount: (service.likeCount || 0) + 1 }
+                            : service
+                    )
+                );
                 setSnackbar({
                     open: true,
-                    message: 'Added to favorites',
+                    message: 'Liked!',
                     severity: 'success'
                 });
             }
         } catch (error) {
-            console.error('Error toggling favorite:', error);
+            console.error('Error toggling like:', error);
             setSnackbar({
                 open: true,
-                message: 'Failed to update favorites',
+                message: 'Failed to update like',
                 severity: 'error'
             });
         }
@@ -523,7 +570,6 @@ const ServicesPage = () => {
         }, 100);
     };
 
-    // Handle next image
     const handleNextImage = (serviceId, totalImages, e) => {
         e.stopPropagation();
         setActiveImageIndex(prev => ({
@@ -532,7 +578,6 @@ const ServicesPage = () => {
         }));
     };
 
-    // Handle previous image
     const handlePrevImage = (serviceId, totalImages, e) => {
         e.stopPropagation();
         setActiveImageIndex(prev => ({
@@ -787,216 +832,218 @@ const ServicesPage = () => {
                         </Box>
                     )}
 
-                    {/* Search Filters - WITHOUT SORT BY */}
-                    <Paper elevation={0} sx={{
-                        background: '#FFFFFF',
-                        borderRadius: '20px',
-                        p: 3,
-                        mb: 3,
-                        boxShadow: '0 2px 8px rgba(0, 0, 0, 0.04)',
-                        border: '1px solid #E8ECF0'
-                    }}>
-                        <Grid container spacing={2} alignItems="center">
-                            <Grid item xs={12} md={4}>
-                                <TextField
-                                    fullWidth
-                                    placeholder="Search services..."
-                                    value={searchQuery}
-                                    onChange={(e) => setSearchQuery(e.target.value)}
-                                    onKeyPress={(e) => e.key === 'Enter' && handleSearch()}
-                                    sx={{
-                                        '& .MuiOutlinedInput-root': {
-                                            backgroundColor: '#F5F7FA',
-                                            borderRadius: '12px',
-                                            '& fieldset': { border: 'none' }
-                                        }
-                                    }}
-                                />
-                            </Grid>
-                            <Grid item xs={12} md={3}>
-                                <FormControl fullWidth>
-                                    <InputLabel sx={{ color: '#8A99A8' }}>Category</InputLabel>
-                                    <Select
-                                        value={selectedCategory}
-                                        onChange={(e) => setSelectedCategory(e.target.value)}
-                                        label="Category"
-                                        sx={{
-                                            backgroundColor: '#F5F7FA',
-                                            borderRadius: '12px',
-                                            '& fieldset': { border: 'none' }
-                                        }}
-                                    >
-                                        <MenuItem value="">All Categories</MenuItem>
-                                        {CATEGORIES.map((cat) => (
-                                            <MenuItem key={cat} value={cat}>{cat}</MenuItem>
-                                        ))}
-                                    </Select>
-                                </FormControl>
-                            </Grid>
-                            <Grid item xs={12} md={3}>
-                                <FormControl fullWidth>
-                                    <InputLabel sx={{ color: '#8A99A8' }}>Location</InputLabel>
-                                    <Select
-                                        value={selectedLocation}
-                                        onChange={(e) => setSelectedLocation(e.target.value)}
-                                        label="Location"
-                                        sx={{
-                                            backgroundColor: '#F5F7FA',
-                                            borderRadius: '12px',
-                                            '& fieldset': { border: 'none' }
-                                        }}
-                                    >
-                                        <MenuItem value="">All Locations</MenuItem>
-                                        {ARMENIAN_LOCATIONS.map((location) => (
-                                            <MenuItem key={location.value} value={location.value}>{location.label}</MenuItem>
-                                        ))}
-                                    </Select>
-                                </FormControl>
-                            </Grid>
-                            <Grid item xs={12} md={2}>
-                                <Stack direction="row" spacing={1}>
-                                    <GradientButton
+                    {/* Search Filters - Only show for All Services tab */}
+                    {activeTab !== 'popular' && (
+                        <Paper elevation={0} sx={{
+                            background: '#FFFFFF',
+                            borderRadius: '20px',
+                            p: 3,
+                            mb: 3,
+                            boxShadow: '0 2px 8px rgba(0, 0, 0, 0.04)',
+                            border: '1px solid #E8ECF0'
+                        }}>
+                            <Grid container spacing={2} alignItems="center">
+                                <Grid item xs={12} md={4}>
+                                    <TextField
                                         fullWidth
-                                        onClick={handleSearch}
-                                        sx={{ height: '56px' }}
-                                    >
-                                        Search
-                                    </GradientButton>
-                                    <Tooltip title="Advanced Filters">
-                                        <IconButton
-                                            onClick={() => setShowAdvancedFilters(!showAdvancedFilters)}
-                                            sx={{
-                                                height: '56px',
-                                                width: '56px',
-                                                border: '1px solid #E8ECF0',
+                                        placeholder="Search services..."
+                                        value={searchQuery}
+                                        onChange={(e) => setSearchQuery(e.target.value)}
+                                        onKeyPress={(e) => e.key === 'Enter' && handleSearch()}
+                                        sx={{
+                                            '& .MuiOutlinedInput-root': {
+                                                backgroundColor: '#F5F7FA',
                                                 borderRadius: '12px',
-                                                bgcolor: showAdvancedFilters ? alpha('#FF9800', 0.1) : '#F5F7FA',
-                                                color: showAdvancedFilters ? '#FF9800' : '#8A99A8'
-                                            }}
-                                        >
-                                            <FilterIcon />
-                                        </IconButton>
-                                    </Tooltip>
-                                </Stack>
-                            </Grid>
-                        </Grid>
-
-                        {/* Advanced Filters */}
-                        <Collapse in={showAdvancedFilters}>
-                            <Box sx={{ mt: 3, pt: 3, borderTop: '1px solid #E8ECF0' }}>
-                                <Typography variant="subtitle1" sx={{ fontWeight: 600, mb: 2, color: '#1A2733' }}>
-                                    Price Range
-                                </Typography>
-                                <Box sx={{ px: 2, mb: 3 }}>
-                                    <Slider
-                                        value={priceRange}
-                                        onChange={handlePriceRangeChange}
-                                        valueLabelDisplay="auto"
-                                        valueLabelFormat={(value) => `${value.toLocaleString()} ֏`}
-                                        min={0}
-                                        max={1000000}
-                                        step={10000}
-                                        sx={{ color: '#FF9800' }}
+                                                '& fieldset': { border: 'none' }
+                                            }
+                                        }}
                                     />
-                                    <Grid container spacing={2} sx={{ mt: 1 }}>
-                                        <Grid item xs={6}>
-                                            <TextField
-                                                fullWidth
-                                                type="number"
-                                                label="Min Price (AMD)"
-                                                value={minPrice}
-                                                onChange={(e) => {
-                                                    setMinPrice(e.target.value);
-                                                    setPriceRange([parseInt(e.target.value) || 0, priceRange[1]]);
-                                                }}
-                                                size="small"
-                                                sx={{
-                                                    '& .MuiOutlinedInput-root': {
-                                                        backgroundColor: '#F5F7FA',
-                                                        borderRadius: '8px',
-                                                        '& fieldset': { border: 'none' }
-                                                    }
-                                                }}
-                                            />
-                                        </Grid>
-                                        <Grid item xs={6}>
-                                            <TextField
-                                                fullWidth
-                                                type="number"
-                                                label="Max Price (AMD)"
-                                                value={maxPrice}
-                                                onChange={(e) => {
-                                                    setMaxPrice(e.target.value);
-                                                    setPriceRange([priceRange[0], parseInt(e.target.value) || 1000000]);
-                                                }}
-                                                size="small"
-                                                sx={{
-                                                    '& .MuiOutlinedInput-root': {
-                                                        backgroundColor: '#F5F7FA',
-                                                        borderRadius: '8px',
-                                                        '& fieldset': { border: 'none' }
-                                                    }
-                                                }}
-                                            />
-                                        </Grid>
-                                    </Grid>
-                                </Box>
-
-                                <Typography variant="subtitle1" sx={{ fontWeight: 600, mb: 2, color: '#1A2733' }}>
-                                    Event Date
-                                </Typography>
-                                <Grid container spacing={2} sx={{ mb: 3 }}>
-                                    <Grid item xs={12} sm={6}>
-                                        <DatePicker
-                                            label="Start Date From"
-                                            value={startDateFrom}
-                                            onChange={(newValue) => setStartDateFrom(newValue)}
-                                            sx={{
-                                                width: '100%',
-                                                '& .MuiOutlinedInput-root': {
-                                                    backgroundColor: '#F5F7FA',
-                                                    borderRadius: '8px',
-                                                    '& fieldset': { border: 'none' }
-                                                }
-                                            }}
-                                            slotProps={{ textField: { fullWidth: true, size: 'small' } }}
-                                        />
-                                    </Grid>
-                                    <Grid item xs={12} sm={6}>
-                                        <DatePicker
-                                            label="Start Date To"
-                                            value={startDateTo}
-                                            onChange={(newValue) => setStartDateTo(newValue)}
-                                            sx={{
-                                                width: '100%',
-                                                '& .MuiOutlinedInput-root': {
-                                                    backgroundColor: '#F5F7FA',
-                                                    borderRadius: '8px',
-                                                    '& fieldset': { border: 'none' }
-                                                }
-                                            }}
-                                            slotProps={{ textField: { fullWidth: true, size: 'small' } }}
-                                        />
-                                    </Grid>
                                 </Grid>
-
-                                {activeFiltersCount > 0 && (
-                                    <Box sx={{ display: 'flex', justifyContent: 'flex-end', mt: 2 }}>
-                                        <OutlinedButton
-                                            startIcon={<ClearIcon />}
-                                            onClick={handleClearFilters}
-                                            size="small"
+                                <Grid item xs={12} md={3}>
+                                    <FormControl fullWidth>
+                                        <InputLabel sx={{ color: '#8A99A8' }}>Category</InputLabel>
+                                        <Select
+                                            value={selectedCategory}
+                                            onChange={(e) => setSelectedCategory(e.target.value)}
+                                            label="Category"
+                                            sx={{
+                                                backgroundColor: '#F5F7FA',
+                                                borderRadius: '12px',
+                                                '& fieldset': { border: 'none' }
+                                            }}
                                         >
-                                            Clear All Filters ({activeFiltersCount})
-                                        </OutlinedButton>
-                                    </Box>
-                                )}
-                            </Box>
-                        </Collapse>
-                    </Paper>
+                                            <MenuItem value="">All Categories</MenuItem>
+                                            {CATEGORIES.map((cat) => (
+                                                <MenuItem key={cat} value={cat}>{cat}</MenuItem>
+                                            ))}
+                                        </Select>
+                                    </FormControl>
+                                </Grid>
+                                <Grid item xs={12} md={3}>
+                                    <FormControl fullWidth>
+                                        <InputLabel sx={{ color: '#8A99A8' }}>Location</InputLabel>
+                                        <Select
+                                            value={selectedLocation}
+                                            onChange={(e) => setSelectedLocation(e.target.value)}
+                                            label="Location"
+                                            sx={{
+                                                backgroundColor: '#F5F7FA',
+                                                borderRadius: '12px',
+                                                '& fieldset': { border: 'none' }
+                                            }}
+                                        >
+                                            <MenuItem value="">All Locations</MenuItem>
+                                            {ARMENIAN_LOCATIONS.map((location) => (
+                                                <MenuItem key={location.value} value={location.value}>{location.label}</MenuItem>
+                                            ))}
+                                        </Select>
+                                    </FormControl>
+                                </Grid>
+                                <Grid item xs={12} md={2}>
+                                    <Stack direction="row" spacing={1}>
+                                        <GradientButton
+                                            fullWidth
+                                            onClick={handleSearch}
+                                            sx={{ height: '56px' }}
+                                        >
+                                            Search
+                                        </GradientButton>
+                                        <Tooltip title="Advanced Filters">
+                                            <IconButton
+                                                onClick={() => setShowAdvancedFilters(!showAdvancedFilters)}
+                                                sx={{
+                                                    height: '56px',
+                                                    width: '56px',
+                                                    border: '1px solid #E8ECF0',
+                                                    borderRadius: '12px',
+                                                    bgcolor: showAdvancedFilters ? alpha('#FF9800', 0.1) : '#F5F7FA',
+                                                    color: showAdvancedFilters ? '#FF9800' : '#8A99A8'
+                                                }}
+                                            >
+                                                <FilterIcon />
+                                            </IconButton>
+                                        </Tooltip>
+                                    </Stack>
+                                </Grid>
+                            </Grid>
 
-                    {/* Active Filters Chips */}
-                    {activeFiltersCount > 0 && (
+                            {/* Advanced Filters */}
+                            <Collapse in={showAdvancedFilters}>
+                                <Box sx={{ mt: 3, pt: 3, borderTop: '1px solid #E8ECF0' }}>
+                                    <Typography variant="subtitle1" sx={{ fontWeight: 600, mb: 2, color: '#1A2733' }}>
+                                        Price Range
+                                    </Typography>
+                                    <Box sx={{ px: 2, mb: 3 }}>
+                                        <Slider
+                                            value={priceRange}
+                                            onChange={handlePriceRangeChange}
+                                            valueLabelDisplay="auto"
+                                            valueLabelFormat={(value) => `${value.toLocaleString()} ֏`}
+                                            min={0}
+                                            max={1000000}
+                                            step={10000}
+                                            sx={{ color: '#FF9800' }}
+                                        />
+                                        <Grid container spacing={2} sx={{ mt: 1 }}>
+                                            <Grid item xs={6}>
+                                                <TextField
+                                                    fullWidth
+                                                    type="number"
+                                                    label="Min Price (AMD)"
+                                                    value={minPrice}
+                                                    onChange={(e) => {
+                                                        setMinPrice(e.target.value);
+                                                        setPriceRange([parseInt(e.target.value) || 0, priceRange[1]]);
+                                                    }}
+                                                    size="small"
+                                                    sx={{
+                                                        '& .MuiOutlinedInput-root': {
+                                                            backgroundColor: '#F5F7FA',
+                                                            borderRadius: '8px',
+                                                            '& fieldset': { border: 'none' }
+                                                        }
+                                                    }}
+                                                />
+                                            </Grid>
+                                            <Grid item xs={6}>
+                                                <TextField
+                                                    fullWidth
+                                                    type="number"
+                                                    label="Max Price (AMD)"
+                                                    value={maxPrice}
+                                                    onChange={(e) => {
+                                                        setMaxPrice(e.target.value);
+                                                        setPriceRange([priceRange[0], parseInt(e.target.value) || 1000000]);
+                                                    }}
+                                                    size="small"
+                                                    sx={{
+                                                        '& .MuiOutlinedInput-root': {
+                                                            backgroundColor: '#F5F7FA',
+                                                            borderRadius: '8px',
+                                                            '& fieldset': { border: 'none' }
+                                                        }
+                                                    }}
+                                                />
+                                            </Grid>
+                                        </Grid>
+                                    </Box>
+
+                                    <Typography variant="subtitle1" sx={{ fontWeight: 600, mb: 2, color: '#1A2733' }}>
+                                        Event Date
+                                    </Typography>
+                                    <Grid container spacing={2} sx={{ mb: 3 }}>
+                                        <Grid item xs={12} sm={6}>
+                                            <DatePicker
+                                                label="Start Date From"
+                                                value={startDateFrom}
+                                                onChange={(newValue) => setStartDateFrom(newValue)}
+                                                sx={{
+                                                    width: '100%',
+                                                    '& .MuiOutlinedInput-root': {
+                                                        backgroundColor: '#F5F7FA',
+                                                        borderRadius: '8px',
+                                                        '& fieldset': { border: 'none' }
+                                                    }
+                                                }}
+                                                slotProps={{ textField: { fullWidth: true, size: 'small' } }}
+                                            />
+                                        </Grid>
+                                        <Grid item xs={12} sm={6}>
+                                            <DatePicker
+                                                label="Start Date To"
+                                                value={startDateTo}
+                                                onChange={(newValue) => setStartDateTo(newValue)}
+                                                sx={{
+                                                    width: '100%',
+                                                    '& .MuiOutlinedInput-root': {
+                                                        backgroundColor: '#F5F7FA',
+                                                        borderRadius: '8px',
+                                                        '& fieldset': { border: 'none' }
+                                                    }
+                                                }}
+                                                slotProps={{ textField: { fullWidth: true, size: 'small' } }}
+                                            />
+                                        </Grid>
+                                    </Grid>
+
+                                    {activeFiltersCount > 0 && (
+                                        <Box sx={{ display: 'flex', justifyContent: 'flex-end', mt: 2 }}>
+                                            <OutlinedButton
+                                                startIcon={<ClearIcon />}
+                                                onClick={handleClearFilters}
+                                                size="small"
+                                            >
+                                                Clear All Filters ({activeFiltersCount})
+                                            </OutlinedButton>
+                                        </Box>
+                                    )}
+                                </Box>
+                            </Collapse>
+                        </Paper>
+                    )}
+
+                    {/* Active Filters Chips - Only show for All Services tab */}
+                    {activeTab !== 'popular' && activeFiltersCount > 0 && (
                         <Box sx={{ display: 'flex', flexWrap: 'wrap', gap: 1, mb: 3 }}>
                             {searchQuery && (
                                 <Chip
@@ -1097,6 +1144,7 @@ const ServicesPage = () => {
                                 const eventDate = formatEventDate(service.startDate, service.startTime);
                                 const images = service.imageUrls || [];
                                 const currentIndex = activeImageIndex[service.id] || 0;
+                                const isLiked = favorites.has(service.id);
 
                                 return (
                                     <Grow in={true} style={{ transitionDelay: `${index * 50}ms` }} key={service.id}>
@@ -1123,34 +1171,38 @@ const ServicesPage = () => {
                                                             <Typography variant="h5" sx={{ fontWeight: 700, color: '#1A2733', fontSize: '1.8rem' }}>
                                                                 {service.name}
                                                             </Typography>
+                                                            {/* Single Fire Icon for Like - Click to like/unlike */}
                                                             <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
-                                                                {service.likeCount > 0 && activeTab === 'popular' && (
-                                                                    <Chip
-                                                                        icon={<WhatshotIcon sx={{ fontSize: 14 }} />}
-                                                                        label={service.likeCount}
-                                                                        size="small"
-                                                                        sx={{ bgcolor: alpha('#FF9800', 0.1), color: '#FF9800' }}
-                                                                    />
-                                                                )}
-                                                                {service.likeCount > 0 && activeTab !== 'popular' && (
-                                                                    <Chip
-                                                                        label={`❤️ ${service.likeCount}`}
-                                                                        size="small"
-                                                                        sx={{ bgcolor: alpha('#FF9800', 0.1), color: '#FF9800' }}
-                                                                    />
-                                                                )}
-                                                                <IconButton
-                                                                    onClick={(e) => handleFavoriteToggle(service.id, e)}
+                                                                <Tooltip title={isLiked ? "Unlike" : "Like"}>
+                                                                    <IconButton
+                                                                        onClick={(e) => handleLikeToggle(service.id, e)}
+                                                                        sx={{
+                                                                            bgcolor: isLiked ? alpha('#FF9800', 0.2) : alpha('#FF9800', 0.1),
+                                                                            '&:hover': {
+                                                                                bgcolor: alpha('#FF9800', 0.3),
+                                                                                transform: 'scale(1.05)'
+                                                                            },
+                                                                            transition: 'all 0.2s ease'
+                                                                        }}
+                                                                    >
+                                                                        <WhatshotIcon
+                                                                            sx={{
+                                                                                color: isLiked ? '#FF9800' : '#8A99A8',
+                                                                                fontSize: 24
+                                                                            }}
+                                                                        />
+                                                                    </IconButton>
+                                                                </Tooltip>
+                                                                <Typography
+                                                                    variant="body1"
                                                                     sx={{
-                                                                        bgcolor: alpha('#FF9800', 0.1),
-                                                                        '&:hover': { bgcolor: alpha('#FF9800', 0.2) }
+                                                                        fontWeight: 600,
+                                                                        color: isLiked ? '#FF9800' : '#5A6874',
+                                                                        minWidth: '45px'
                                                                     }}
                                                                 >
-                                                                    {favorites.has(service.id) ?
-                                                                        <FavoriteIcon sx={{ color: '#FF9800' }} /> :
-                                                                        <FavoriteBorderIcon sx={{ color: '#8A99A8' }} />
-                                                                    }
-                                                                </IconButton>
+                                                                    {service.likeCount || 0}
+                                                                </Typography>
                                                             </Box>
                                                         </Box>
 

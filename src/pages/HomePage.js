@@ -254,20 +254,14 @@ function HomePage() {
             return;
         }
 
-        // Build search params object
-        const searchParams = {};
-        if (categoryId) searchParams.category = categoryId;
-        if (sortByPopular) searchParams.sortBy = 'likeCount';
-
-        // Save to sessionStorage for persistence
-        sessionStorage.setItem('servicesSearchParams', JSON.stringify(searchParams));
-
-        // Navigate to services page with URL params
-        const urlParams = new URLSearchParams();
-        if (categoryId) urlParams.append('category', categoryId);
-        if (sortByPopular) urlParams.append('sortBy', 'likeCount');
-
-        navigate(`/services?${urlParams.toString()}`);
+        if (sortByPopular) {
+            // Navigate to services page with popular tab active
+            navigate('/services?tab=popular');
+        } else if (categoryId) {
+            navigate(`/services?category=${categoryId}`);
+        } else {
+            navigate('/services');
+        }
     };
 
     const handleSearch = () => {

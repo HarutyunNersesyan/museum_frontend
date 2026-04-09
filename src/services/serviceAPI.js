@@ -1,4 +1,4 @@
-// src/services/serviceAPI.js - Without cart functionality
+// src/services/serviceAPI.js
 
 import axios from 'axios';
 
@@ -35,6 +35,20 @@ export const serviceAPI = {
             return response;
         } catch (error) {
             console.error('Get all services error:', error);
+            throw error;
+        }
+    },
+
+    // Get popular services (sorted by like count)
+    getPopularServices: async (page = 0, size = 10) => {
+        try {
+            const response = await axios.get(
+                `${API_BASE_URL}/services/popular?page=${page}&size=${size}`,
+                { headers: getAuthHeaders() }
+            );
+            return response;
+        } catch (error) {
+            console.error('Get popular services error:', error);
             throw error;
         }
     },
@@ -84,12 +98,6 @@ export const serviceAPI = {
             }
             if (searchParams.minParticipants) {
                 params.minParticipants = searchParams.minParticipants;
-            }
-            if (searchParams.sortBy) {
-                params.sortBy = searchParams.sortBy;
-            }
-            if (searchParams.sortDirection) {
-                params.sortDirection = searchParams.sortDirection;
             }
 
             console.log('Searching services with params:', params);
