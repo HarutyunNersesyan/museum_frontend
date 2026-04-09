@@ -1,3 +1,5 @@
+// src/pages/HomePage.js
+
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import {
@@ -245,20 +247,29 @@ function HomePage() {
         navigate('/admin/dashboard');
     };
 
-    const handleServicesClick = (categoryId = null) => {
+    const handleServicesClick = (categoryId = null, sortByPopular = false) => {
         if (!user) {
             setSnackbar({ open: true, message: 'Please sign in to browse services', severity: 'warning' });
             handleOpenLoginModal();
             return;
         }
-        if (categoryId) {
-            navigate(`/services?category=${categoryId}`);
-        } else {
-            navigate('/services');
-        }
+
+        // Build search params object
+        const searchParams = {};
+        if (categoryId) searchParams.category = categoryId;
+        if (sortByPopular) searchParams.sortBy = 'likeCount';
+
+        // Save to sessionStorage for persistence
+        sessionStorage.setItem('servicesSearchParams', JSON.stringify(searchParams));
+
+        // Navigate to services page with URL params
+        const urlParams = new URLSearchParams();
+        if (categoryId) urlParams.append('category', categoryId);
+        if (sortByPopular) urlParams.append('sortBy', 'likeCount');
+
+        navigate(`/services?${urlParams.toString()}`);
     };
 
-    // Search handler - saves search params and navigates to ServicesPage
     const handleSearch = () => {
         if (!user) {
             setSnackbar({ open: true, message: 'Please sign in to search services', severity: 'warning' });
@@ -346,7 +357,7 @@ function HomePage() {
                 }}
                 onMouseEnter={() => setHoveredCategory(category.id)}
                 onMouseLeave={() => setHoveredCategory(null)}
-                onClick={() => handleServicesClick(category.id)}
+                onClick={() => handleServicesClick(category.id, false)}
             >
                 <Tooltip title={category.name} placement="top" arrow>
                     <Box sx={{
@@ -537,7 +548,6 @@ function HomePage() {
                             >
                                 Services
                             </Button>
-                            {/* Admin button removed as requested */}
                         </Box>
 
                         <Box sx={{ display: 'flex', alignItems: 'center', gap: 2 }}>
@@ -841,7 +851,7 @@ function HomePage() {
                                     </Button>
                                     <Button
                                         variant="contained"
-                                        onClick={() => handleServicesClick()}
+                                        onClick={() => handleServicesClick(null, true)}
                                         endIcon={<WhatshotIcon />}
                                         sx={{
                                             background: 'linear-gradient(135deg, #FF6B35 0%, #FFB347 100%)',

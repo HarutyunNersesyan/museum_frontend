@@ -1,7 +1,7 @@
-// src/pages/ServicesPage.js - Fixed import
+// src/pages/ServicesPage.js - Without Sort By
 
 import React, { useState, useEffect } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, useLocation } from 'react-router-dom';
 import {
     Container,
     Typography,
@@ -64,17 +64,18 @@ import {
     ChevronLeft as ChevronLeftIcon,
     ChevronRight as ChevronRightIcon,
     Image as ImageIcon,
-    Category as CategoryIcon
+    Category as CategoryIcon,
+    Whatshot as WhatshotIcon
 } from '@mui/icons-material';
 import { DatePicker } from '@mui/x-date-pickers/DatePicker';
 import { LocalizationProvider } from '@mui/x-date-pickers/LocalizationProvider';
 import { AdapterDayjs } from '@mui/x-date-pickers/AdapterDayjs';
 import dayjs from 'dayjs';
 import { useAuth } from '../context/AuthContext';
-import { serviceAPI } from '../services/serviceAPI';
+import serviceAPI from '../services/serviceAPI';
 import { alpha, styled } from '@mui/material/styles';
 
-// Styled components matching AdminDashboard
+// Styled components
 const GradientButton = styled(Button)(({ theme }) => ({
     background: 'linear-gradient(135deg, #FF9800 0%, #FF5722 100%)',
     borderRadius: '12px',
@@ -203,6 +204,7 @@ const scrollbarStyles = {
 
 const ServicesPage = () => {
     const navigate = useNavigate();
+    const location = useLocation();
     const { user, logout, isAdmin } = useAuth();
 
     const [services, setServices] = useState([]);
@@ -231,6 +233,9 @@ const ServicesPage = () => {
     const [isSearching, setIsSearching] = useState(false);
     const [activeImageIndex, setActiveImageIndex] = useState({});
 
+    // New state for tabs - "all" or "popular"
+    const [activeTab, setActiveTab] = useState('all');
+
     // Filter states
     const [searchQuery, setSearchQuery] = useState('');
     const [selectedCategory, setSelectedCategory] = useState('');
@@ -240,6 +245,9 @@ const ServicesPage = () => {
     const [priceRange, setPriceRange] = useState([0, 1000000]);
     const [startDateFrom, setStartDateFrom] = useState(null);
     const [startDateTo, setStartDateTo] = useState(null);
+    // sortBy is now determined by activeTab only
+    const sortBy = activeTab === 'popular' ? 'likeCount' : 'createdAt';
+    const sortDirection = 'DESC';
 
     // Mouse move effect for animated background
     useEffect(() => {
@@ -252,8 +260,33 @@ const ServicesPage = () => {
         return () => window.removeEventListener('mousemove', handleMouseMove);
     }, []);
 
-    // Load initial data on mount
+    // Read URL params on mount
     useEffect(() => {
+        const urlParams = new URLSearchParams(location.search);
+        const categoryFromUrl = urlParams.get('category');
+        const queryFromUrl = urlParams.get('query');
+        const locationFromUrl = urlParams.get('location');
+        const tabFromUrl = urlParams.get('tab');
+
+        if (categoryFromUrl) setSelectedCategory(categoryFromUrl);
+        if (queryFromUrl) setSearchQuery(queryFromUrl);
+        if (locationFromUrl) setSelectedLocation(locationFromUrl);
+        if (tabFromUrl === 'popular') {
+            setActiveTab('popular');
+        } else if (tabFromUrl === 'all') {
+            setActiveTab('all');
+        }
+
+        // Check sessionStorage for search params
+        const savedParams = sessionStorage.getItem('servicesSearchParams');
+        if (savedParams) {
+            const params = JSON.parse(savedParams);
+            if (params.category) setSelectedCategory(params.category);
+            if (params.query) setSearchQuery(params.query);
+            if (params.location) setSelectedLocation(params.location);
+            sessionStorage.removeItem('servicesSearchParams');
+        }
+
         loadInitialData();
     }, []);
 
@@ -264,12 +297,12 @@ const ServicesPage = () => {
         }
     }, [user]);
 
-    // Load services when page changes
+    // Load services when page changes or tab changes
     useEffect(() => {
         if (page > 0 || isSearching) {
             performSearch();
         }
-    }, [page]);
+    }, [page, activeTab]);
 
     const loadInitialData = async () => {
         setLoading(true);
@@ -291,8 +324,8 @@ const ServicesPage = () => {
                 location: selectedLocation || null,
                 page: page,
                 size: 10,
-                sortBy: 'createdAt',
-                sortDirection: 'DESC'
+                sortBy: sortBy,
+                sortDirection: sortDirection
             };
 
             if (minPrice && minPrice !== '') {
@@ -323,6 +356,20 @@ const ServicesPage = () => {
         } finally {
             setLoading(false);
         }
+    };
+
+    // Handle tab change
+    const handleTabChange = (event, newValue) => {
+        setActiveTab(newValue);
+        setPage(0);
+        setIsSearching(false);
+
+        // Update URL without reload
+        const urlParams = new URLSearchParams(location.search);
+        urlParams.set('tab', newValue);
+        navigate(`${location.pathname}?${urlParams.toString()}`, { replace: true });
+
+        setTimeout(() => performSearch(), 100);
     };
 
     const loadFavorites = async () => {
@@ -677,7 +724,70 @@ const ServicesPage = () => {
                         </Box>
                     </Fade>
 
-                    {/* Search Filters */}
+                    {/* TABS - All Services and Popular */}
+                    <Box sx={{
+                        display: 'flex',
+                        justifyContent: 'center',
+                        mb: 4,
+                        borderBottom: '1px solid #E8ECF0'
+                    }}>
+                        <Tabs
+                            value={activeTab}
+                            onChange={handleTabChange}
+                            sx={{
+                                '& .MuiTab-root': {
+                                    fontSize: '1rem',
+                                    fontWeight: 600,
+                                    textTransform: 'none',
+                                    minWidth: 120,
+                                    py: 1.5,
+                                    color: '#8A99A8',
+                                    '&.Mui-selected': {
+                                        color: '#FF9800'
+                                    }
+                                },
+                                '& .MuiTabs-indicator': {
+                                    backgroundColor: '#FF9800',
+                                    height: 3,
+                                    borderRadius: '3px 3px 0 0'
+                                }
+                            }}
+                        >
+                            <Tab
+                                label="All Services"
+                                value="all"
+                                icon={<CelebrationIcon sx={{ fontSize: 20 }} />}
+                                iconPosition="start"
+                            />
+                            <Tab
+                                label="Popular"
+                                value="popular"
+                                icon={<WhatshotIcon sx={{ fontSize: 20 }} />}
+                                iconPosition="start"
+                            />
+                        </Tabs>
+                    </Box>
+
+                    {/* Active Tab Info */}
+                    {activeTab === 'popular' && !loading && services.length > 0 && (
+                        <Box sx={{
+                            display: 'flex',
+                            alignItems: 'center',
+                            justifyContent: 'center',
+                            gap: 1,
+                            mb: 3,
+                            p: 1.5,
+                            bgcolor: alpha('#FF9800', 0.08),
+                            borderRadius: '12px'
+                        }}>
+                            <WhatshotIcon sx={{ color: '#FF9800', fontSize: 20 }} />
+                            <Typography variant="body2" sx={{ color: '#FF9800', fontWeight: 500 }}>
+                                Showing most popular services based on user likes
+                            </Typography>
+                        </Box>
+                    )}
+
+                    {/* Search Filters - WITHOUT SORT BY */}
                     <Paper elevation={0} sx={{
                         background: '#FFFFFF',
                         borderRadius: '20px',
@@ -944,11 +1054,17 @@ const ServicesPage = () => {
                         <Box sx={{ mb: 3 }}>
                             <Typography sx={{ color: '#8A99A8' }}>
                                 Found <strong style={{ color: '#FF9800' }}>{totalElements}</strong> {totalElements === 1 ? 'service' : 'services'}
+                                {activeTab === 'popular' && (
+                                    <Box component="span" sx={{ ml: 2, display: 'inline-flex', alignItems: 'center', gap: 0.5 }}>
+                                        <WhatshotIcon sx={{ fontSize: 16, color: '#FF9800' }} />
+                                        <span style={{ color: '#FF9800' }}>Sorted by popularity</span>
+                                    </Box>
+                                )}
                             </Typography>
                         </Box>
                     )}
 
-                    {/* Services Grid - AdminDashboard Style Horizontal Layout */}
+                    {/* Services Grid */}
                     {loading ? (
                         <Box sx={{ display: 'flex', flexDirection: 'column', gap: 4 }}>
                             {[1, 2, 3].map((i) => (
@@ -1007,18 +1123,35 @@ const ServicesPage = () => {
                                                             <Typography variant="h5" sx={{ fontWeight: 700, color: '#1A2733', fontSize: '1.8rem' }}>
                                                                 {service.name}
                                                             </Typography>
-                                                            <IconButton
-                                                                onClick={(e) => handleFavoriteToggle(service.id, e)}
-                                                                sx={{
-                                                                    bgcolor: alpha('#FF9800', 0.1),
-                                                                    '&:hover': { bgcolor: alpha('#FF9800', 0.2) }
-                                                                }}
-                                                            >
-                                                                {favorites.has(service.id) ?
-                                                                    <FavoriteIcon sx={{ color: '#FF9800' }} /> :
-                                                                    <FavoriteBorderIcon sx={{ color: '#8A99A8' }} />
-                                                                }
-                                                            </IconButton>
+                                                            <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
+                                                                {service.likeCount > 0 && activeTab === 'popular' && (
+                                                                    <Chip
+                                                                        icon={<WhatshotIcon sx={{ fontSize: 14 }} />}
+                                                                        label={service.likeCount}
+                                                                        size="small"
+                                                                        sx={{ bgcolor: alpha('#FF9800', 0.1), color: '#FF9800' }}
+                                                                    />
+                                                                )}
+                                                                {service.likeCount > 0 && activeTab !== 'popular' && (
+                                                                    <Chip
+                                                                        label={`❤️ ${service.likeCount}`}
+                                                                        size="small"
+                                                                        sx={{ bgcolor: alpha('#FF9800', 0.1), color: '#FF9800' }}
+                                                                    />
+                                                                )}
+                                                                <IconButton
+                                                                    onClick={(e) => handleFavoriteToggle(service.id, e)}
+                                                                    sx={{
+                                                                        bgcolor: alpha('#FF9800', 0.1),
+                                                                        '&:hover': { bgcolor: alpha('#FF9800', 0.2) }
+                                                                    }}
+                                                                >
+                                                                    {favorites.has(service.id) ?
+                                                                        <FavoriteIcon sx={{ color: '#FF9800' }} /> :
+                                                                        <FavoriteBorderIcon sx={{ color: '#8A99A8' }} />
+                                                                    }
+                                                                </IconButton>
+                                                            </Box>
                                                         </Box>
 
                                                         <Typography variant="body1" sx={{ color: '#5A6874', mb: '26px', lineHeight: 1.6, fontSize: '1rem' }}>
