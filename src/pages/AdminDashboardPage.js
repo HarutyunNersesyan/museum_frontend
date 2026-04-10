@@ -46,8 +46,6 @@ import {
     GlobalStyles
 } from '@mui/material';
 import { LocalizationProvider } from '@mui/x-date-pickers/LocalizationProvider';
-import { DatePicker } from '@mui/x-date-pickers/DatePicker';
-import { TimePicker } from '@mui/x-date-pickers/TimePicker';
 import { AdapterDayjs } from '@mui/x-date-pickers/AdapterDayjs';
 import dayjs from 'dayjs';
 import {
@@ -62,7 +60,6 @@ import {
     Image as ImageIcon,
     Category as CategoryIcon,
     LocationOn as LocationIcon,
-    AttachMoney as PriceIcon,
     Reply as ReplyIcon,
     Logout as LogoutIcon,
     Person as PersonIcon,
@@ -71,7 +68,6 @@ import {
     CloudUpload as UploadIcon,
     DeleteOutline as DeleteOutlineIcon,
     AccessTime as AccessTimeIcon,
-    Event as EventIcon,
     ChevronLeft as ChevronLeftIcon,
     ChevronRight as ChevronRightIcon
 } from '@mui/icons-material';
@@ -221,6 +217,23 @@ const ARMENIAN_CITIES = [
     { value: 'JERMUK', label: 'Jermuk', region: 'Vayots Dzor' }
 ];
 
+// Categories - UPDATED to match backend enum
+const categories = [
+    { value: 'PARTY', label: '🎉 Party / Celebration', icon: '🎉' },
+    { value: 'BIRTHDAY', label: '🎂 Birthday Party', icon: '🎂' },
+    { value: 'DECORATION', label: '🎨 Decoration', icon: '🎨' },
+    { value: 'PHOTOGRAPHY', label: '📸 Photography', icon: '📸' },
+    { value: 'WEDDING', label: '💒 Wedding', icon: '💒' },
+    { value: 'CORPORATE', label: '🏢 Corporate Event', icon: '🏢' },
+    { value: 'ENGAGEMENT', label: '💍 Engagement', icon: '💍' },
+    { value: 'ANNIVERSARY', label: '🎪 Anniversary', icon: '🎪' },
+    { value: 'GRADUATION_CEREMONY', label: '🎓 Graduation Party', icon: '🎓' },
+    { value: 'FLOWERS', label: '🌸 Floral Design', icon: '🌸' },
+    { value: 'LIGHTING', label: '💡 Lighting', icon: '💡' },
+    { value: 'STAGE_SETUP', label: '🎭 Stage Setup', icon: '🎭' },
+    { value: 'RENTALS', label: '🔧 Equipment Rental', icon: '🔧' }
+];
+
 const AdminDashboardPage = () => {
     const navigate = useNavigate();
     const { user, logout } = useAuth();
@@ -265,23 +278,8 @@ const AdminDashboardPage = () => {
         category: '',
         location: '',
         duration: '',
-        maxParticipants: '',
-        tags: '',
-        startDate: null,
-        startTime: null
+        tags: ''
     });
-
-    const categories = [
-        { value: 'PARTY', label: '🎉 Party / Celebration', icon: '🎉' },
-        { value: 'BIRTHDAY', label: '🎂 Birthday Party', icon: '🎂' },
-        { value: 'ENTERTAINMENT', label: '🎬 Entertainment', icon: '🎬' },
-        { value: 'CATERING', label: '🍽️ Catering Services', icon: '🍽️' },
-        { value: 'DECORATION', label: '🎨 Decoration', icon: '🎨' },
-        { value: 'PHOTOGRAPHY', label: '📸 Photography', icon: '📸' },
-        { value: 'MUSIC', label: '🎵 Music / DJ', icon: '🎵' },
-        { value: 'VENUE', label: '🏛️ Venue Rental', icon: '🏛️' },
-        { value: 'OTHER', label: '✨ Other Services', icon: '✨' }
-    ];
 
     useEffect(() => {
         const token = localStorage.getItem('token');
@@ -358,10 +356,7 @@ const AdminDashboardPage = () => {
             category: '',
             location: '',
             duration: '',
-            maxParticipants: '',
-            tags: '',
-            startDate: null,
-            startTime: null
+            tags: ''
         });
         setImageFiles([]);
         setImagePreviews([]);
@@ -372,24 +367,6 @@ const AdminDashboardPage = () => {
     const handleOpenEditDialog = (service) => {
         setEditingService(service);
 
-        // Safely parse dates - only if they exist
-        let startDateValue = null;
-        let startTimeValue = null;
-
-        if (service.startDate) {
-            const parsedDate = dayjs(service.startDate);
-            if (parsedDate.isValid()) {
-                startDateValue = parsedDate;
-            }
-        }
-
-        if (service.startTime) {
-            const parsedTime = dayjs(service.startTime, 'HH:mm');
-            if (parsedTime.isValid()) {
-                startTimeValue = parsedTime;
-            }
-        }
-
         setFormData({
             name: service.name,
             description: service.description,
@@ -397,10 +374,7 @@ const AdminDashboardPage = () => {
             category: service.category,
             location: service.location,
             duration: service.duration || '',
-            maxParticipants: service.maxParticipants || '',
-            tags: service.tags || '',
-            startDate: startDateValue,
-            startTime: startTimeValue
+            tags: service.tags || ''
         });
         setExistingImages(service.imageUrls || []);
         setImageFiles([]);
@@ -418,10 +392,6 @@ const AdminDashboardPage = () => {
 
     const handleInputChange = (e) => {
         const { name, value } = e.target;
-        setFormData(prev => ({ ...prev, [name]: value }));
-    };
-
-    const handleDateChange = (name, value) => {
         setFormData(prev => ({ ...prev, [name]: value }));
     };
 
@@ -466,18 +436,6 @@ const AdminDashboardPage = () => {
 
         setLoading(true);
         try {
-            // Properly format date and time - only if they exist and are valid
-            let formattedStartDate = null;
-            let formattedStartTime = null;
-
-            if (formData.startDate && dayjs(formData.startDate).isValid()) {
-                formattedStartDate = dayjs(formData.startDate).format('YYYY-MM-DD');
-            }
-
-            if (formData.startTime && dayjs(formData.startTime).isValid()) {
-                formattedStartTime = dayjs(formData.startTime).format('HH:mm');
-            }
-
             const submitData = {
                 name: formData.name,
                 description: formData.description,
@@ -485,10 +443,7 @@ const AdminDashboardPage = () => {
                 category: formData.category,
                 location: formData.location,
                 duration: formData.duration ? parseInt(formData.duration) : null,
-                maxParticipants: formData.maxParticipants ? parseInt(formData.maxParticipants) : null,
-                tags: formData.tags || '',
-                startDate: formattedStartDate,
-                startTime: formattedStartTime
+                tags: formData.tags || ''
             };
 
             if (editingService) {
@@ -596,29 +551,10 @@ const AdminDashboardPage = () => {
         return new Date(dateString).toLocaleString();
     };
 
-    // Helper function to safely format date
-    const formatEventDate = (startDate, startTime) => {
-        if (!startDate) return null;
-        try {
-            const date = dayjs(startDate);
-            if (!date.isValid()) return null;
-            let formatted = date.format('MMMM D, YYYY');
-            if (startTime) {
-                const time = dayjs(startTime, 'HH:mm');
-                if (time.isValid()) {
-                    formatted += ` at ${time.format('HH:mm')}`;
-                }
-            }
-            return formatted;
-        } catch (error) {
-            return null;
-        }
-    };
-
-    // Function to disable today and past dates (only allow tomorrow and future)
-    const disablePastAndTodayDates = (date) => {
-        const today = dayjs().startOf('day');
-        return date && date.isBefore(today.add(1, 'day'));
+    // Helper function to get category display name
+    const getCategoryDisplayName = (categoryValue) => {
+        const category = categories.find(cat => cat.value === categoryValue);
+        return category ? category.label : categoryValue;
     };
 
     // Handle next image
@@ -749,25 +685,6 @@ const AdminDashboardPage = () => {
 
                 {/* Main Content */}
                 <Container maxWidth="xl" sx={{ position: 'relative', zIndex: 1, py: 4 }}>
-                    {/* Welcome Section */}
-                    <Fade in={true} timeout={500}>
-                        <Box sx={{ mb: 5, textAlign: 'center' }}>
-                            <Typography variant="h3" sx={{
-                                fontWeight: 800,
-                                background: 'linear-gradient(135deg, #FF9800, #FF5722, #FF9800)',
-                                backgroundSize: '200% 200%',
-                                WebkitBackgroundClip: 'text',
-                                WebkitTextFillColor: 'transparent',
-                                mb: 1
-                            }}>
-                                Welcome back, {user?.userName || 'Admin'}!
-                            </Typography>
-                            <Typography variant="body1" sx={{ color: '#8A99A8' }}>
-                                Here's what's happening with your holiday services today
-                            </Typography>
-                        </Box>
-                    </Fade>
-
                     {/* Stats Cards */}
                     <Grid container spacing={3} sx={{ mb: 5 }}>
                         <Grid item xs={12} sm={6} md={4}>
@@ -823,7 +740,7 @@ const AdminDashboardPage = () => {
                         </Grid>
                     </Grid>
 
-                    {/* Tabs Section - Direct Box without extra Paper wrapper */}
+                    {/* Tabs Section */}
                     <Box sx={{
                         background: '#FFFFFF',
                         borderRadius: '20px',
@@ -843,7 +760,7 @@ const AdminDashboardPage = () => {
                             <Tab label="✉️ Customer Inquiries" icon={<EmailIcon />} iconPosition="start" />
                         </Tabs>
 
-                        {/* Services Tab - Vertical Layout with Image Carousel */}
+                        {/* Services Tab */}
                         {activeTab === 0 && (
                             <Box sx={{ p: 3 }}>
                                 <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 3, flexWrap: 'wrap', gap: 2 }}>
@@ -869,7 +786,6 @@ const AdminDashboardPage = () => {
                                 ) : (
                                     <Box sx={{ display: 'flex', flexDirection: 'column', gap: 4 }}>
                                         {services.map((service, index) => {
-                                            const eventDate = formatEventDate(service.startDate, service.startTime);
                                             const images = service.imageUrls || [];
                                             const currentIndex = activeImageIndex[service.id] || 0;
 
@@ -915,11 +831,11 @@ const AdminDashboardPage = () => {
                                                                     <Grid container spacing={3} sx={{ mb: '26px' }}>
                                                                         <Grid item xs={6} sm={4}>
                                                                             <Box sx={{ display: 'flex', alignItems: 'center', gap: 1.5 }}>
-                                                                                <PriceIcon sx={{ fontSize: 22, color: '#4CAF50' }} />
+                                                                                {/* Icon removed - no icon for price */}
                                                                                 <Box>
                                                                                     <Typography variant="body2" sx={{ color: '#8A99A8', display: 'block', fontSize: '0.85rem' }}>Price</Typography>
                                                                                     <Typography variant="body1" sx={{ color: '#4CAF50', fontWeight: 600, fontSize: '1.1rem' }}>
-                                                                                        {formatPriceAMD(service.price)}
+                                                                                        Since {service.price?.toLocaleString()} ֏
                                                                                     </Typography>
                                                                                 </Box>
                                                                             </Box>
@@ -930,7 +846,7 @@ const AdminDashboardPage = () => {
                                                                                 <Box>
                                                                                     <Typography variant="body2" sx={{ color: '#8A99A8', display: 'block', fontSize: '0.85rem' }}>Category</Typography>
                                                                                     <Typography variant="body1" sx={{ color: '#1A2733', fontSize: '1rem' }}>
-                                                                                        {service.category}
+                                                                                        {getCategoryDisplayName(service.category)}
                                                                                     </Typography>
                                                                                 </Box>
                                                                             </Box>
@@ -948,21 +864,12 @@ const AdminDashboardPage = () => {
                                                                         </Grid>
                                                                     </Grid>
 
-                                                                    {eventDate && (
-                                                                        <Box sx={{ display: 'flex', alignItems: 'center', gap: 1.5, mb: '26px' }}>
-                                                                            <EventIcon sx={{ fontSize: 22, color: '#8A99A8' }} />
-                                                                            <Typography variant="body1" sx={{ color: '#5A6874', fontSize: '1rem' }}>
-                                                                                {eventDate}
-                                                                            </Typography>
-                                                                        </Box>
-                                                                    )}
-
-                                                                    {service.duration && (
+                                                                    {/* Duration - Only show if exists and greater than 0 */}
+                                                                    {service.duration && service.duration > 0 && (
                                                                         <Box sx={{ display: 'flex', alignItems: 'center', gap: 1.5, mb: '26px' }}>
                                                                             <AccessTimeIcon sx={{ fontSize: 22, color: '#8A99A8' }} />
                                                                             <Typography variant="body1" sx={{ color: '#5A6874', fontSize: '1rem' }}>
                                                                                 Duration: {service.duration} hours
-                                                                                {service.maxParticipants && ` | Max: ${service.maxParticipants} participants`}
                                                                             </Typography>
                                                                         </Box>
                                                                     )}
@@ -1014,12 +921,12 @@ const AdminDashboardPage = () => {
                                                                 </Box>
                                                             </Grid>
 
-                                                            {/* Right side - Image Carousel with White Background */}
+                                                            {/* Right side - Image Carousel */}
                                                             <Grid item xs={12} md={5}>
                                                                 <Box sx={{
                                                                     height: '100%',
                                                                     minHeight: '364px',
-                                                                    background: '#FFFFFF', // Changed from gradient to pure white
+                                                                    background: '#FFFFFF',
                                                                     display: 'flex',
                                                                     flexDirection: 'column',
                                                                     alignItems: 'center',
@@ -1036,7 +943,7 @@ const AdminDashboardPage = () => {
                                                                                 display: 'flex',
                                                                                 alignItems: 'center',
                                                                                 justifyContent: 'center',
-                                                                                backgroundColor: '#FFFFFF', // Changed to white
+                                                                                backgroundColor: '#FFFFFF',
                                                                                 borderRadius: '12px',
                                                                                 overflow: 'hidden',
                                                                                 position: 'relative',
@@ -1048,7 +955,6 @@ const AdminDashboardPage = () => {
                                                                                 />
                                                                             </Box>
 
-                                                                            {/* Navigation Arrows - Only show if more than 1 image */}
                                                                             {images.length > 1 && (
                                                                                 <>
                                                                                     <IconButton
@@ -1086,7 +992,6 @@ const AdminDashboardPage = () => {
                                                                                         <ChevronRightIcon />
                                                                                     </IconButton>
 
-                                                                                    {/* Image indicators */}
                                                                                     <Box sx={{
                                                                                         position: 'absolute',
                                                                                         bottom: 16,
@@ -1118,7 +1023,6 @@ const AdminDashboardPage = () => {
                                                                                         ))}
                                                                                     </Box>
 
-                                                                                    {/* Image counter */}
                                                                                     <Chip
                                                                                         label={`${currentIndex + 1} / ${images.length}`}
                                                                                         size="small"
@@ -1338,7 +1242,7 @@ const AdminDashboardPage = () => {
                                 </Grid>
                             </Grid>
 
-                            {/* Location and Tags - Now in the same row */}
+                            {/* Location and Duration */}
                             <Grid container spacing={3}>
                                 <Grid item xs={6}>
                                     <FormControl fullWidth required variant="outlined">
@@ -1367,21 +1271,6 @@ const AdminDashboardPage = () => {
                                 <Grid item xs={6}>
                                     <FlatTextField
                                         fullWidth
-                                        label="Tags (comma separated)"
-                                        name="tags"
-                                        value={formData.tags}
-                                        onChange={handleInputChange}
-                                        placeholder="e.g., premium, outdoor, family-friendly"
-                                        variant="outlined"
-                                    />
-                                </Grid>
-                            </Grid>
-
-                            {/* Duration and Max Participants */}
-                            <Grid container spacing={3}>
-                                <Grid item xs={6}>
-                                    <FlatTextField
-                                        fullWidth
                                         type="number"
                                         label="Duration (hours)"
                                         name="duration"
@@ -1390,113 +1279,41 @@ const AdminDashboardPage = () => {
                                         variant="outlined"
                                     />
                                 </Grid>
+                            </Grid>
+
+                            {/* Tags and Image Upload - Side by side */}
+                            <Grid container spacing={3}>
                                 <Grid item xs={6}>
                                     <FlatTextField
                                         fullWidth
-                                        type="number"
-                                        label="Max Participants"
-                                        name="maxParticipants"
-                                        value={formData.maxParticipants}
+                                        label="Tags (comma separated)"
+                                        name="tags"
+                                        value={formData.tags}
                                         onChange={handleInputChange}
+                                        placeholder="e.g., premium, outdoor, family-friendly"
                                         variant="outlined"
                                     />
                                 </Grid>
-                            </Grid>
-
-                            {/* Date and Time Section */}
-                            <Typography variant="subtitle1" sx={{ mt: 1, color: '#FF9800', display: 'flex', alignItems: 'center', gap: 1, fontWeight: 600 }}>
-                                <EventIcon sx={{ fontSize: 22 }} /> Event Schedule
-                            </Typography>
-
-                            <Grid container spacing={3}>
-                                {/* Start Date - Only future dates (tomorrow and after) */}
-                                <Grid item xs={12} sm={6}>
-                                    <DatePicker
-                                        label="Start Date"
-                                        value={formData.startDate}
-                                        onChange={(newValue) => handleDateChange('startDate', newValue)}
-                                        shouldDisableDate={disablePastAndTodayDates}
-                                        minDate={dayjs().add(1, 'day').startOf('day')}
+                                <Grid item xs={6}>
+                                    <OutlinedButton
+                                        component="label"
+                                        startIcon={<UploadIcon />}
+                                        fullWidth
                                         sx={{
-                                            width: '100%',
-                                            '& .MuiOutlinedInput-root': {
-                                                backgroundColor: '#F5F7FA',
-                                                borderRadius: '8px',
-                                                border: 'none',
-                                                '& fieldset': { border: 'none' },
-                                                '&:hover': { backgroundColor: '#EEF0F2' },
-                                                '&.Mui-focused': {
-                                                    backgroundColor: '#EEF0F2',
-                                                    boxShadow: '0 0 0 2px rgba(255, 152, 0, 0.2)'
-                                                }
-                                            }
+                                            height: '56px',
+                                            borderColor: '#E0E4E8',
+                                            color: '#5A6874',
+                                            backgroundColor: '#F5F7FA',
+                                            '&:hover': { borderColor: '#FF9800', backgroundColor: '#EEF0F2' }
                                         }}
-                                        slotProps={{
-                                            textField: {
-                                                fullWidth: true,
-                                                variant: 'outlined'
-                                            }
-                                        }}
-                                    />
-                                </Grid>
-
-                                {/* Start Time - 24-hour format */}
-                                <Grid item xs={12} sm={6}>
-                                    <TimePicker
-                                        label="Start Time (24-hour)"
-                                        value={formData.startTime}
-                                        onChange={(newValue) => handleDateChange('startTime', newValue)}
-                                        ampm={false}
-                                        format="HH:mm"
-                                        sx={{
-                                            width: '100%',
-                                            '& .MuiOutlinedInput-root': {
-                                                backgroundColor: '#F5F7FA',
-                                                borderRadius: '8px',
-                                                border: 'none',
-                                                '& fieldset': { border: 'none' },
-                                                '&:hover': { backgroundColor: '#EEF0F2' },
-                                                '&.Mui-focused': {
-                                                    backgroundColor: '#EEF0F2',
-                                                    boxShadow: '0 0 0 2px rgba(255, 152, 0, 0.2)'
-                                                }
-                                            }
-                                        }}
-                                        slotProps={{
-                                            textField: {
-                                                fullWidth: true,
-                                                placeholder: "14:30",
-                                                variant: 'outlined'
-                                            }
-                                        }}
-                                    />
+                                    >
+                                        Upload Images
+                                        <input type="file" multiple accept="image/*" onChange={handleImageSelect} style={{ display: 'none' }} ref={fileInputRef} />
+                                    </OutlinedButton>
                                 </Grid>
                             </Grid>
 
-                            <Typography variant="caption" sx={{ color: '#8A99A8', textAlign: 'center' }}>
-                                ⏰ Time is displayed in 24-hour format (e.g., 14:30 for 2:30 PM)<br/>
-                                📅 Only future dates (from tomorrow onwards) can be selected
-                            </Typography>
-
-                            {/* Image Upload Section */}
-                            <Typography variant="subtitle1" sx={{ mt: 1, color: '#FF9800', display: 'flex', alignItems: 'center', gap: 1, fontWeight: 600 }}>
-                                <ImageIcon sx={{ fontSize: 22 }} /> Service Images
-                            </Typography>
-
-                            <OutlinedButton
-                                component="label"
-                                startIcon={<UploadIcon />}
-                                sx={{
-                                    borderColor: '#E0E4E8',
-                                    color: '#5A6874',
-                                    backgroundColor: '#F5F7FA',
-                                    '&:hover': { borderColor: '#FF9800', backgroundColor: '#EEF0F2' }
-                                }}
-                            >
-                                Upload Images
-                                <input type="file" multiple accept="image/*" onChange={handleImageSelect} style={{ display: 'none' }} ref={fileInputRef} />
-                            </OutlinedButton>
-
+                            {/* Image Previews Section */}
                             {existingImages.length > 0 && (
                                 <Box>
                                     <Typography variant="body2" sx={{ color: '#8A99A8', mb: 1 }}>Current Images:</Typography>
@@ -1548,10 +1365,6 @@ const AdminDashboardPage = () => {
                                     </ImageList>
                                 </Box>
                             )}
-
-                            <Typography variant="caption" sx={{ color: '#8A99A8', textAlign: 'center' }}>
-                                Supported formats: JPG, PNG, GIF, BMP. Max size: 5MB per image.
-                            </Typography>
                         </Box>
                     </DialogContent>
                     <DialogActions sx={{ p: 3, borderTop: 'none', bgcolor: '#FFFFFF' }}>

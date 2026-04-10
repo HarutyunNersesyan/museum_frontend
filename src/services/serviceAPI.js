@@ -67,7 +67,7 @@ export const serviceAPI = {
         }
     },
 
-    // Search services with full filtering support
+    // Search services with full filtering support and sorting
     searchServices: async (searchParams) => {
         try {
             const params = {
@@ -75,29 +75,48 @@ export const serviceAPI = {
                 size: searchParams.size || 12
             };
 
+            // Add search query if provided
             if (searchParams.query && searchParams.query.trim() !== '') {
                 params.query = searchParams.query.trim();
             }
+
+            // Add category filter if provided
             if (searchParams.category && searchParams.category !== '') {
                 params.category = searchParams.category;
             }
+
+            // Add location filter if provided
             if (searchParams.location && searchParams.location !== '') {
                 params.location = searchParams.location;
             }
+
+            // Add price filters if provided
             if (searchParams.minPrice !== undefined && searchParams.minPrice !== null && searchParams.minPrice !== '') {
                 params.minPrice = parseFloat(searchParams.minPrice);
             }
             if (searchParams.maxPrice !== undefined && searchParams.maxPrice !== null && searchParams.maxPrice !== '') {
                 params.maxPrice = parseFloat(searchParams.maxPrice);
             }
+
+            // Add date filters if provided
             if (searchParams.startDateFrom) {
                 params.startDateFrom = searchParams.startDateFrom;
             }
             if (searchParams.startDateTo) {
                 params.startDateTo = searchParams.startDateTo;
             }
+
+            // Add participants filter if provided
             if (searchParams.minParticipants) {
                 params.minParticipants = searchParams.minParticipants;
+            }
+
+            // Add sorting parameters if provided
+            // For All Services tab: sortBy: 'startDate', sortDirection: 'ASC'
+            // For Popular tab: this is handled by getPopularServices method
+            if (searchParams.sortBy) {
+                params.sortBy = searchParams.sortBy;
+                params.sortDirection = searchParams.sortDirection || 'ASC';
             }
 
             console.log('Searching services with params:', params);
@@ -142,7 +161,7 @@ export const serviceAPI = {
         }
     },
 
-    // ==================== Favorites ====================
+    // ==================== Favorites / Likes ====================
     addToFavorites: async (serviceId) => {
         try {
             const response = await axios.post(

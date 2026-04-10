@@ -1,4 +1,4 @@
-// src/pages/ServicesPage.js
+// src/pages/ServicesPage.js - Full updated file
 
 import React, { useState, useEffect } from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
@@ -326,7 +326,10 @@ const ServicesPage = () => {
                 category: selectedCategory || null,
                 location: selectedLocation || null,
                 page: page,
-                size: 10
+                size: 10,
+                // Sort by startDate for All Services (closest events first)
+                sortBy: 'startDate',
+                sortDirection: 'ASC'
             };
 
             if (minPrice && minPrice !== '') {
@@ -832,6 +835,25 @@ const ServicesPage = () => {
                         </Box>
                     )}
 
+                    {/* Info for All Services tab - Sorted by date */}
+                    {activeTab !== 'popular' && !loading && services.length > 0 && (
+                        <Box sx={{
+                            display: 'flex',
+                            alignItems: 'center',
+                            justifyContent: 'center',
+                            gap: 1,
+                            mb: 3,
+                            p: 1.5,
+                            bgcolor: alpha('#2196F3', 0.08),
+                            borderRadius: '12px'
+                        }}>
+                            <EventIcon sx={{ color: '#2196F3', fontSize: 20 }} />
+                            <Typography variant="body2" sx={{ color: '#2196F3', fontWeight: 500 }}>
+                                Showing upcoming events (closest first)
+                            </Typography>
+                        </Box>
+                    )}
+
                     {/* Search Filters - Only show for All Services tab */}
                     {activeTab !== 'popular' && (
                         <Paper elevation={0} sx={{
@@ -1105,6 +1127,12 @@ const ServicesPage = () => {
                                     <Box component="span" sx={{ ml: 2, display: 'inline-flex', alignItems: 'center', gap: 0.5 }}>
                                         <WhatshotIcon sx={{ fontSize: 16, color: '#FF9800' }} />
                                         <span style={{ color: '#FF9800' }}>Sorted by popularity</span>
+                                    </Box>
+                                )}
+                                {activeTab !== 'popular' && (
+                                    <Box component="span" sx={{ ml: 2, display: 'inline-flex', alignItems: 'center', gap: 0.5 }}>
+                                        <EventIcon sx={{ fontSize: 16, color: '#2196F3' }} />
+                                        <span style={{ color: '#2196F3' }}>Sorted by date (closest first)</span>
                                     </Box>
                                 )}
                             </Typography>
