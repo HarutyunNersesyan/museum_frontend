@@ -69,7 +69,13 @@ import {
     DeleteOutline as DeleteOutlineIcon,
     AccessTime as AccessTimeIcon,
     ChevronLeft as ChevronLeftIcon,
-    ChevronRight as ChevronRightIcon
+    ChevronRight as ChevronRightIcon,
+    Phone as PhoneIcon,
+    Language as LanguageIcon,
+    Facebook as FacebookIcon,
+    Instagram as InstagramIcon,
+    YouTube as YouTubeIcon,
+    LinkedIn as LinkedInIcon
 } from '@mui/icons-material';
 import { useAuth } from '../context/AuthContext';
 import { alpha, styled } from '@mui/material/styles';
@@ -234,6 +240,14 @@ const categories = [
     { value: 'RENTALS', label: '🔧 Equipment Rental', icon: '🔧' }
 ];
 
+// Social media platforms with real icons
+const socialPlatforms = [
+    { value: 'FACEBOOK', label: 'Facebook', icon: <FacebookIcon sx={{ color: '#1877F2' }} />, placeholder: 'https://facebook.com/yourpage' },
+    { value: 'INSTAGRAM', label: 'Instagram', icon: <InstagramIcon sx={{ color: '#E4405F' }} />, placeholder: 'https://instagram.com/yourprofile' },
+    { value: 'YOUTUBE', label: 'YouTube', icon: <YouTubeIcon sx={{ color: '#FF0000' }} />, placeholder: 'https://youtube.com/c/yourchannel' },
+    { value: 'LINKEDIN', label: 'LinkedIn', icon: <LinkedInIcon sx={{ color: '#0077B5' }} />, placeholder: 'https://linkedin.com/company/yourcompany' }
+];
+
 const AdminDashboardPage = () => {
     const navigate = useNavigate();
     const { user, logout } = useAuth();
@@ -268,6 +282,13 @@ const AdminDashboardPage = () => {
     const [existingImages, setExistingImages] = useState([]);
     const fileInputRef = useRef(null);
 
+    // New state variables for social networks, phone numbers, and contact email
+    const [socialNetworks, setSocialNetworks] = useState([]);
+    const [phoneNumbersList, setPhoneNumbersList] = useState([]);
+    const [contactEmail, setContactEmail] = useState('');
+    const [newPhoneNumber, setNewPhoneNumber] = useState('');
+    const [phoneError, setPhoneError] = useState('');
+
     // State for image carousel
     const [activeImageIndex, setActiveImageIndex] = useState({});
 
@@ -280,6 +301,58 @@ const AdminDashboardPage = () => {
         duration: '',
         tags: ''
     });
+
+    // Validate Armenian phone number (8 digits)
+    const validateArmenianPhone = (phone) => {
+        const phoneRegex = /^[0-9]{8}$/;
+        return phoneRegex.test(phone);
+    };
+
+    // Add phone number
+    const handleAddPhoneNumber = () => {
+        if (!newPhoneNumber.trim()) {
+            setPhoneError('Please enter a phone number');
+            return;
+        }
+
+        if (!validateArmenianPhone(newPhoneNumber.trim())) {
+            setPhoneError('Phone number must be exactly 8 digits (e.g., 99123456)');
+            return;
+        }
+
+        if (phoneNumbersList.includes(newPhoneNumber.trim())) {
+            setPhoneError('This phone number already exists');
+            return;
+        }
+
+        setPhoneNumbersList([...phoneNumbersList, newPhoneNumber.trim()]);
+        setNewPhoneNumber('');
+        setPhoneError('');
+    };
+
+    // Remove phone number
+    const handleRemovePhoneNumber = (index) => {
+        const newList = phoneNumbersList.filter((_, i) => i !== index);
+        setPhoneNumbersList(newList);
+    };
+
+    // Add social network
+    const handleAddSocialNetwork = (platform) => {
+        setSocialNetworks([...socialNetworks, { platform, url: '' }]);
+    };
+
+    // Update social network URL
+    const handleUpdateSocialUrl = (index, url) => {
+        const updated = [...socialNetworks];
+        updated[index].url = url;
+        setSocialNetworks(updated);
+    };
+
+    // Remove social network
+    const handleRemoveSocialNetwork = (index) => {
+        const updated = socialNetworks.filter((_, i) => i !== index);
+        setSocialNetworks(updated);
+    };
 
     useEffect(() => {
         const token = localStorage.getItem('token');
@@ -361,6 +434,10 @@ const AdminDashboardPage = () => {
         setImageFiles([]);
         setImagePreviews([]);
         setExistingImages([]);
+        setSocialNetworks([]);
+        setPhoneNumbersList([]);
+        setContactEmail('');
+        setNewPhoneNumber('');
         setDialogOpen(true);
     };
 
@@ -376,9 +453,23 @@ const AdminDashboardPage = () => {
             duration: service.duration || '',
             tags: service.tags || ''
         });
+
         setExistingImages(service.imageUrls || []);
         setImageFiles([]);
         setImagePreviews([]);
+
+        // Load social networks
+        setSocialNetworks(service.socialNetworks?.map(sn => ({
+            platform: sn.platform,
+            url: sn.url
+        })) || []);
+
+        // Load phone numbers
+        setPhoneNumbersList(service.phoneNumbers || []);
+
+        // Load contact email
+        setContactEmail(service.contactEmail || '');
+
         setDialogOpen(true);
     };
 
@@ -388,6 +479,10 @@ const AdminDashboardPage = () => {
         setImageFiles([]);
         setImagePreviews([]);
         setExistingImages([]);
+        setSocialNetworks([]);
+        setPhoneNumbersList([]);
+        setContactEmail('');
+        setNewPhoneNumber('');
     };
 
     const handleInputChange = (e) => {
@@ -443,7 +538,10 @@ const AdminDashboardPage = () => {
                 category: formData.category,
                 location: formData.location,
                 duration: formData.duration ? parseInt(formData.duration) : null,
-                tags: formData.tags || ''
+                tags: formData.tags || '',
+                socialNetworks: socialNetworks.filter(sn => sn.url && sn.url.trim() !== ''),
+                phoneNumbers: phoneNumbersList,
+                contactEmail: contactEmail || null
             };
 
             if (editingService) {
@@ -831,11 +929,10 @@ const AdminDashboardPage = () => {
                                                                     <Grid container spacing={3} sx={{ mb: '26px' }}>
                                                                         <Grid item xs={6} sm={4}>
                                                                             <Box sx={{ display: 'flex', alignItems: 'center', gap: 1.5 }}>
-                                                                                {/* Icon removed - no icon for price */}
                                                                                 <Box>
                                                                                     <Typography variant="body2" sx={{ color: '#8A99A8', display: 'block', fontSize: '0.85rem' }}>Price</Typography>
                                                                                     <Typography variant="body1" sx={{ color: '#4CAF50', fontWeight: 600, fontSize: '1.1rem' }}>
-                                                                                        Since {service.price?.toLocaleString()} ֏
+                                                                                        {service.price?.toLocaleString()} ֏
                                                                                     </Typography>
                                                                                 </Box>
                                                                             </Box>
@@ -871,6 +968,69 @@ const AdminDashboardPage = () => {
                                                                             <Typography variant="body1" sx={{ color: '#5A6874', fontSize: '1rem' }}>
                                                                                 Duration: {service.duration} hours
                                                                             </Typography>
+                                                                        </Box>
+                                                                    )}
+
+                                                                    {/* Contact Email */}
+                                                                    {service.contactEmail && (
+                                                                        <Box sx={{ display: 'flex', alignItems: 'center', gap: 1.5, mb: 2 }}>
+                                                                            <EmailIcon sx={{ fontSize: 20, color: '#8A99A8' }} />
+                                                                            <Typography variant="body2" sx={{ color: '#5A6874' }}>
+                                                                                {service.contactEmail}
+                                                                            </Typography>
+                                                                        </Box>
+                                                                    )}
+
+                                                                    {/* Phone Numbers */}
+                                                                    {service.phoneNumbers && service.phoneNumbers.length > 0 && (
+                                                                        <Box sx={{ display: 'flex', alignItems: 'center', gap: 1.5, mb: 2, flexWrap: 'wrap' }}>
+                                                                            <PhoneIcon sx={{ fontSize: 20, color: '#8A99A8' }} />
+                                                                            <Box sx={{ display: 'flex', gap: 1, flexWrap: 'wrap' }}>
+                                                                                {service.phoneNumbers.map((phone, idx) => (
+                                                                                    <Chip
+                                                                                        key={idx}
+                                                                                        label={phone}
+                                                                                        size="small"
+                                                                                        sx={{ bgcolor: alpha('#FF9800', 0.1), color: '#FF9800' }}
+                                                                                    />
+                                                                                ))}
+                                                                            </Box>
+                                                                        </Box>
+                                                                    )}
+
+                                                                    {/* Social Networks */}
+                                                                    {service.socialNetworks && service.socialNetworks.length > 0 && (
+                                                                        <Box sx={{ display: 'flex', alignItems: 'center', gap: 1.5, mb: 2, flexWrap: 'wrap' }}>
+                                                                            <LanguageIcon sx={{ fontSize: 20, color: '#8A99A8' }} />
+                                                                            <Box sx={{ display: 'flex', gap: 1, flexWrap: 'wrap' }}>
+                                                                                {service.socialNetworks.map((social, idx) => {
+                                                                                    const getSocialIcon = (platform) => {
+                                                                                        switch(platform?.toUpperCase()) {
+                                                                                            case 'FACEBOOK': return <FacebookIcon sx={{ fontSize: 18, color: '#1877F2' }} />;
+                                                                                            case 'INSTAGRAM': return <InstagramIcon sx={{ fontSize: 18, color: '#E4405F' }} />;
+                                                                                            case 'YOUTUBE': return <YouTubeIcon sx={{ fontSize: 18, color: '#FF0000' }} />;
+                                                                                            case 'LINKEDIN': return <LinkedInIcon sx={{ fontSize: 18, color: '#0077B5' }} />;
+                                                                                            default: return <LanguageIcon sx={{ fontSize: 18, color: '#FF9800' }} />;
+                                                                                        }
+                                                                                    };
+                                                                                    return (
+                                                                                        <Button
+                                                                                            key={idx}
+                                                                                            size="small"
+                                                                                            href={social.url}
+                                                                                            target="_blank"
+                                                                                            startIcon={getSocialIcon(social.platform)}
+                                                                                            sx={{
+                                                                                                textTransform: 'none',
+                                                                                                color: '#1A2733',
+                                                                                                '&:hover': { bgcolor: alpha('#FF9800', 0.1) }
+                                                                                            }}
+                                                                                        >
+                                                                                            {social.platform}
+                                                                                        </Button>
+                                                                                    );
+                                                                                })}
+                                                                            </Box>
                                                                         </Box>
                                                                     )}
 
@@ -1281,37 +1441,142 @@ const AdminDashboardPage = () => {
                                 </Grid>
                             </Grid>
 
-                            {/* Tags and Image Upload - Side by side */}
-                            <Grid container spacing={3}>
-                                <Grid item xs={6}>
+                            {/* Social Networks Section */}
+                            <Box sx={{ mt: 2 }}>
+                                <Typography variant="subtitle1" sx={{ fontWeight: 600, color: '#1A2733', mb: 2 }}>
+                                    🌐 Social Networks (Optional)
+                                </Typography>
+                                <Grid container spacing={2}>
+                                    {socialPlatforms.map((platform) => {
+                                        const existing = socialNetworks.find(sn => sn.platform === platform.value);
+                                        const index = socialNetworks.findIndex(sn => sn.platform === platform.value);
+
+                                        return (
+                                            <Grid item xs={12} sm={6} key={platform.value}>
+                                                <Box sx={{ display: 'flex', gap: 1, alignItems: 'center' }}>
+                                                    {platform.icon}
+                                                    {existing ? (
+                                                        <FlatTextField
+                                                            fullWidth
+                                                            size="small"
+                                                            placeholder={platform.placeholder}
+                                                            value={existing.url}
+                                                            onChange={(e) => handleUpdateSocialUrl(index, e.target.value)}
+                                                            sx={{ flex: 1 }}
+                                                        />
+                                                    ) : (
+                                                        <OutlinedButton
+                                                            size="small"
+                                                            onClick={() => handleAddSocialNetwork(platform.value)}
+                                                            sx={{ flex: 1, justifyContent: 'flex-start' }}
+                                                        >
+                                                            + Add {platform.label}
+                                                        </OutlinedButton>
+                                                    )}
+                                                    {existing && (
+                                                        <IconButton
+                                                            size="small"
+                                                            onClick={() => handleRemoveSocialNetwork(index)}
+                                                            sx={{ color: '#f44336' }}
+                                                        >
+                                                            <DeleteIcon fontSize="small" />
+                                                        </IconButton>
+                                                    )}
+                                                </Box>
+                                            </Grid>
+                                        );
+                                    })}
+                                </Grid>
+                            </Box>
+
+                            {/* Phone Numbers Section */}
+                            <Box sx={{ mt: 3 }}>
+                                <Typography variant="subtitle1" sx={{ fontWeight: 600, color: '#1A2733', mb: 2 }}>
+                                    📞 Phone Numbers (Optional - Armenian numbers only)
+                                </Typography>
+
+                                {/* Add phone number input */}
+                                <Box sx={{ display: 'flex', gap: 1, mb: 2 }}>
                                     <FlatTextField
-                                        fullWidth
-                                        label="Tags (comma separated)"
-                                        name="tags"
-                                        value={formData.tags}
-                                        onChange={handleInputChange}
-                                        placeholder="e.g., premium, outdoor, family-friendly"
-                                        variant="outlined"
-                                    />
-                                </Grid>
-                                <Grid item xs={6}>
-                                    <OutlinedButton
-                                        component="label"
-                                        startIcon={<UploadIcon />}
-                                        fullWidth
-                                        sx={{
-                                            height: '56px',
-                                            borderColor: '#E0E4E8',
-                                            color: '#5A6874',
-                                            backgroundColor: '#F5F7FA',
-                                            '&:hover': { borderColor: '#FF9800', backgroundColor: '#EEF0F2' }
+                                        size="small"
+                                        placeholder="Enter 8-digit number (e.g., 99123456)"
+                                        value={newPhoneNumber}
+                                        onChange={(e) => {
+                                            setNewPhoneNumber(e.target.value);
+                                            setPhoneError('');
                                         }}
-                                    >
-                                        Upload Images
-                                        <input type="file" multiple accept="image/*" onChange={handleImageSelect} style={{ display: 'none' }} ref={fileInputRef} />
-                                    </OutlinedButton>
-                                </Grid>
-                            </Grid>
+                                        error={!!phoneError}
+                                        helperText={phoneError}
+                                        sx={{ flex: 1 }}
+                                    />
+                                    <GradientButton onClick={handleAddPhoneNumber} sx={{ minWidth: '100px' }}>
+                                        Add
+                                    </GradientButton>
+                                </Box>
+
+                                {/* Phone numbers list */}
+                                {phoneNumbersList.length > 0 && (
+                                    <Box sx={{ display: 'flex', flexWrap: 'wrap', gap: 1 }}>
+                                        {phoneNumbersList.map((phone, idx) => (
+                                            <Chip
+                                                key={idx}
+                                                label={`📞 ${phone}`}
+                                                onDelete={() => handleRemovePhoneNumber(idx)}
+                                                sx={{
+                                                    bgcolor: alpha('#FF9800', 0.1),
+                                                    color: '#FF9800',
+                                                    '&:hover': { bgcolor: alpha('#FF9800', 0.2) }
+                                                }}
+                                            />
+                                        ))}
+                                    </Box>
+                                )}
+                            </Box>
+
+                            {/* Contact Email Section */}
+                            <Box sx={{ mt: 3 }}>
+                                <Typography variant="subtitle1" sx={{ fontWeight: 600, color: '#1A2733', mb: 2 }}>
+                                    ✉️ Contact Email (Optional)
+                                </Typography>
+                                <FlatTextField
+                                    fullWidth
+                                    type="email"
+                                    placeholder="contact@example.com"
+                                    value={contactEmail}
+                                    onChange={(e) => setContactEmail(e.target.value)}
+                                    size="small"
+                                />
+                            </Box>
+
+                            {/* Tags - moved to the end */}
+                            <FlatTextField
+                                fullWidth
+                                label="Tags (comma separated)"
+                                name="tags"
+                                value={formData.tags}
+                                onChange={handleInputChange}
+                                placeholder="e.g., premium, outdoor, family-friendly"
+                                variant="outlined"
+                            />
+
+                            {/* Upload Images - moved to the end */}
+                            <Box>
+                                <OutlinedButton
+                                    component="label"
+                                    startIcon={<UploadIcon />}
+                                    fullWidth
+                                    sx={{
+                                        height: '56px',
+                                        borderColor: '#E0E4E8',
+                                        color: '#5A6874',
+                                        backgroundColor: '#F5F7FA',
+                                        '&:hover': { borderColor: '#FF9800', backgroundColor: '#EEF0F2' }
+                                    }}
+                                >
+                                    Upload Images
+                                    <input type="file" multiple accept="image/*" onChange={handleImageSelect} style={{ display: 'none' }} ref={fileInputRef} />
+                                </OutlinedButton>
+                            </Box>
 
                             {/* Image Previews Section */}
                             {existingImages.length > 0 && (

@@ -32,12 +32,12 @@ export const adminAPI = {
         }
     },
 
-    // Create service with image upload - UPDATED with date/time
+    // Create service with image upload - UPDATED with social networks, phone numbers, contact email
     createService: async (serviceData, imageFiles = []) => {
         try {
             const formData = new FormData();
 
-            // Add each field individually (not as JSON)
+            // Add each field individually
             formData.append('name', serviceData.name);
             formData.append('description', serviceData.description);
             formData.append('price', serviceData.price.toString());
@@ -47,27 +47,34 @@ export const adminAPI = {
             if (serviceData.duration) {
                 formData.append('duration', serviceData.duration.toString());
             }
-            if (serviceData.maxParticipants) {
-                formData.append('maxParticipants', serviceData.maxParticipants.toString());
-            }
             if (serviceData.tags) {
                 formData.append('tags', serviceData.tags);
             }
 
-            // ✅ ADD DATE AND TIME FIELDS
-            if (serviceData.startDate) {
-                formData.append('startDate', serviceData.startDate);
-                console.log('Adding startDate to formData:', serviceData.startDate);
+            // Add contact email (optional)
+            if (serviceData.contactEmail) {
+                formData.append('contactEmail', serviceData.contactEmail);
             }
-            if (serviceData.startTime) {
-                formData.append('startTime', serviceData.startTime);
-                console.log('Adding startTime to formData:', serviceData.startTime);
+
+            // Add phone numbers (optional)
+            if (serviceData.phoneNumbers && serviceData.phoneNumbers.length > 0) {
+                serviceData.phoneNumbers.forEach(phone => {
+                    formData.append('phoneNumbers', phone);
+                });
+            }
+
+            // Add social networks as JSON (optional)
+            if (serviceData.socialNetworks && serviceData.socialNetworks.length > 0) {
+                formData.append('socialNetworks', JSON.stringify(serviceData.socialNetworks));
+                console.log('Adding social networks:', serviceData.socialNetworks);
             }
 
             // Add image files
-            imageFiles.forEach((file) => {
-                formData.append('images', file);
-            });
+            if (imageFiles && imageFiles.length > 0) {
+                imageFiles.forEach((file) => {
+                    formData.append('images', file);
+                });
+            }
 
             const response = await axios.post(
                 `${API_BASE_URL}/services/with-images`,
@@ -86,7 +93,7 @@ export const adminAPI = {
         }
     },
 
-    // Update service with images - UPDATED with date/time
+    // Update service with images - UPDATED with social networks, phone numbers, contact email
     updateService: async (serviceId, serviceData, imageFiles = [], existingImageUrls = []) => {
         try {
             const formData = new FormData();
@@ -101,32 +108,41 @@ export const adminAPI = {
             if (serviceData.duration) {
                 formData.append('duration', serviceData.duration.toString());
             }
-            if (serviceData.maxParticipants) {
-                formData.append('maxParticipants', serviceData.maxParticipants.toString());
-            }
             if (serviceData.tags) {
                 formData.append('tags', serviceData.tags);
             }
 
-            // ✅ ADD DATE AND TIME FIELDS
-            if (serviceData.startDate) {
-                formData.append('startDate', serviceData.startDate);
-                console.log('Adding startDate to formData:', serviceData.startDate);
+            // Add contact email (optional)
+            if (serviceData.contactEmail) {
+                formData.append('contactEmail', serviceData.contactEmail);
             }
-            if (serviceData.startTime) {
-                formData.append('startTime', serviceData.startTime);
-                console.log('Adding startTime to formData:', serviceData.startTime);
+
+            // Add phone numbers (optional)
+            if (serviceData.phoneNumbers && serviceData.phoneNumbers.length > 0) {
+                serviceData.phoneNumbers.forEach(phone => {
+                    formData.append('phoneNumbers', phone);
+                });
+            }
+
+            // Add social networks as JSON (optional)
+            if (serviceData.socialNetworks && serviceData.socialNetworks.length > 0) {
+                formData.append('socialNetworks', JSON.stringify(serviceData.socialNetworks));
+                console.log('Updating social networks:', serviceData.socialNetworks);
             }
 
             // Add existing image URLs
-            existingImageUrls.forEach((url) => {
-                formData.append('existingImageUrls', url);
-            });
+            if (existingImageUrls && existingImageUrls.length > 0) {
+                existingImageUrls.forEach((url) => {
+                    formData.append('existingImageUrls', url);
+                });
+            }
 
             // Add new image files
-            imageFiles.forEach((file) => {
-                formData.append('images', file);
-            });
+            if (imageFiles && imageFiles.length > 0) {
+                imageFiles.forEach((file) => {
+                    formData.append('images', file);
+                });
+            }
 
             const response = await axios.put(
                 `${API_BASE_URL}/services/${serviceId}/with-images`,
