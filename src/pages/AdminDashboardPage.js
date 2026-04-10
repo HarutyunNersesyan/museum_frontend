@@ -60,11 +60,9 @@ import {
     Image as ImageIcon,
     Category as CategoryIcon,
     LocationOn as LocationIcon,
-    Reply as ReplyIcon,
     Logout as LogoutIcon,
     Person as PersonIcon,
     AdminPanelSettings as AdminIcon,
-    Save as SaveIcon,
     CloudUpload as UploadIcon,
     DeleteOutline as DeleteOutlineIcon,
     AccessTime as AccessTimeIcon,
@@ -81,7 +79,6 @@ import { useAuth } from '../context/AuthContext';
 import { alpha, styled } from '@mui/material/styles';
 import adminAPI from '../services/adminAPI';
 import { isAdmin } from '../utils/jwtUtils';
-import { formatPriceAMD } from '../services/serviceAPI';
 
 // Styled components for light design
 const GlassCard = styled(Card)(({ theme }) => ({
@@ -223,7 +220,7 @@ const ARMENIAN_CITIES = [
     { value: 'JERMUK', label: 'Jermuk', region: 'Vayots Dzor' }
 ];
 
-// Categories - UPDATED to match backend enum
+// Categories
 const categories = [
     { value: 'PARTY', label: '🎉 Party / Celebration', icon: '🎉' },
     { value: 'BIRTHDAY', label: '🎂 Birthday Party', icon: '🎂' },
@@ -253,20 +250,13 @@ const AdminDashboardPage = () => {
     const { user, logout } = useAuth();
 
     const [loading, setLoading] = useState(false);
-    const [activeTab, setActiveTab] = useState(0);
     const [services, setServices] = useState([]);
-    const [inquiries, setInquiries] = useState([]);
     const [stats, setStats] = useState({
         totalServices: 0,
-        availableServices: 0,
-        pendingInquiries: 0
+        availableServices: 0
     });
     const [dialogOpen, setDialogOpen] = useState(false);
     const [editingService, setEditingService] = useState(null);
-    const [selectedInquiry, setSelectedInquiry] = useState(null);
-    const [inquiryDialogOpen, setInquiryDialogOpen] = useState(false);
-    const [responseText, setResponseText] = useState('');
-    const [sendingResponse, setSendingResponse] = useState(false);
     const [snackbar, setSnackbar] = useState({
         open: false,
         message: '',
@@ -282,7 +272,7 @@ const AdminDashboardPage = () => {
     const [existingImages, setExistingImages] = useState([]);
     const fileInputRef = useRef(null);
 
-    // New state variables for social networks, phone numbers, and contact email
+    // State variables for social networks, phone numbers, and contact email
     const [socialNetworks, setSocialNetworks] = useState([]);
     const [phoneNumbersList, setPhoneNumbersList] = useState([]);
     const [contactEmail, setContactEmail] = useState('');
@@ -373,7 +363,6 @@ const AdminDashboardPage = () => {
         try {
             await Promise.all([
                 loadServices(),
-                loadInquiries(),
                 loadStats()
             ]);
         } catch (error) {
@@ -393,30 +382,12 @@ const AdminDashboardPage = () => {
         }
     };
 
-    const loadInquiries = async () => {
-        try {
-            const response = await adminAPI.getAllInquiries(0, 50);
-            setInquiries(response.data.content);
-        } catch (error) {
-            console.error('Error loading inquiries:', error);
-        }
-    };
-
     const loadStats = async () => {
         try {
             const response = await adminAPI.getStats();
             setStats(response.data);
         } catch (error) {
             console.error('Error loading stats:', error);
-        }
-    };
-
-    const handleTabChange = (event, newValue) => {
-        setActiveTab(newValue);
-        if (newValue === 0) {
-            loadServices();
-        } else if (newValue === 1) {
-            loadInquiries();
         }
     };
 
@@ -606,31 +577,6 @@ const AdminDashboardPage = () => {
         }
     };
 
-    const handleOpenInquiryResponse = (inquiry) => {
-        setSelectedInquiry(inquiry);
-        setResponseText('');
-        setInquiryDialogOpen(true);
-    };
-
-    const handleSendResponse = async () => {
-        if (!responseText.trim()) {
-            setSnackbar({ open: true, message: 'Please enter a response', severity: 'warning' });
-            return;
-        }
-
-        setSendingResponse(true);
-        try {
-            await adminAPI.respondToInquiry(selectedInquiry.id, { response: responseText });
-            setSnackbar({ open: true, message: 'Response sent successfully', severity: 'success' });
-            setInquiryDialogOpen(false);
-            loadInquiries();
-        } catch (error) {
-            setSnackbar({ open: true, message: 'Failed to send response', severity: 'error' });
-        } finally {
-            setSendingResponse(false);
-        }
-    };
-
     const handleMenuOpen = (event) => {
         setAnchorEl(event.currentTarget);
     };
@@ -643,10 +589,6 @@ const AdminDashboardPage = () => {
         await logout();
         handleMenuClose();
         navigate('/');
-    };
-
-    const formatDate = (dateString) => {
-        return new Date(dateString).toLocaleString();
     };
 
     // Helper function to get category display name
@@ -783,9 +725,9 @@ const AdminDashboardPage = () => {
 
                 {/* Main Content */}
                 <Container maxWidth="xl" sx={{ position: 'relative', zIndex: 1, py: 4 }}>
-                    {/* Stats Cards */}
+                    {/* Stats Cards - Only Total Services and Available Services */}
                     <Grid container spacing={3} sx={{ mb: 5 }}>
-                        <Grid item xs={12} sm={6} md={4}>
+                        <Grid item xs={12} sm={6}>
                             <StatCard color="#FF9800">
                                 <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
                                     <Box>
@@ -802,7 +744,7 @@ const AdminDashboardPage = () => {
                                 </Box>
                             </StatCard>
                         </Grid>
-                        <Grid item xs={12} sm={6} md={4}>
+                        <Grid item xs={12} sm={6}>
                             <StatCard color="#4CAF50">
                                 <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
                                     <Box>
@@ -819,26 +761,9 @@ const AdminDashboardPage = () => {
                                 </Box>
                             </StatCard>
                         </Grid>
-                        <Grid item xs={12} sm={6} md={4}>
-                            <StatCard color="#FF9800">
-                                <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
-                                    <Box>
-                                        <Typography variant="body2" sx={{ color: '#8A99A8', mb: 1 }}>
-                                            Pending Inquiries
-                                        </Typography>
-                                        <Typography variant="h3" sx={{ fontWeight: 700, color: '#FF9800' }}>
-                                            {stats.pendingInquiries}
-                                        </Typography>
-                                    </Box>
-                                    <Avatar sx={{ bgcolor: alpha('#FF9800', 0.1), width: 56, height: 56 }}>
-                                        <EmailIcon sx={{ fontSize: 32, color: '#FF9800' }} />
-                                    </Avatar>
-                                </Box>
-                            </StatCard>
-                        </Grid>
                     </Grid>
 
-                    {/* Tabs Section */}
+                    {/* Services Section - No Tabs */}
                     <Box sx={{
                         background: '#FFFFFF',
                         borderRadius: '20px',
@@ -846,467 +771,376 @@ const AdminDashboardPage = () => {
                         border: 'none',
                         boxShadow: '0 2px 8px rgba(0, 0, 0, 0.04)'
                     }}>
-                        <Tabs value={activeTab} onChange={handleTabChange} sx={{
-                            borderBottom: 'none',
-                            '& .MuiTab-root': {
-                                color: '#8A99A8',
-                                py: 2,
-                                '&.Mui-selected': { color: '#FF9800' }
-                            }
-                        }}>
-                            <Tab label="📦 Services Management" icon={<CelebrationIcon />} iconPosition="start" />
-                            <Tab label="✉️ Customer Inquiries" icon={<EmailIcon />} iconPosition="start" />
-                        </Tabs>
-
-                        {/* Services Tab */}
-                        {activeTab === 0 && (
-                            <Box sx={{ p: 3 }}>
-                                <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 3, flexWrap: 'wrap', gap: 2 }}>
-                                    <Typography variant="h6" sx={{ fontWeight: 600, color: '#1A2733' }}>
-                                        All Services ({services.length})
-                                    </Typography>
-                                    <GradientButton startIcon={<AddIcon />} onClick={handleOpenCreateDialog}>
-                                        Add New Service
-                                    </GradientButton>
-                                </Box>
-
-                                {loading ? (
-                                    <Box sx={{ display: 'flex', justifyContent: 'center', py: 8 }}>
-                                        <CircularProgress sx={{ color: '#FF9800' }} />
-                                    </Box>
-                                ) : services.length === 0 ? (
-                                    <Box sx={{ textAlign: 'center', py: 8 }}>
-                                        <Typography sx={{ color: '#8A99A8' }}>No services found</Typography>
-                                        <Button onClick={handleOpenCreateDialog} sx={{ mt: 2, color: '#FF9800' }}>
-                                            Create your first service
-                                        </Button>
-                                    </Box>
-                                ) : (
-                                    <Box sx={{ display: 'flex', flexDirection: 'column', gap: 4 }}>
-                                        {services.map((service, index) => {
-                                            const images = service.imageUrls || [];
-                                            const currentIndex = activeImageIndex[service.id] || 0;
-
-                                            return (
-                                                <Grow in={true} style={{ transitionDelay: `${index * 50}ms` }} key={service.id}>
-                                                    <Paper sx={{
-                                                        borderRadius: '20px',
-                                                        overflow: 'hidden',
-                                                        border: 'none',
-                                                        boxShadow: '0 2px 8px rgba(0, 0, 0, 0.04)',
-                                                        transition: 'all 0.3s ease',
-                                                        minHeight: '364px',
-                                                        '&:hover': {
-                                                            transform: 'translateY(-2px)',
-                                                            boxShadow: '0 8px 20px rgba(255, 152, 0, 0.12)'
-                                                        }
-                                                    }}>
-                                                        <Grid container sx={{ minHeight: '364px' }}>
-                                                            {/* Left side - Information */}
-                                                            <Grid item xs={12} md={7}>
-                                                                <Box sx={{ p: '31px' }}>
-                                                                    <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', mb: '26px' }}>
-                                                                        <Typography variant="h5" sx={{ fontWeight: 700, color: '#1A2733', fontSize: '1.8rem' }}>
-                                                                            {service.name}
-                                                                        </Typography>
-                                                                        <Chip
-                                                                            label={service.isAvailable ? '● Available' : '● Hidden'}
-                                                                            size="medium"
-                                                                            sx={{
-                                                                                bgcolor: service.isAvailable ? alpha('#4CAF50', 0.1) : alpha('#f44336', 0.1),
-                                                                                color: service.isAvailable ? '#4CAF50' : '#f44336',
-                                                                                fontWeight: 600,
-                                                                                fontSize: '0.9rem',
-                                                                                py: 1
-                                                                            }}
-                                                                        />
-                                                                    </Box>
-
-                                                                    <Typography variant="body1" sx={{ color: '#5A6874', mb: '26px', lineHeight: 1.6, fontSize: '1rem' }}>
-                                                                        {service.description}
-                                                                    </Typography>
-
-                                                                    <Grid container spacing={3} sx={{ mb: '26px' }}>
-                                                                        <Grid item xs={6} sm={4}>
-                                                                            <Box sx={{ display: 'flex', alignItems: 'center', gap: 1.5 }}>
-                                                                                <Box>
-                                                                                    <Typography variant="body2" sx={{ color: '#8A99A8', display: 'block', fontSize: '0.85rem' }}>Price</Typography>
-                                                                                    <Typography variant="body1" sx={{ color: '#4CAF50', fontWeight: 600, fontSize: '1.1rem' }}>
-                                                                                        {service.price?.toLocaleString()} ֏
-                                                                                    </Typography>
-                                                                                </Box>
-                                                                            </Box>
-                                                                        </Grid>
-                                                                        <Grid item xs={6} sm={4}>
-                                                                            <Box sx={{ display: 'flex', alignItems: 'center', gap: 1.5 }}>
-                                                                                <CategoryIcon sx={{ fontSize: 22, color: '#FF9800' }} />
-                                                                                <Box>
-                                                                                    <Typography variant="body2" sx={{ color: '#8A99A8', display: 'block', fontSize: '0.85rem' }}>Category</Typography>
-                                                                                    <Typography variant="body1" sx={{ color: '#1A2733', fontSize: '1rem' }}>
-                                                                                        {getCategoryDisplayName(service.category)}
-                                                                                    </Typography>
-                                                                                </Box>
-                                                                            </Box>
-                                                                        </Grid>
-                                                                        <Grid item xs={6} sm={4}>
-                                                                            <Box sx={{ display: 'flex', alignItems: 'center', gap: 1.5 }}>
-                                                                                <LocationIcon sx={{ fontSize: 22, color: '#FF9800' }} />
-                                                                                <Box>
-                                                                                    <Typography variant="body2" sx={{ color: '#8A99A8', display: 'block', fontSize: '0.85rem' }}>Location</Typography>
-                                                                                    <Typography variant="body1" sx={{ color: '#1A2733', fontSize: '1rem' }}>
-                                                                                        {service.location}
-                                                                                    </Typography>
-                                                                                </Box>
-                                                                            </Box>
-                                                                        </Grid>
-                                                                    </Grid>
-
-                                                                    {/* Duration - Only show if exists and greater than 0 */}
-                                                                    {service.duration && service.duration > 0 && (
-                                                                        <Box sx={{ display: 'flex', alignItems: 'center', gap: 1.5, mb: '26px' }}>
-                                                                            <AccessTimeIcon sx={{ fontSize: 22, color: '#8A99A8' }} />
-                                                                            <Typography variant="body1" sx={{ color: '#5A6874', fontSize: '1rem' }}>
-                                                                                Duration: {service.duration} hours
-                                                                            </Typography>
-                                                                        </Box>
-                                                                    )}
-
-                                                                    {/* Contact Email */}
-                                                                    {service.contactEmail && (
-                                                                        <Box sx={{ display: 'flex', alignItems: 'center', gap: 1.5, mb: 2 }}>
-                                                                            <EmailIcon sx={{ fontSize: 20, color: '#8A99A8' }} />
-                                                                            <Typography variant="body2" sx={{ color: '#5A6874' }}>
-                                                                                {service.contactEmail}
-                                                                            </Typography>
-                                                                        </Box>
-                                                                    )}
-
-                                                                    {/* Phone Numbers */}
-                                                                    {service.phoneNumbers && service.phoneNumbers.length > 0 && (
-                                                                        <Box sx={{ display: 'flex', alignItems: 'center', gap: 1.5, mb: 2, flexWrap: 'wrap' }}>
-                                                                            <PhoneIcon sx={{ fontSize: 20, color: '#8A99A8' }} />
-                                                                            <Box sx={{ display: 'flex', gap: 1, flexWrap: 'wrap' }}>
-                                                                                {service.phoneNumbers.map((phone, idx) => (
-                                                                                    <Chip
-                                                                                        key={idx}
-                                                                                        label={phone}
-                                                                                        size="small"
-                                                                                        sx={{ bgcolor: alpha('#FF9800', 0.1), color: '#FF9800' }}
-                                                                                    />
-                                                                                ))}
-                                                                            </Box>
-                                                                        </Box>
-                                                                    )}
-
-                                                                    {/* Social Networks */}
-                                                                    {service.socialNetworks && service.socialNetworks.length > 0 && (
-                                                                        <Box sx={{ display: 'flex', alignItems: 'center', gap: 1.5, mb: 2, flexWrap: 'wrap' }}>
-                                                                            <LanguageIcon sx={{ fontSize: 20, color: '#8A99A8' }} />
-                                                                            <Box sx={{ display: 'flex', gap: 1, flexWrap: 'wrap' }}>
-                                                                                {service.socialNetworks.map((social, idx) => {
-                                                                                    const getSocialIcon = (platform) => {
-                                                                                        switch(platform?.toUpperCase()) {
-                                                                                            case 'FACEBOOK': return <FacebookIcon sx={{ fontSize: 18, color: '#1877F2' }} />;
-                                                                                            case 'INSTAGRAM': return <InstagramIcon sx={{ fontSize: 18, color: '#E4405F' }} />;
-                                                                                            case 'YOUTUBE': return <YouTubeIcon sx={{ fontSize: 18, color: '#FF0000' }} />;
-                                                                                            case 'LINKEDIN': return <LinkedInIcon sx={{ fontSize: 18, color: '#0077B5' }} />;
-                                                                                            default: return <LanguageIcon sx={{ fontSize: 18, color: '#FF9800' }} />;
-                                                                                        }
-                                                                                    };
-                                                                                    return (
-                                                                                        <Button
-                                                                                            key={idx}
-                                                                                            size="small"
-                                                                                            href={social.url}
-                                                                                            target="_blank"
-                                                                                            startIcon={getSocialIcon(social.platform)}
-                                                                                            sx={{
-                                                                                                textTransform: 'none',
-                                                                                                color: '#1A2733',
-                                                                                                '&:hover': { bgcolor: alpha('#FF9800', 0.1) }
-                                                                                            }}
-                                                                                        >
-                                                                                            {social.platform}
-                                                                                        </Button>
-                                                                                    );
-                                                                                })}
-                                                                            </Box>
-                                                                        </Box>
-                                                                    )}
-
-                                                                    <Divider sx={{ borderColor: '#E8ECF0', my: '26px' }} />
-
-                                                                    <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-                                                                        <FormControlLabel
-                                                                            control={
-                                                                                <Switch
-                                                                                    checked={service.isAvailable}
-                                                                                    onChange={() => handleToggleAvailability(service.id, service.isAvailable)}
-                                                                                    sx={{
-                                                                                        '& .MuiSwitch-switchBase.Mui-checked': { color: '#4CAF50' },
-                                                                                        '& .MuiSwitch-switchBase.Mui-checked + .MuiSwitch-track': { bgcolor: '#4CAF50' }
-                                                                                    }}
-                                                                                />
-                                                                            }
-                                                                            label="Visible"
-                                                                            sx={{ mr: 0 }}
-                                                                        />
-                                                                        <Box>
-                                                                            <Tooltip title="Edit">
-                                                                                <IconButton
-                                                                                    size="medium"
-                                                                                    onClick={() => handleOpenEditDialog(service)}
-                                                                                    sx={{
-                                                                                        color: '#FF9800',
-                                                                                        '&:hover': { bgcolor: alpha('#FF9800', 0.1) }
-                                                                                    }}
-                                                                                >
-                                                                                    <EditIcon />
-                                                                                </IconButton>
-                                                                            </Tooltip>
-                                                                            <Tooltip title="Delete">
-                                                                                <IconButton
-                                                                                    size="medium"
-                                                                                    onClick={() => handleDeleteService(service.id)}
-                                                                                    sx={{
-                                                                                        color: '#f44336',
-                                                                                        '&:hover': { bgcolor: alpha('#f44336', 0.1) }
-                                                                                    }}
-                                                                                >
-                                                                                    <DeleteIcon />
-                                                                                </IconButton>
-                                                                            </Tooltip>
-                                                                        </Box>
-                                                                    </Box>
-                                                                </Box>
-                                                            </Grid>
-
-                                                            {/* Right side - Image Carousel */}
-                                                            <Grid item xs={12} md={5}>
-                                                                <Box sx={{
-                                                                    height: '100%',
-                                                                    minHeight: '364px',
-                                                                    background: '#FFFFFF',
-                                                                    display: 'flex',
-                                                                    flexDirection: 'column',
-                                                                    alignItems: 'center',
-                                                                    justifyContent: 'center',
-                                                                    position: 'relative',
-                                                                    overflow: 'hidden',
-                                                                    p: 2
-                                                                }}>
-                                                                    {images.length > 0 ? (
-                                                                        <>
-                                                                            <Box sx={{
-                                                                                width: '100%',
-                                                                                height: '100%',
-                                                                                display: 'flex',
-                                                                                alignItems: 'center',
-                                                                                justifyContent: 'center',
-                                                                                backgroundColor: '#FFFFFF',
-                                                                                borderRadius: '12px',
-                                                                                overflow: 'hidden',
-                                                                                position: 'relative',
-                                                                                flex: 1
-                                                                            }}>
-                                                                                <ServiceImage
-                                                                                    src={images[currentIndex]}
-                                                                                    alt={`${service.name} - ${currentIndex + 1}`}
-                                                                                />
-                                                                            </Box>
-
-                                                                            {images.length > 1 && (
-                                                                                <>
-                                                                                    <IconButton
-                                                                                        onClick={() => handlePrevImage(service.id, images.length)}
-                                                                                        sx={{
-                                                                                            position: 'absolute',
-                                                                                            left: 16,
-                                                                                            top: '50%',
-                                                                                            transform: 'translateY(-50%)',
-                                                                                            backgroundColor: alpha('#000000', 0.5),
-                                                                                            color: 'white',
-                                                                                            '&:hover': {
-                                                                                                backgroundColor: alpha('#000000', 0.7),
-                                                                                            },
-                                                                                            zIndex: 1
-                                                                                        }}
-                                                                                    >
-                                                                                        <ChevronLeftIcon />
-                                                                                    </IconButton>
-                                                                                    <IconButton
-                                                                                        onClick={() => handleNextImage(service.id, images.length)}
-                                                                                        sx={{
-                                                                                            position: 'absolute',
-                                                                                            right: 16,
-                                                                                            top: '50%',
-                                                                                            transform: 'translateY(-50%)',
-                                                                                            backgroundColor: alpha('#000000', 0.5),
-                                                                                            color: 'white',
-                                                                                            '&:hover': {
-                                                                                                backgroundColor: alpha('#000000', 0.7),
-                                                                                            },
-                                                                                            zIndex: 1
-                                                                                        }}
-                                                                                    >
-                                                                                        <ChevronRightIcon />
-                                                                                    </IconButton>
-
-                                                                                    <Box sx={{
-                                                                                        position: 'absolute',
-                                                                                        bottom: 16,
-                                                                                        left: '50%',
-                                                                                        transform: 'translateX(-50%)',
-                                                                                        display: 'flex',
-                                                                                        gap: 1,
-                                                                                        zIndex: 1,
-                                                                                        backgroundColor: alpha('#000000', 0.5),
-                                                                                        padding: '4px 8px',
-                                                                                        borderRadius: '20px'
-                                                                                    }}>
-                                                                                        {images.map((_, idx) => (
-                                                                                            <Box
-                                                                                                key={idx}
-                                                                                                onClick={() => setActiveImageIndex(prev => ({ ...prev, [service.id]: idx }))}
-                                                                                                sx={{
-                                                                                                    width: 8,
-                                                                                                    height: 8,
-                                                                                                    borderRadius: '50%',
-                                                                                                    backgroundColor: idx === currentIndex ? '#FF9800' : 'white',
-                                                                                                    cursor: 'pointer',
-                                                                                                    transition: 'all 0.3s ease',
-                                                                                                    '&:hover': {
-                                                                                                        transform: 'scale(1.2)'
-                                                                                                    }
-                                                                                                }}
-                                                                                            />
-                                                                                        ))}
-                                                                                    </Box>
-
-                                                                                    <Chip
-                                                                                        label={`${currentIndex + 1} / ${images.length}`}
-                                                                                        size="small"
-                                                                                        sx={{
-                                                                                            position: 'absolute',
-                                                                                            top: 16,
-                                                                                            right: 16,
-                                                                                            bgcolor: alpha('#000000', 0.7),
-                                                                                            color: 'white',
-                                                                                            fontWeight: 500,
-                                                                                            fontSize: '0.75rem',
-                                                                                            zIndex: 1
-                                                                                        }}
-                                                                                    />
-                                                                                </>
-                                                                            )}
-                                                                        </>
-                                                                    ) : (
-                                                                        <Box sx={{
-                                                                            textAlign: 'center',
-                                                                            p: 4
-                                                                        }}>
-                                                                            <ImageIcon sx={{ fontSize: 100, color: alpha('#FF9800', 0.3), mb: 2 }} />
-                                                                            <Typography variant="body1" sx={{ color: '#8A99A8', fontSize: '1rem' }}>
-                                                                                No images available
-                                                                            </Typography>
-                                                                        </Box>
-                                                                    )}
-                                                                </Box>
-                                                            </Grid>
-                                                        </Grid>
-                                                    </Paper>
-                                                </Grow>
-                                            );
-                                        })}
-                                    </Box>
-                                )}
-                            </Box>
-                        )}
-
-                        {/* Inquiries Tab */}
-                        {activeTab === 1 && (
-                            <Box sx={{ p: 3 }}>
-                                <Typography variant="h6" sx={{ mb: 3, fontWeight: 600, color: '#1A2733' }}>
-                                    Customer Inquiries ({inquiries.length})
+                        <Box sx={{ p: 3 }}>
+                            <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 3, flexWrap: 'wrap', gap: 2 }}>
+                                <Typography variant="h6" sx={{ fontWeight: 600, color: '#1A2733' }}>
+                                    All Services ({services.length})
                                 </Typography>
-                                {inquiries.length === 0 ? (
-                                    <Box sx={{ textAlign: 'center', py: 8 }}>
-                                        <EmailIcon sx={{ fontSize: 80, color: alpha('#8A99A8', 0.3), mb: 2 }} />
-                                        <Typography sx={{ color: '#8A99A8' }}>No inquiries found</Typography>
-                                    </Box>
-                                ) : (
-                                    <TableContainer component={Paper} sx={{
-                                        background: '#FFFFFF',
-                                        borderRadius: '16px',
-                                        overflow: 'hidden',
-                                        border: 'none',
-                                        boxShadow: '0 2px 8px rgba(0, 0, 0, 0.04)'
-                                    }}>
-                                        <Table>
-                                            <TableHead>
-                                                <TableRow sx={{ bgcolor: alpha('#FF9800', 0.05) }}>
-                                                    <TableCell sx={{ color: '#FF9800', fontWeight: 600 }}>Customer</TableCell>
-                                                    <TableCell sx={{ color: '#FF9800', fontWeight: 600 }}>Service</TableCell>
-                                                    <TableCell sx={{ color: '#FF9800', fontWeight: 600 }}>Subject</TableCell>
-                                                    <TableCell sx={{ color: '#FF9800', fontWeight: 600 }}>Message</TableCell>
-                                                    <TableCell sx={{ color: '#FF9800', fontWeight: 600 }}>Date</TableCell>
-                                                    <TableCell sx={{ color: '#FF9800', fontWeight: 600 }}>Action</TableCell>
-                                                </TableRow>
-                                            </TableHead>
-                                            <TableBody>
-                                                {inquiries.map((inquiry) => (
-                                                    <TableRow key={inquiry.id} sx={{ '&:hover': { bgcolor: alpha('#FF9800', 0.02) } }}>
-                                                        <TableCell>
-                                                            <Typography variant="body2" sx={{ color: '#1A2733', fontWeight: 500 }}>
-                                                                {inquiry.user?.userName || 'Unknown'}
-                                                            </Typography>
-                                                            <Typography variant="caption" sx={{ color: '#8A99A8' }}>
-                                                                {inquiry.userEmail}
-                                                            </Typography>
-                                                        </TableCell>
-                                                        <TableCell>
-                                                            <Typography variant="body2" sx={{ color: '#1A2733' }}>{inquiry.service?.name}</Typography>
-                                                        </TableCell>
-                                                        <TableCell>
-                                                            <Typography variant="body2" sx={{ color: '#1A2733' }}>{inquiry.subject}</Typography>
-                                                        </TableCell>
-                                                        <TableCell>
-                                                            <Typography variant="body2" sx={{ color: '#5A6874', maxWidth: 250 }}>
-                                                                {inquiry.message.length > 100 ? inquiry.message.substring(0, 100) + '...' : inquiry.message}
-                                                            </Typography>
-                                                        </TableCell>
-                                                        <TableCell>
-                                                            <Typography variant="caption" sx={{ color: '#8A99A8' }}>
-                                                                {formatDate(inquiry.createdAt)}
-                                                            </Typography>
-                                                        </TableCell>
-                                                        <TableCell>
-                                                            <Button
-                                                                size="small"
-                                                                variant="outlined"
-                                                                startIcon={<ReplyIcon />}
-                                                                onClick={() => handleOpenInquiryResponse(inquiry)}
-                                                                sx={{
-                                                                    borderColor: '#FF9800',
-                                                                    color: '#FF9800',
-                                                                    borderRadius: '20px',
-                                                                    '&:hover': {
-                                                                        borderColor: '#FF5722',
-                                                                        backgroundColor: alpha('#FF9800', 0.05)
-                                                                    }
-                                                                }}
-                                                            >
-                                                                Respond
-                                                            </Button>
-                                                        </TableCell>
-                                                    </TableRow>
-                                                ))}
-                                            </TableBody>
-                                        </Table>
-                                    </TableContainer>
-                                )}
+                                <GradientButton startIcon={<AddIcon />} onClick={handleOpenCreateDialog}>
+                                    Add New Service
+                                </GradientButton>
                             </Box>
-                        )}
+
+                            {loading ? (
+                                <Box sx={{ display: 'flex', justifyContent: 'center', py: 8 }}>
+                                    <CircularProgress sx={{ color: '#FF9800' }} />
+                                </Box>
+                            ) : services.length === 0 ? (
+                                <Box sx={{ textAlign: 'center', py: 8 }}>
+                                    <Typography sx={{ color: '#8A99A8' }}>No services found</Typography>
+                                    <Button onClick={handleOpenCreateDialog} sx={{ mt: 2, color: '#FF9800' }}>
+                                        Create your first service
+                                    </Button>
+                                </Box>
+                            ) : (
+                                <Box sx={{ display: 'flex', flexDirection: 'column', gap: 4 }}>
+                                    {services.map((service, index) => {
+                                        const images = service.imageUrls || [];
+                                        const currentIndex = activeImageIndex[service.id] || 0;
+
+                                        return (
+                                            <Grow in={true} style={{ transitionDelay: `${index * 50}ms` }} key={service.id}>
+                                                <Paper sx={{
+                                                    borderRadius: '20px',
+                                                    overflow: 'hidden',
+                                                    border: 'none',
+                                                    boxShadow: '0 2px 8px rgba(0, 0, 0, 0.04)',
+                                                    transition: 'all 0.3s ease',
+                                                    minHeight: '364px',
+                                                    '&:hover': {
+                                                        transform: 'translateY(-2px)',
+                                                        boxShadow: '0 8px 20px rgba(255, 152, 0, 0.12)'
+                                                    }
+                                                }}>
+                                                    <Grid container sx={{ minHeight: '364px' }}>
+                                                        {/* Left side - Information */}
+                                                        <Grid item xs={12} md={7}>
+                                                            <Box sx={{ p: '31px' }}>
+                                                                <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', mb: '26px' }}>
+                                                                    <Typography variant="h5" sx={{ fontWeight: 700, color: '#1A2733', fontSize: '1.8rem' }}>
+                                                                        {service.name}
+                                                                    </Typography>
+                                                                    <Chip
+                                                                        label={service.isAvailable ? '● Available' : '● Hidden'}
+                                                                        size="medium"
+                                                                        sx={{
+                                                                            bgcolor: service.isAvailable ? alpha('#4CAF50', 0.1) : alpha('#f44336', 0.1),
+                                                                            color: service.isAvailable ? '#4CAF50' : '#f44336',
+                                                                            fontWeight: 600,
+                                                                            fontSize: '0.9rem',
+                                                                            py: 1
+                                                                        }}
+                                                                    />
+                                                                </Box>
+
+                                                                <Typography variant="body1" sx={{ color: '#5A6874', mb: '26px', lineHeight: 1.6, fontSize: '1rem' }}>
+                                                                    {service.description}
+                                                                </Typography>
+
+                                                                <Grid container spacing={3} sx={{ mb: '26px' }}>
+                                                                    <Grid item xs={6} sm={4}>
+                                                                        <Box sx={{ display: 'flex', alignItems: 'center', gap: 1.5 }}>
+                                                                            <Box>
+                                                                                <Typography variant="body2" sx={{ color: '#8A99A8', display: 'block', fontSize: '0.85rem' }}>Price</Typography>
+                                                                                <Typography variant="body1" sx={{ color: '#4CAF50', fontWeight: 600, fontSize: '1.1rem' }}>
+                                                                                    Since {service.price?.toLocaleString()} ֏
+                                                                                </Typography>
+                                                                            </Box>
+                                                                        </Box>
+                                                                    </Grid>
+                                                                    <Grid item xs={6} sm={4}>
+                                                                        <Box sx={{ display: 'flex', alignItems: 'center', gap: 1.5 }}>
+                                                                            <CategoryIcon sx={{ fontSize: 22, color: '#FF9800' }} />
+                                                                            <Box>
+                                                                                <Typography variant="body2" sx={{ color: '#8A99A8', display: 'block', fontSize: '0.85rem' }}>Category</Typography>
+                                                                                <Typography variant="body1" sx={{ color: '#1A2733', fontSize: '1rem' }}>
+                                                                                    {getCategoryDisplayName(service.category)}
+                                                                                </Typography>
+                                                                            </Box>
+                                                                        </Box>
+                                                                    </Grid>
+                                                                    <Grid item xs={6} sm={4}>
+                                                                        <Box sx={{ display: 'flex', alignItems: 'center', gap: 1.5 }}>
+                                                                            <LocationIcon sx={{ fontSize: 22, color: '#FF9800' }} />
+                                                                            <Box>
+                                                                                <Typography variant="body2" sx={{ color: '#8A99A8', display: 'block', fontSize: '0.85rem' }}>Location</Typography>
+                                                                                <Typography variant="body1" sx={{ color: '#1A2733', fontSize: '1rem' }}>
+                                                                                    {service.location}
+                                                                                </Typography>
+                                                                            </Box>
+                                                                        </Box>
+                                                                    </Grid>
+                                                                </Grid>
+
+                                                                {/* Duration - Only show if exists and greater than 0 */}
+                                                                {service.duration && service.duration > 0 && (
+                                                                    <Box sx={{ display: 'flex', alignItems: 'center', gap: 1.5, mb: '26px' }}>
+                                                                        <AccessTimeIcon sx={{ fontSize: 22, color: '#8A99A8' }} />
+                                                                        <Typography variant="body1" sx={{ color: '#5A6874', fontSize: '1rem' }}>
+                                                                            Duration: {service.duration} hours
+                                                                        </Typography>
+                                                                    </Box>
+                                                                )}
+
+                                                                {/* Our Contacts Section */}
+                                                                {(service.contactEmail || (service.phoneNumbers && service.phoneNumbers.length > 0) || (service.socialNetworks && service.socialNetworks.length > 0)) && (
+                                                                    <Box sx={{ mt: 2, mb: 2 }}>
+                                                                        <Typography variant="subtitle1" sx={{ fontWeight: 600, color: '#1A2733', mb: 1.5 }}>
+                                                                            📞 Contact Us
+                                                                        </Typography>
+
+                                                                        {/* Contact Email */}
+                                                                        {service.contactEmail && (
+                                                                            <Box sx={{ display: 'flex', alignItems: 'center', gap: 1.5, mb: 1.5 }}>
+                                                                                <EmailIcon sx={{ fontSize: 20, color: '#8A99A8' }} />
+                                                                                <Typography variant="body2" sx={{ color: '#5A6874' }}>
+                                                                                    {service.contactEmail}
+                                                                                </Typography>
+                                                                            </Box>
+                                                                        )}
+
+                                                                        {/* Phone Numbers */}
+                                                                        {service.phoneNumbers && service.phoneNumbers.length > 0 && (
+                                                                            <Box sx={{ display: 'flex', alignItems: 'center', gap: 1.5, mb: 1.5, flexWrap: 'wrap' }}>
+                                                                                <PhoneIcon sx={{ fontSize: 20, color: '#8A99A8' }} />
+                                                                                <Box sx={{ display: 'flex', gap: 1, flexWrap: 'wrap' }}>
+                                                                                    {service.phoneNumbers.map((phone, idx) => (
+                                                                                        <Chip
+                                                                                            key={idx}
+                                                                                            label={phone}
+                                                                                            size="small"
+                                                                                            sx={{ bgcolor: alpha('#FF9800', 0.1), color: '#FF9800' }}
+                                                                                        />
+                                                                                    ))}
+                                                                                </Box>
+                                                                            </Box>
+                                                                        )}
+
+                                                                        {/* Social Networks */}
+                                                                        {service.socialNetworks && service.socialNetworks.length > 0 && (
+                                                                            <Box sx={{ display: 'flex', alignItems: 'center', gap: 1.5, mb: 1.5, flexWrap: 'wrap' }}>
+                                                                                <LanguageIcon sx={{ fontSize: 20, color: '#8A99A8' }} />
+                                                                                <Box sx={{ display: 'flex', gap: 1, flexWrap: 'wrap' }}>
+                                                                                    {service.socialNetworks.map((social, idx) => {
+                                                                                        const getSocialIcon = (platform) => {
+                                                                                            switch(platform?.toUpperCase()) {
+                                                                                                case 'FACEBOOK': return <FacebookIcon sx={{ fontSize: 18, color: '#1877F2' }} />;
+                                                                                                case 'INSTAGRAM': return <InstagramIcon sx={{ fontSize: 18, color: '#E4405F' }} />;
+                                                                                                case 'YOUTUBE': return <YouTubeIcon sx={{ fontSize: 18, color: '#FF0000' }} />;
+                                                                                                case 'LINKEDIN': return <LinkedInIcon sx={{ fontSize: 18, color: '#0077B5' }} />;
+                                                                                                default: return <LanguageIcon sx={{ fontSize: 18, color: '#FF9800' }} />;
+                                                                                            }
+                                                                                        };
+                                                                                        return (
+                                                                                            <Button
+                                                                                                key={idx}
+                                                                                                size="small"
+                                                                                                href={social.url}
+                                                                                                target="_blank"
+                                                                                                startIcon={getSocialIcon(social.platform)}
+                                                                                                sx={{
+                                                                                                    textTransform: 'none',
+                                                                                                    color: '#1A2733',
+                                                                                                    '&:hover': { bgcolor: alpha('#FF9800', 0.1) }
+                                                                                                }}
+                                                                                            >
+                                                                                                {social.platform}
+                                                                                            </Button>
+                                                                                        );
+                                                                                    })}
+                                                                                </Box>
+                                                                            </Box>
+                                                                        )}
+                                                                    </Box>
+                                                                )}
+
+                                                                <Divider sx={{ borderColor: '#E8ECF0', my: '26px' }} />
+
+                                                                <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                                                                    <FormControlLabel
+                                                                        control={
+                                                                            <Switch
+                                                                                checked={service.isAvailable}
+                                                                                onChange={() => handleToggleAvailability(service.id, service.isAvailable)}
+                                                                                sx={{
+                                                                                    '& .MuiSwitch-switchBase.Mui-checked': { color: '#4CAF50' },
+                                                                                    '& .MuiSwitch-switchBase.Mui-checked + .MuiSwitch-track': { bgcolor: '#4CAF50' }
+                                                                                }}
+                                                                            />
+                                                                        }
+                                                                        label="Visible"
+                                                                        sx={{ mr: 0 }}
+                                                                    />
+                                                                    <Box>
+                                                                        <Tooltip title="Edit">
+                                                                            <IconButton
+                                                                                size="medium"
+                                                                                onClick={() => handleOpenEditDialog(service)}
+                                                                                sx={{
+                                                                                    color: '#FF9800',
+                                                                                    '&:hover': { bgcolor: alpha('#FF9800', 0.1) }
+                                                                                }}
+                                                                            >
+                                                                                <EditIcon />
+                                                                            </IconButton>
+                                                                        </Tooltip>
+                                                                        <Tooltip title="Delete">
+                                                                            <IconButton
+                                                                                size="medium"
+                                                                                onClick={() => handleDeleteService(service.id)}
+                                                                                sx={{
+                                                                                    color: '#f44336',
+                                                                                    '&:hover': { bgcolor: alpha('#f44336', 0.1) }
+                                                                                }}
+                                                                            >
+                                                                                <DeleteIcon />
+                                                                            </IconButton>
+                                                                        </Tooltip>
+                                                                    </Box>
+                                                                </Box>
+                                                            </Box>
+                                                        </Grid>
+
+                                                        {/* Right side - Image Carousel */}
+                                                        <Grid item xs={12} md={5}>
+                                                            <Box sx={{
+                                                                height: '100%',
+                                                                minHeight: '364px',
+                                                                background: '#FFFFFF',
+                                                                display: 'flex',
+                                                                flexDirection: 'column',
+                                                                alignItems: 'center',
+                                                                justifyContent: 'center',
+                                                                position: 'relative',
+                                                                overflow: 'hidden',
+                                                                p: 2
+                                                            }}>
+                                                                {images.length > 0 ? (
+                                                                    <>
+                                                                        <Box sx={{
+                                                                            width: '100%',
+                                                                            height: '100%',
+                                                                            display: 'flex',
+                                                                            alignItems: 'center',
+                                                                            justifyContent: 'center',
+                                                                            backgroundColor: '#FFFFFF',
+                                                                            borderRadius: '12px',
+                                                                            overflow: 'hidden',
+                                                                            position: 'relative',
+                                                                            flex: 1
+                                                                        }}>
+                                                                            <ServiceImage
+                                                                                src={images[currentIndex]}
+                                                                                alt={`${service.name} - ${currentIndex + 1}`}
+                                                                            />
+                                                                        </Box>
+
+                                                                        {images.length > 1 && (
+                                                                            <>
+                                                                                <IconButton
+                                                                                    onClick={() => handlePrevImage(service.id, images.length)}
+                                                                                    sx={{
+                                                                                        position: 'absolute',
+                                                                                        left: 16,
+                                                                                        top: '50%',
+                                                                                        transform: 'translateY(-50%)',
+                                                                                        backgroundColor: alpha('#000000', 0.5),
+                                                                                        color: 'white',
+                                                                                        '&:hover': {
+                                                                                            backgroundColor: alpha('#000000', 0.7),
+                                                                                        },
+                                                                                        zIndex: 1
+                                                                                    }}
+                                                                                >
+                                                                                    <ChevronLeftIcon />
+                                                                                </IconButton>
+                                                                                <IconButton
+                                                                                    onClick={() => handleNextImage(service.id, images.length)}
+                                                                                    sx={{
+                                                                                        position: 'absolute',
+                                                                                        right: 16,
+                                                                                        top: '50%',
+                                                                                        transform: 'translateY(-50%)',
+                                                                                        backgroundColor: alpha('#000000', 0.5),
+                                                                                        color: 'white',
+                                                                                        '&:hover': {
+                                                                                            backgroundColor: alpha('#000000', 0.7),
+                                                                                        },
+                                                                                        zIndex: 1
+                                                                                    }}
+                                                                                >
+                                                                                    <ChevronRightIcon />
+                                                                                </IconButton>
+
+                                                                                <Box sx={{
+                                                                                    position: 'absolute',
+                                                                                    bottom: 16,
+                                                                                    left: '50%',
+                                                                                    transform: 'translateX(-50%)',
+                                                                                    display: 'flex',
+                                                                                    gap: 1,
+                                                                                    zIndex: 1,
+                                                                                    backgroundColor: alpha('#000000', 0.5),
+                                                                                    padding: '4px 8px',
+                                                                                    borderRadius: '20px'
+                                                                                }}>
+                                                                                    {images.map((_, idx) => (
+                                                                                        <Box
+                                                                                            key={idx}
+                                                                                            onClick={() => setActiveImageIndex(prev => ({ ...prev, [service.id]: idx }))}
+                                                                                            sx={{
+                                                                                                width: 8,
+                                                                                                height: 8,
+                                                                                                borderRadius: '50%',
+                                                                                                backgroundColor: idx === currentIndex ? '#FF9800' : 'white',
+                                                                                                cursor: 'pointer',
+                                                                                                transition: 'all 0.3s ease',
+                                                                                                '&:hover': {
+                                                                                                    transform: 'scale(1.2)'
+                                                                                                }
+                                                                                            }}
+                                                                                        />
+                                                                                    ))}
+                                                                                </Box>
+
+                                                                                <Chip
+                                                                                    label={`${currentIndex + 1} / ${images.length}`}
+                                                                                    size="small"
+                                                                                    sx={{
+                                                                                        position: 'absolute',
+                                                                                        top: 16,
+                                                                                        right: 16,
+                                                                                        bgcolor: alpha('#000000', 0.7),
+                                                                                        color: 'white',
+                                                                                        fontWeight: 500,
+                                                                                        fontSize: '0.75rem',
+                                                                                        zIndex: 1
+                                                                                    }}
+                                                                                />
+                                                                            </>
+                                                                        )}
+                                                                    </>
+                                                                ) : (
+                                                                    <Box sx={{
+                                                                        textAlign: 'center',
+                                                                        p: 4
+                                                                    }}>
+                                                                        <ImageIcon sx={{ fontSize: 100, color: alpha('#FF9800', 0.3), mb: 2 }} />
+                                                                        <Typography variant="body1" sx={{ color: '#8A99A8', fontSize: '1rem' }}>
+                                                                            No images available
+                                                                        </Typography>
+                                                                    </Box>
+                                                                )}
+                                                            </Box>
+                                                        </Grid>
+                                                    </Grid>
+                                                </Paper>
+                                            </Grow>
+                                        );
+                                    })}
+                                </Box>
+                            )}
+                        </Box>
                     </Box>
                 </Container>
 
@@ -1489,94 +1323,116 @@ const AdminDashboardPage = () => {
                                 </Grid>
                             </Box>
 
-                            {/* Phone Numbers Section */}
-                            <Box sx={{ mt: 3 }}>
-                                <Typography variant="subtitle1" sx={{ fontWeight: 600, color: '#1A2733', mb: 2 }}>
-                                    📞 Phone Numbers (Optional - Armenian numbers only)
-                                </Typography>
-
-                                {/* Add phone number input */}
-                                <Box sx={{ display: 'flex', gap: 1, mb: 2 }}>
-                                    <FlatTextField
-                                        size="small"
-                                        placeholder="Enter 8-digit number (e.g., 99123456)"
-                                        value={newPhoneNumber}
-                                        onChange={(e) => {
-                                            setNewPhoneNumber(e.target.value);
-                                            setPhoneError('');
-                                        }}
-                                        error={!!phoneError}
-                                        helperText={phoneError}
-                                        sx={{ flex: 1 }}
-                                    />
-                                    <GradientButton onClick={handleAddPhoneNumber} sx={{ minWidth: '100px' }}>
-                                        Add
-                                    </GradientButton>
-                                </Box>
-
-                                {/* Phone numbers list */}
-                                {phoneNumbersList.length > 0 && (
-                                    <Box sx={{ display: 'flex', flexWrap: 'wrap', gap: 1 }}>
-                                        {phoneNumbersList.map((phone, idx) => (
-                                            <Chip
-                                                key={idx}
-                                                label={`📞 ${phone}`}
-                                                onDelete={() => handleRemovePhoneNumber(idx)}
-                                                sx={{
-                                                    bgcolor: alpha('#FF9800', 0.1),
-                                                    color: '#FF9800',
-                                                    '&:hover': { bgcolor: alpha('#FF9800', 0.2) }
-                                                }}
-                                            />
-                                        ))}
+                            {/* Contact Email and Phone Numbers - Side by side */}
+                            <Grid container spacing={3}>
+                                {/* Contact Email - Left side */}
+                                <Grid item xs={12} md={6}>
+                                    <Box>
+                                        <Typography variant="subtitle1" sx={{ fontWeight: 600, color: '#1A2733', mb: 2 }}>
+                                            ✉️ Contact Email (Optional)
+                                        </Typography>
+                                        <FlatTextField
+                                            fullWidth
+                                            type="email"
+                                            placeholder="contact@example.com"
+                                            value={contactEmail}
+                                            onChange={(e) => setContactEmail(e.target.value)}
+                                            size="small"
+                                        />
                                     </Box>
-                                )}
-                            </Box>
+                                </Grid>
 
-                            {/* Contact Email Section */}
-                            <Box sx={{ mt: 3 }}>
-                                <Typography variant="subtitle1" sx={{ fontWeight: 600, color: '#1A2733', mb: 2 }}>
-                                    ✉️ Contact Email (Optional)
-                                </Typography>
-                                <FlatTextField
-                                    fullWidth
-                                    type="email"
-                                    placeholder="contact@example.com"
-                                    value={contactEmail}
-                                    onChange={(e) => setContactEmail(e.target.value)}
-                                    size="small"
-                                />
-                            </Box>
+                                {/* Phone Numbers - Right side */}
+                                <Grid item xs={12} md={6}>
+                                    <Box>
+                                        <Typography variant="subtitle1" sx={{ fontWeight: 600, color: '#1A2733', mb: 2 }}>
+                                            📞 Phone Numbers (Optional - Armenian numbers only)
+                                        </Typography>
 
-                            {/* Tags - moved to the end */}
-                            <FlatTextField
-                                fullWidth
-                                label="Tags (comma separated)"
-                                name="tags"
-                                value={formData.tags}
-                                onChange={handleInputChange}
-                                placeholder="e.g., premium, outdoor, family-friendly"
-                                variant="outlined"
-                            />
+                                        {/* Add phone number input */}
+                                        <Box sx={{ display: 'flex', gap: 1, mb: 2 }}>
+                                            <FlatTextField
+                                                size="small"
+                                                placeholder="Enter 8-digit number (e.g., 99123456)"
+                                                value={newPhoneNumber}
+                                                onChange={(e) => {
+                                                    setNewPhoneNumber(e.target.value);
+                                                    setPhoneError('');
+                                                }}
+                                                error={!!phoneError}
+                                                helperText={phoneError}
+                                                sx={{ flex: 1 }}
+                                            />
+                                            <GradientButton onClick={handleAddPhoneNumber} sx={{ minWidth: '100px' }}>
+                                                Add
+                                            </GradientButton>
+                                        </Box>
 
-                            {/* Upload Images - moved to the end */}
-                            <Box>
-                                <OutlinedButton
-                                    component="label"
-                                    startIcon={<UploadIcon />}
-                                    fullWidth
-                                    sx={{
-                                        height: '56px',
-                                        borderColor: '#E0E4E8',
-                                        color: '#5A6874',
-                                        backgroundColor: '#F5F7FA',
-                                        '&:hover': { borderColor: '#FF9800', backgroundColor: '#EEF0F2' }
-                                    }}
-                                >
-                                    Upload Images
-                                    <input type="file" multiple accept="image/*" onChange={handleImageSelect} style={{ display: 'none' }} ref={fileInputRef} />
-                                </OutlinedButton>
-                            </Box>
+                                        {/* Phone numbers list */}
+                                        {phoneNumbersList.length > 0 && (
+                                            <Box sx={{ display: 'flex', flexWrap: 'wrap', gap: 1 }}>
+                                                {phoneNumbersList.map((phone, idx) => (
+                                                    <Chip
+                                                        key={idx}
+                                                        label={`📞 ${phone}`}
+                                                        onDelete={() => handleRemovePhoneNumber(idx)}
+                                                        sx={{
+                                                            bgcolor: alpha('#FF9800', 0.1),
+                                                            color: '#FF9800',
+                                                            '&:hover': { bgcolor: alpha('#FF9800', 0.2) }
+                                                        }}
+                                                    />
+                                                ))}
+                                            </Box>
+                                        )}
+                                    </Box>
+                                </Grid>
+                            </Grid>
+
+                            {/* Tags and Upload Images - Side by side */}
+                            <Grid container spacing={3}>
+                                {/* Tags - Left side */}
+                                <Grid item xs={12} md={6}>
+                                    <Box>
+                                        <Typography variant="subtitle1" sx={{ fontWeight: 600, color: '#1A2733', mb: 2 }}>
+                                            🏷️ Tags (Optional)
+                                        </Typography>
+                                        <FlatTextField
+                                            fullWidth
+                                            label="Tags (comma separated)"
+                                            name="tags"
+                                            value={formData.tags}
+                                            onChange={handleInputChange}
+                                            placeholder="e.g., premium, outdoor, family-friendly"
+                                            variant="outlined"
+                                        />
+                                    </Box>
+                                </Grid>
+
+                                {/* Upload Images - Right side */}
+                                <Grid item xs={12} md={6}>
+                                    <Box>
+                                        <Typography variant="subtitle1" sx={{ fontWeight: 600, color: '#1A2733', mb: 2 }}>
+                                            🖼️ Upload Images (Optional)
+                                        </Typography>
+                                        <OutlinedButton
+                                            component="label"
+                                            startIcon={<UploadIcon />}
+                                            fullWidth
+                                            sx={{
+                                                height: '56px',
+                                                borderColor: '#E0E4E8',
+                                                color: '#5A6874',
+                                                backgroundColor: '#F5F7FA',
+                                                '&:hover': { borderColor: '#FF9800', backgroundColor: '#EEF0F2' }
+                                            }}
+                                        >
+                                            Choose Images
+                                            <input type="file" multiple accept="image/*" onChange={handleImageSelect} style={{ display: 'none' }} ref={fileInputRef} />
+                                        </OutlinedButton>
+                                    </Box>
+                                </Grid>
+                            </Grid>
 
                             {/* Image Previews Section */}
                             {existingImages.length > 0 && (
@@ -1638,60 +1494,6 @@ const AdminDashboardPage = () => {
                         </OutlinedButton>
                         <GradientButton onClick={handleSubmit} disabled={loading}>
                             {loading ? <CircularProgress size={24} sx={{ color: 'white' }} /> : (editingService ? 'Update Service' : 'Create Service')}
-                        </GradientButton>
-                    </DialogActions>
-                </Dialog>
-
-                {/* Respond to Inquiry Dialog */}
-                <Dialog open={inquiryDialogOpen} onClose={() => setInquiryDialogOpen(false)} maxWidth="md" fullWidth
-                        PaperProps={{ sx: { bgcolor: '#FFFFFF', borderRadius: '16px', border: 'none', boxShadow: '0 4px 12px rgba(0, 0, 0, 0.08)' } }}>
-                    <DialogTitle sx={{ borderBottom: 'none', bgcolor: '#FFFFFF', pt: 3, px: 3 }}>
-                        <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
-                            <ReplyIcon sx={{ color: '#FF9800' }} />
-                            <Typography variant="h5" sx={{ fontWeight: 600, color: '#1A2733' }}>Respond to Customer</Typography>
-                        </Box>
-                        <IconButton onClick={() => setInquiryDialogOpen(false)} sx={{ position: 'absolute', right: 16, top: 16, color: '#8A99A8' }}>
-                            <CloseIcon />
-                        </IconButton>
-                    </DialogTitle>
-                    <DialogContent sx={{ p: 3 }}>
-                        {selectedInquiry && (
-                            <Box sx={{ mt: 2 }}>
-                                <Paper sx={{ p: 2.5, mb: 3, bgcolor: alpha('#FF9800', 0.05), borderRadius: '12px', border: 'none' }}>
-                                    <Grid container spacing={2}>
-                                        <Grid item xs={6}>
-                                            <Typography variant="caption" sx={{ color: '#8A99A8' }}>Customer</Typography>
-                                            <Typography variant="body2" sx={{ color: '#1A2733' }}>{selectedInquiry.user?.userName}</Typography>
-                                        </Grid>
-                                        <Grid item xs={6}>
-                                            <Typography variant="caption" sx={{ color: '#8A99A8' }}>Email</Typography>
-                                            <Typography variant="body2" sx={{ color: '#1A2733' }}>{selectedInquiry.userEmail}</Typography>
-                                        </Grid>
-                                        <Grid item xs={12}>
-                                            <Typography variant="caption" sx={{ color: '#8A99A8' }}>Message</Typography>
-                                            <Typography variant="body2" sx={{ color: '#5A6874' }}>{selectedInquiry.message}</Typography>
-                                        </Grid>
-                                    </Grid>
-                                </Paper>
-                                <FlatTextField
-                                    fullWidth
-                                    multiline
-                                    rows={6}
-                                    label="Your Response"
-                                    value={responseText}
-                                    onChange={(e) => setResponseText(e.target.value)}
-                                    required
-                                    variant="outlined"
-                                />
-                            </Box>
-                        )}
-                    </DialogContent>
-                    <DialogActions sx={{ p: 3, borderTop: 'none', bgcolor: '#FFFFFF' }}>
-                        <OutlinedButton onClick={() => setInquiryDialogOpen(false)}>
-                            Cancel
-                        </OutlinedButton>
-                        <GradientButton onClick={handleSendResponse} disabled={sendingResponse}>
-                            {sendingResponse ? <CircularProgress size={24} sx={{ color: 'white' }} /> : 'Send Response'}
                         </GradientButton>
                     </DialogActions>
                 </Dialog>

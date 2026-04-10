@@ -7,7 +7,6 @@
     <list default="true" id="52f9de53-701b-4b52-b101-40303d7b40ec" name="Changes" comment="">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/pages/AdminDashboardPage.js" beforeDir="false" afterPath="$PROJECT_DIR$/src/pages/AdminDashboardPage.js" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/services/adminAPI.js" beforeDir="false" afterPath="$PROJECT_DIR$/src/services/adminAPI.js" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -162,14 +161,7 @@
       <workItem from="1775800525802" duration="801000" />
       <workItem from="1775805030529" duration="4950000" />
       <workItem from="1775811029429" duration="510000" />
-      <workItem from="1775814531861" duration="2515000" />
-    </task>
-    <task id="LOCAL-00001" summary="first commit">
-      <created>1765462776214</created>
-      <option name="number" value="00001" />
-      <option name="presentableId" value="LOCAL-00001" />
-      <option name="project" value="LOCAL" />
-      <updated>1765462776214</updated>
+      <workItem from="1775814531861" duration="4089000" />
     </task>
     <task id="LOCAL-00002" summary="first commit">
       <created>1765562449452</created>
@@ -507,7 +499,14 @@
       <option name="project" value="LOCAL" />
       <updated>1775810031923</updated>
     </task>
-    <option name="localTasksCounter" value="50" />
+    <task id="LOCAL-00050" summary="Bugs fix.">
+      <created>1775817234683</created>
+      <option name="number" value="00050" />
+      <option name="presentableId" value="LOCAL-00050" />
+      <option name="project" value="LOCAL" />
+      <updated>1775817234683</updated>
+    </task>
+    <option name="localTasksCounter" value="51" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
