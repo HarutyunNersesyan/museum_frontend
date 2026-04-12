@@ -513,74 +513,93 @@ const AboutUsPage = () => {
                 py: { xs: 4, md: 6 },
                 px: { xs: 2, sm: 3, md: 4, lg: 6 }
             }}>
-                {/* Hero Section - FULL WIDTH with CENTERED title - NO BACKGROUND */}
+                {/* Hero Section - Image on LEFT, Text on RIGHT aligned with image top */}
                 <Fade in timeout={1000}>
-                    <Box sx={{
-                        textAlign: 'center',
+                    <Grid container spacing={4} sx={{
                         mb: { xs: 6, md: 8 },
                         animation: `${slideIn} 0.8s ease-out`,
-                        width: '100%'
+                        width: '100%',
+                        m: 0,
+                        alignItems: 'flex-start'
                     }}>
-                        <Typography variant="h1" sx={{
-                            fontSize: { xs: 36, sm: 48, md: 64, lg: 72 },
-                            fontWeight: 800,
-                            lineHeight: 1.2,
-                            mb: 3,
-                            letterSpacing: '-0.02em',
-                            textAlign: 'center'
-                        }}>
-                            <Box component="span" sx={{ color: '#2C2C2C' }}>
-                                About{' '}
-                            </Box>
-                            <Box component="span" sx={{
-                                background: 'linear-gradient(135deg, #FF6B35 0%, #FFB347 100%)',
-                                backgroundSize: '200% 200%',
-                                animation: `${gradientShift} 3s ease infinite`,
-                                backgroundClip: 'text',
-                                WebkitBackgroundClip: 'text',
-                                color: 'transparent'
-                            }}>
-                                Festivy
-                            </Box>
-                        </Typography>
-
-                        <Box sx={{
-                            width: 80,
-                            height: 3,
-                            background: 'linear-gradient(90deg, #FF6B35, #FFB347)',
-                            borderRadius: 2,
-                            mb: 5,
-                            mx: 'auto'
-                        }} />
-
-                        {/* Text without background */}
-                        <Box sx={{
-                            width: '100%',
-                            p: { xs: 3, md: 5 }
-                        }}>
-                            <Typography variant="body1" sx={{
-                                color: '#3A3A3A',
-                                fontSize: { xs: 16, md: 18 },
-                                lineHeight: 1.9,
-                                textAlign: 'left',
-                                fontWeight: 450,
-                                letterSpacing: '0.01em',
-                                width: '100%',
-                                '& span': {
-                                    fontWeight: 600
+                        {/* Left side - Image */}
+                        <Grid item xs={12} md={6}>
+                            <Box sx={{
+                                position: 'relative',
+                                borderRadius: '32px',
+                                overflow: 'hidden',
+                                boxShadow: '0 20px 40px rgba(0,0,0,0.1)',
+                                transition: 'transform 0.3s ease',
+                                '&:hover': {
+                                    transform: 'scale(1.02)'
                                 }
                             }}>
-                                Welcome to <span style={{ color: '#FF6B35' }}>Festivy</span> — your ultimate destination for creating unforgettable celebrations.
-                                We bring together the finest <span style={{ color: '#FFB347' }}>party planners</span>,
-                                <span style={{ color: '#FF8C42' }}> entertainers</span>, and
-                                <span style={{ color: '#FF9F4A' }}> service providers</span> to turn your vision into reality.
-                                Whether you're planning an intimate birthday or a grand festival, our platform connects you with professionals who
-                                bring <span style={{ color: '#FF6B35' }}>passion</span>,
-                                <span style={{ color: '#FFB347' }}> creativity</span>, and
-                                <span style={{ color: '#FF8C42' }}> excellence</span> to every event.
-                            </Typography>
-                        </Box>
-                    </Box>
+                                <img
+                                    src="https://images.unsplash.com/photo-1511795409834-ef04bbd61622?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1169&q=80"
+                                    alt="Celebration event with decorations and happy people"
+                                    style={{
+                                        width: '100%',
+                                        height: 'auto',
+                                        display: 'block',
+                                        objectFit: 'cover'
+                                    }}
+                                />
+                            </Box>
+                        </Grid>
+
+                        {/* Right side - Text starts from image top edge */}
+                        <Grid item xs={12} md={6}>
+                            <Box sx={{ p: { xs: 2, md: 4 }, pt: { xs: 2, md: 0 } }}>
+                                {/* "About Festivy" title REMOVED */}
+                                {/* Orange line REMOVED */}
+
+                                {/* Text content - starts directly */}
+                                <Typography variant="body1" sx={{
+                                    color: '#3A3A3A',
+                                    fontSize: { xs: 16, md: 18 },
+                                    lineHeight: 1.9,
+                                    fontWeight: 450,
+                                    letterSpacing: '0.01em',
+                                    mb: 3
+                                }}>
+                                    <span style={{ fontWeight: 600, color: '#FF6B35' }}>Festivy</span> is your ultimate destination for creating unforgettable celebrations. We bring together the finest party planners, entertainers, and service providers to turn your vision into reality. Whether you're planning an intimate birthday gathering, a romantic engagement, a corporate event, or a grand festival, our platform connects you with professionals who bring passion, creativity, and excellence to every event.
+                                </Typography>
+
+                                <Typography variant="body1" sx={{
+                                    color: '#3A3A3A',
+                                    fontSize: { xs: 16, md: 18 },
+                                    lineHeight: 1.9,
+                                    fontWeight: 450,
+                                    letterSpacing: '0.01em',
+                                    mb: 3
+                                }}>
+                                    At <span style={{ fontWeight: 600, color: '#FF6B35' }}>Festivy</span>, we believe that every celebration tells a unique story. That's why we focus on providing a seamless and personalized experience, helping you discover and collaborate with trusted experts who truly understand your needs. From stunning decorations and delicious catering to live music, photography, and interactive entertainment, every detail is carefully curated to match your style and expectations.
+                                </Typography>
+
+                                <Typography variant="body1" sx={{
+                                    color: '#3A3A3A',
+                                    fontSize: { xs: 16, md: 18 },
+                                    lineHeight: 1.9,
+                                    fontWeight: 450,
+                                    letterSpacing: '0.01em',
+                                    mb: 3
+                                }}>
+                                    Our mission is to simplify the event planning process while elevating the quality of your celebrations. With an easy-to-use platform and a wide range of verified service providers, you can explore ideas, compare options, and make confident decisions—all in one place. No matter the size or theme of your event, <span style={{ fontWeight: 600, color: '#FF6B35' }}>Festivy</span> empowers you to create moments that leave lasting impressions.
+                                </Typography>
+
+                                <Typography variant="body1" sx={{
+                                    color: '#3A3A3A',
+                                    fontSize: { xs: 16, md: 18 },
+                                    lineHeight: 1.9,
+                                    fontWeight: 450,
+                                    letterSpacing: '0.01em',
+                                    fontStyle: 'italic'
+                                }}>
+                                    Let <span style={{ fontWeight: 600, color: '#FF6B35' }}>Festivy</span> be your partner in celebration, where imagination meets professionalism, and every occasion becomes a cherished memory.
+                                </Typography>
+                            </Box>
+                        </Grid>
+                    </Grid>
                 </Fade>
 
                 {/* Service Categories Section - FULL WIDTH */}
