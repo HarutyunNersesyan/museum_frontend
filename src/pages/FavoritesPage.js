@@ -47,7 +47,9 @@ import {
     Facebook as FacebookIcon,
     Instagram as InstagramIcon,
     YouTube as YouTubeIcon,
-    LinkedIn as LinkedInIcon
+    LinkedIn as LinkedInIcon,
+    Info as InfoIcon,
+    HowToReg as HowToRegIcon
 } from '@mui/icons-material';
 import { LocalizationProvider } from '@mui/x-date-pickers/LocalizationProvider';
 import { AdapterDayjs } from '@mui/x-date-pickers/AdapterDayjs';
@@ -57,20 +59,6 @@ import serviceAPI from '../services/serviceAPI';
 import { alpha, styled } from '@mui/material/styles';
 
 // Styled components
-const GradientButton = styled(Button)(({ theme }) => ({
-    background: 'linear-gradient(135deg, #FF9800 0%, #FF5722 100%)',
-    borderRadius: '12px',
-    padding: '10px 24px',
-    fontWeight: 600,
-    textTransform: 'none',
-    color: '#FFFFFF',
-    transition: 'all 0.3s ease',
-    '&:hover': {
-        transform: 'translateY(-2px)',
-        boxShadow: '0 8px 25px rgba(255, 152, 0, 0.3)'
-    }
-}));
-
 const ServiceImage = styled('img')({
     maxWidth: '100%',
     maxHeight: '100%',
@@ -99,7 +87,7 @@ const formatEventDate = (startDate, startTime) => {
     }
 };
 
-// Global scrollbar styles
+// Global scrollbar styles (same as HomePage)
 const scrollbarStyles = {
     '*::-webkit-scrollbar': {
         width: '10px',
@@ -110,14 +98,14 @@ const scrollbarStyles = {
         borderRadius: '10px',
     },
     '*::-webkit-scrollbar-thumb': {
-        background: '#FF9800',
+        background: '#FF6B35',
         borderRadius: '10px',
         '&:hover': {
-            background: '#FF5722',
+            background: '#E55A2B',
         },
     },
     '*': {
-        scrollbarColor: '#FF9800 #F5F0E8',
+        scrollbarColor: '#FF6B35 #F5F0E8',
         scrollbarWidth: 'thin',
     },
 };
@@ -226,12 +214,26 @@ const FavoritesPage = () => {
         navigate('/admin/dashboard');
     };
 
+    const handleAboutClick = () => {
+        navigate('/about');
+    };
+
+    const handleHowItWorks = () => {
+        navigate('/');
+        setTimeout(() => {
+            const element = document.getElementById('how-it-works');
+            if (element) {
+                element.scrollIntoView({ behavior: 'smooth' });
+            }
+        }, 100);
+    };
+
     const userInitial = user?.userName ? user.userName.charAt(0).toUpperCase() : '';
 
     if (!user) {
         return (
             <Backdrop open={true} sx={{ zIndex: 9999, backgroundColor: 'rgba(255,255,255,0.9)' }}>
-                <CircularProgress sx={{ color: '#FF9800' }} />
+                <CircularProgress sx={{ color: '#FF6B35' }} />
             </Backdrop>
         );
     }
@@ -243,7 +245,7 @@ const FavoritesPage = () => {
             case 'INSTAGRAM': return <InstagramIcon sx={{ fontSize: 16, color: '#E4405F' }} />;
             case 'YOUTUBE': return <YouTubeIcon sx={{ fontSize: 16, color: '#FF0000' }} />;
             case 'LINKEDIN': return <LinkedInIcon sx={{ fontSize: 16, color: '#0077B5' }} />;
-            default: return <LanguageIcon sx={{ fontSize: 16, color: '#FF9800' }} />;
+            default: return <LanguageIcon sx={{ fontSize: 16, color: '#FF6B35' }} />;
         }
     };
 
@@ -251,29 +253,43 @@ const FavoritesPage = () => {
         <LocalizationProvider dateAdapter={AdapterDayjs}>
             <Box sx={{
                 minHeight: '100vh',
-                background: '#FFFFFF',
+                background: 'linear-gradient(135deg, #FFF9F0 0%, #F5F0E8 100%)',
                 fontFamily: 'Inter, sans-serif',
                 position: 'relative'
             }}>
                 <GlobalStyles styles={scrollbarStyles} />
 
-                {/* Header */}
+                {/* Header - SAME AS HOMEPAGE */}
                 <Box sx={{
                     position: 'sticky',
                     top: 0,
                     zIndex: 100,
-                    backgroundColor: '#FFFFFF',
-                    borderBottom: '1px solid #E8ECF0',
-                    px: { xs: 2, sm: 3, md: 4, lg: 6 }
+                    backgroundColor: alpha('#FFFFFF', 0.95),
+                    backdropFilter: 'blur(10px)',
+                    borderBottom: '1px solid rgba(0,0,0,0.08)',
+                    boxShadow: '0 2px 20px rgba(0,0,0,0.03)'
                 }}>
-                    <Container maxWidth={false} disableGutters sx={{ py: 1.5 }}>
-                        <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
-                            <Box onClick={() => navigate('/')} sx={{ display: 'flex', alignItems: 'center', gap: 1.5, cursor: 'pointer' }}>
+                    <Container maxWidth="xl">
+                        <Box sx={{
+                            display: 'flex',
+                            alignItems: 'center',
+                            justifyContent: 'space-between',
+                            height: 70,
+                        }}>
+                            <Box
+                                onClick={() => navigate('/')}
+                                sx={{
+                                    display: 'flex',
+                                    alignItems: 'center',
+                                    gap: 1.5,
+                                    cursor: 'pointer'
+                                }}
+                            >
                                 <Box sx={{
                                     width: 38,
                                     height: 38,
                                     borderRadius: '12px',
-                                    background: 'linear-gradient(135deg, #FF9800 0%, #FF5722 100%)',
+                                    background: 'linear-gradient(135deg, #FF6B35 0%, #FFB347 100%)',
                                     display: 'flex',
                                     alignItems: 'center',
                                     justifyContent: 'center'
@@ -282,7 +298,7 @@ const FavoritesPage = () => {
                                 </Box>
                                 <Typography variant="h6" sx={{
                                     fontWeight: 800,
-                                    background: 'linear-gradient(135deg, #FF9800 0%, #FF5722 100%)',
+                                    background: 'linear-gradient(135deg, #FF6B35 0%, #FFB347 100%)',
                                     WebkitBackgroundClip: 'text',
                                     WebkitTextFillColor: 'transparent',
                                     letterSpacing: '-0.5px'
@@ -291,53 +307,141 @@ const FavoritesPage = () => {
                                 </Typography>
                             </Box>
 
+                            <Box sx={{ display: { xs: 'none', md: 'flex' }, alignItems: 'center', gap: 3 }}>
+                                <Button
+                                    startIcon={<InfoIcon />}
+                                    sx={{ fontWeight: 500, color: '#4A4A4A', '&:hover': { color: '#FF6B35' } }}
+                                    onClick={handleAboutClick}
+                                >
+                                    About Us
+                                </Button>
+                                <Button
+                                    startIcon={<HowToRegIcon />}
+                                    sx={{ fontWeight: 500, color: '#4A4A4A', '&:hover': { color: '#FF6B35' } }}
+                                    onClick={handleHowItWorks}
+                                >
+                                    How It Works
+                                </Button>
+                                <Button
+                                    startIcon={<CelebrationIcon />}
+                                    sx={{ fontWeight: 500, color: '#4A4A4A', '&:hover': { color: '#FF6B35' } }}
+                                    onClick={() => navigate('/services')}
+                                >
+                                    Services
+                                </Button>
+                            </Box>
+
                             <Box sx={{ display: 'flex', alignItems: 'center', gap: 2 }}>
-                                <Tooltip title="Saved Services">
-                                    <IconButton
-                                        onClick={() => navigate('/favorites')}
-                                        sx={{
-                                            position: 'relative',
-                                            bgcolor: alpha('#FF9800', 0.1),
-                                            '&:hover': {
-                                                bgcolor: alpha('#FF9800', 0.2),
-                                                transform: 'scale(1.05)'
-                                            }
-                                        }}
-                                    >
-                                        <BookmarkIcon sx={{ color: '#FF9800' }} />
-                                        {totalElements > 0 && (
-                                            <Box
+                                {user ? (
+                                    <>
+                                        {/* Welcome Chip */}
+                                        <Chip
+                                            label={`Welcome, ${user.userName}`}
+                                            size="small"
+                                            sx={{
+                                                display: { xs: 'none', sm: 'flex' },
+                                                bgcolor: alpha('#FF6B35', 0.1),
+                                                color: '#FF6B35',
+                                                border: `1px solid ${alpha('#FF6B35', 0.2)}`
+                                            }}
+                                        />
+
+                                        {/* Saved Button with Bookmark Icon */}
+                                        <Tooltip title="Saved Services">
+                                            <IconButton
+                                                onClick={() => navigate('/favorites')}
                                                 sx={{
-                                                    position: 'absolute',
-                                                    top: -5,
-                                                    right: -5,
-                                                    bgcolor: '#FF5722',
-                                                    color: 'white',
-                                                    borderRadius: '50%',
-                                                    width: 20,
-                                                    height: 20,
-                                                    display: 'flex',
-                                                    alignItems: 'center',
-                                                    justifyContent: 'center',
-                                                    fontSize: '11px',
-                                                    fontWeight: 'bold'
+                                                    position: 'relative',
+                                                    bgcolor: alpha('#FF6B35', 0.1),
+                                                    '&:hover': {
+                                                        bgcolor: alpha('#FF6B35', 0.2),
+                                                        transform: 'scale(1.05)'
+                                                    }
                                                 }}
                                             >
-                                                {totalElements > 99 ? '99+' : totalElements}
-                                            </Box>
-                                        )}
-                                    </IconButton>
-                                </Tooltip>
+                                                <BookmarkIcon sx={{ color: '#FF6B35' }} />
+                                                {totalElements > 0 && (
+                                                    <Box
+                                                        sx={{
+                                                            position: 'absolute',
+                                                            top: -5,
+                                                            right: -5,
+                                                            bgcolor: '#FF5722',
+                                                            color: 'white',
+                                                            borderRadius: '50%',
+                                                            width: 20,
+                                                            height: 20,
+                                                            display: 'flex',
+                                                            alignItems: 'center',
+                                                            justifyContent: 'center',
+                                                            fontSize: '11px',
+                                                            fontWeight: 'bold'
+                                                        }}
+                                                    >
+                                                        {totalElements > 99 ? '99+' : totalElements}
+                                                    </Box>
+                                                )}
+                                            </IconButton>
+                                        </Tooltip>
 
-                                <IconButton onClick={handleMenuOpen} sx={{ background: 'linear-gradient(135deg, #FF9800 0%, #FF5722 100%)', width: 38, height: 38, '&:hover': { transform: 'scale(1.05)' } }}>
-                                    <Avatar sx={{ width: 38, height: 38, bgcolor: 'transparent', color: 'white' }}>{userInitial || <AccountCircleIcon />}</Avatar>
-                                </IconButton>
-                                <Menu anchorEl={anchorEl} open={Boolean(anchorEl)} onClose={handleMenuClose} PaperProps={{ sx: { bgcolor: '#FFFFFF', color: '#1A2733', border: '1px solid #E8ECF0', minWidth: 200, borderRadius: '16px', boxShadow: '0 4px 20px rgba(0,0,0,0.08)' } }}>
-                                    <MenuItem onClick={handleProfile}><PersonIcon sx={{ mr: 2, fontSize: 20, color: '#FF9800' }} />Profile</MenuItem>
-                                    {isAdmin && <MenuItem onClick={handleAdminPanel}><AdminIcon sx={{ mr: 2, fontSize: 20, color: '#FF9800' }} />Admin Panel</MenuItem>}
-                                    <Divider />
-                                    <MenuItem onClick={handleLogout}><LogoutIcon sx={{ mr: 2, fontSize: 20, color: '#f44336' }} />Logout</MenuItem>
-                                </Menu>
+                                        {/* Profile Icon */}
+                                        <IconButton
+                                            onClick={handleMenuOpen}
+                                            sx={{
+                                                background: 'linear-gradient(135deg, #FF6B35 0%, #FFB347 100%)',
+                                                width: 38,
+                                                height: 38,
+                                                '&:hover': { transform: 'scale(1.05)' }
+                                            }}
+                                        >
+                                            <Avatar sx={{ width: 38, height: 38, bgcolor: 'transparent', color: 'white' }}>
+                                                {userInitial || <AccountCircleIcon />}
+                                            </Avatar>
+                                        </IconButton>
+
+                                        <Menu
+                                            anchorEl={anchorEl}
+                                            open={Boolean(anchorEl)}
+                                            onClose={handleMenuClose}
+                                            PaperProps={{
+                                                sx: {
+                                                    bgcolor: '#FFFFFF',
+                                                    color: '#1A1A1A',
+                                                    border: '1px solid #E0E0E0',
+                                                    minWidth: 200,
+                                                    borderRadius: '16px',
+                                                    boxShadow: '0 4px 20px rgba(0,0,0,0.1)'
+                                                }
+                                            }}
+                                        >
+                                            <MenuItem onClick={handleProfile}><PersonIcon sx={{ mr: 2, fontSize: 20, color: '#FF6B35' }} />Profile</MenuItem>
+                                            {isAdmin && (
+                                                <MenuItem onClick={handleAdminPanel}><AdminIcon sx={{ mr: 2, fontSize: 20, color: '#FF9800' }} />Admin Panel</MenuItem>
+                                            )}
+                                            <Divider />
+                                            <MenuItem onClick={handleLogout}><LogoutIcon sx={{ mr: 2, fontSize: 20, color: '#FF6B35' }} />Logout</MenuItem>
+                                        </Menu>
+                                    </>
+                                ) : (
+                                    <>
+                                        <Button sx={{ fontWeight: 500, color: '#4A4A4A', '&:hover': { color: '#FF6B35' } }} onClick={() => navigate('/login')}>
+                                            Sign In
+                                        </Button>
+                                        <Button
+                                            variant="contained"
+                                            sx={{
+                                                fontWeight: 600,
+                                                borderRadius: '12px',
+                                                background: 'linear-gradient(135deg, #FF6B35 0%, #FFB347 100%)',
+                                                boxShadow: '0 4px 12px rgba(255,107,53,0.25)',
+                                                '&:hover': { transform: 'translateY(-2px)', boxShadow: '0 6px 16px rgba(255,107,53,0.35)' }
+                                            }}
+                                            onClick={() => navigate('/signup')}
+                                        >
+                                            Sign Up
+                                        </Button>
+                                    </>
+                                )}
                             </Box>
                         </Box>
                     </Container>
@@ -354,8 +458,15 @@ const FavoritesPage = () => {
                     <Fade in={true} timeout={500}>
                         <Box sx={{ textAlign: 'center', mb: 5 }}>
                             <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 2, mb: 2 }}>
-                                <BookmarkIcon sx={{ fontSize: 48, color: '#FF9800' }} />
-                                <Typography variant="h1" sx={{ fontSize: { xs: '36px', md: '48px' }, fontWeight: 800, background: 'linear-gradient(135deg, #FF9800 0%, #FF5722 100%)', WebkitBackgroundClip: 'text', WebkitTextFillColor: 'transparent', letterSpacing: '-1px' }}>
+                                <BookmarkIcon sx={{ fontSize: 48, color: '#FF6B35' }} />
+                                <Typography variant="h1" sx={{
+                                    fontSize: { xs: '36px', md: '48px' },
+                                    fontWeight: 800,
+                                    background: 'linear-gradient(135deg, #FF6B35 0%, #FFB347 100%)',
+                                    WebkitBackgroundClip: 'text',
+                                    WebkitTextFillColor: 'transparent',
+                                    letterSpacing: '-1px'
+                                }}>
                                     Saved Services
                                 </Typography>
                             </Box>
@@ -369,7 +480,7 @@ const FavoritesPage = () => {
                     {!loading && favorites.length > 0 && (
                         <Box sx={{ mb: 3 }}>
                             <Typography sx={{ color: '#8A99A8' }}>
-                                You have <strong style={{ color: '#FF9800' }}>{totalElements}</strong> saved {totalElements === 1 ? 'service' : 'services'}
+                                You have <strong style={{ color: '#FF6B35' }}>{totalElements}</strong> saved {totalElements === 1 ? 'service' : 'services'}
                             </Typography>
                         </Box>
                     )}
@@ -403,9 +514,24 @@ const FavoritesPage = () => {
                             <Typography variant="body1" sx={{ color: '#8A99A8', mb: 3 }}>
                                 Start exploring services and click the 🔥 button to save your favorites
                             </Typography>
-                            <GradientButton onClick={() => navigate('/services')}>
+                            <Button
+                                variant="contained"
+                                onClick={() => navigate('/services')}
+                                sx={{
+                                    fontWeight: 600,
+                                    borderRadius: '40px',
+                                    background: 'linear-gradient(135deg, #FF6B35 0%, #FFB347 100%)',
+                                    boxShadow: '0 4px 12px rgba(255,107,53,0.25)',
+                                    px: 4,
+                                    py: 1.5,
+                                    '&:hover': {
+                                        transform: 'translateY(-2px)',
+                                        boxShadow: '0 6px 16px rgba(255,107,53,0.35)'
+                                    }
+                                }}
+                            >
                                 Browse Services
-                            </GradientButton>
+                            </Button>
                         </Box>
                     ) : (
                         <Box sx={{ display: 'flex', flexDirection: 'column', gap: 0 }}>
@@ -458,7 +584,7 @@ const FavoritesPage = () => {
                                                                             }
                                                                         }}
                                                                     >
-                                                                        <WhatshotIcon sx={{ color: '#FF9800', fontSize: 28 }} />
+                                                                        <WhatshotIcon sx={{ color: '#FF6B35', fontSize: 28 }} />
                                                                     </IconButton>
                                                                 </Tooltip>
                                                             </Box>
@@ -474,7 +600,7 @@ const FavoritesPage = () => {
                                                                             Price
                                                                         </Typography>
                                                                         <Typography variant="body1" sx={{ color: '#4CAF50', fontWeight: 600, fontSize: { xs: '0.9rem', sm: '1rem' } }}>
-                                                                            Since {service.price?.toLocaleString()} ֏
+                                                                            From {service.price?.toLocaleString()} ֏
                                                                         </Typography>
                                                                     </Box>
                                                                 </Grid>
@@ -539,7 +665,7 @@ const FavoritesPage = () => {
                                                                             <PhoneIcon sx={{ fontSize: 18, color: '#8A99A8' }} />
                                                                             <Box sx={{ display: 'flex', gap: 1, flexWrap: 'wrap' }}>
                                                                                 {service.phoneNumbers.map((phone, idx) => (
-                                                                                    <Chip key={idx} label={phone} size="small" sx={{ bgcolor: alpha('#FF9800', 0.1), color: '#FF9800', fontSize: '0.7rem' }} />
+                                                                                    <Chip key={idx} label={phone} size="small" sx={{ bgcolor: alpha('#FF6B35', 0.1), color: '#FF6B35', fontSize: '0.7rem' }} />
                                                                                 ))}
                                                                             </Box>
                                                                         </Box>
@@ -560,7 +686,7 @@ const FavoritesPage = () => {
                                                                                             textTransform: 'none',
                                                                                             color: '#1A2733',
                                                                                             fontSize: '0.7rem',
-                                                                                            '&:hover': { bgcolor: alpha('#FF9800', 0.1) }
+                                                                                            '&:hover': { bgcolor: alpha('#FF6B35', 0.1) }
                                                                                         }}
                                                                                     >
                                                                                         {social.platform}
@@ -608,26 +734,91 @@ const FavoritesPage = () => {
 
                                                                     {images.length > 1 && (
                                                                         <>
-                                                                            <IconButton onClick={(e) => handlePrevImage(service.id, images.length, e)} sx={{ position: 'absolute', left: 8, top: '50%', transform: 'translateY(-50%)', backgroundColor: alpha('#000000', 0.5), color: 'white', '&:hover': { backgroundColor: alpha('#000000', 0.7) }, zIndex: 1, width: { xs: 28, sm: 32 }, height: { xs: 28, sm: 32 } }}>
+                                                                            <IconButton
+                                                                                onClick={(e) => handlePrevImage(service.id, images.length, e)}
+                                                                                sx={{
+                                                                                    position: 'absolute',
+                                                                                    left: 8,
+                                                                                    top: '50%',
+                                                                                    transform: 'translateY(-50%)',
+                                                                                    backgroundColor: alpha('#000000', 0.5),
+                                                                                    color: 'white',
+                                                                                    '&:hover': { backgroundColor: alpha('#000000', 0.7) },
+                                                                                    zIndex: 1,
+                                                                                    width: { xs: 28, sm: 32 },
+                                                                                    height: { xs: 28, sm: 32 }
+                                                                                }}
+                                                                            >
                                                                                 <ChevronLeftIcon sx={{ fontSize: { xs: 18, sm: 20 } }} />
                                                                             </IconButton>
-                                                                            <IconButton onClick={(e) => handleNextImage(service.id, images.length, e)} sx={{ position: 'absolute', right: 8, top: '50%', transform: 'translateY(-50%)', backgroundColor: alpha('#000000', 0.5), color: 'white', '&:hover': { backgroundColor: alpha('#000000', 0.7) }, zIndex: 1, width: { xs: 28, sm: 32 }, height: { xs: 28, sm: 32 } }}>
+                                                                            <IconButton
+                                                                                onClick={(e) => handleNextImage(service.id, images.length, e)}
+                                                                                sx={{
+                                                                                    position: 'absolute',
+                                                                                    right: 8,
+                                                                                    top: '50%',
+                                                                                    transform: 'translateY(-50%)',
+                                                                                    backgroundColor: alpha('#000000', 0.5),
+                                                                                    color: 'white',
+                                                                                    '&:hover': { backgroundColor: alpha('#000000', 0.7) },
+                                                                                    zIndex: 1,
+                                                                                    width: { xs: 28, sm: 32 },
+                                                                                    height: { xs: 28, sm: 32 }
+                                                                                }}
+                                                                            >
                                                                                 <ChevronRightIcon sx={{ fontSize: { xs: 18, sm: 20 } }} />
                                                                             </IconButton>
 
-                                                                            <Box sx={{ position: 'absolute', bottom: 8, left: '50%', transform: 'translateX(-50%)', display: 'flex', gap: 0.5, zIndex: 1, backgroundColor: alpha('#000000', 0.5), padding: '3px 6px', borderRadius: '16px' }}>
+                                                                            <Box sx={{
+                                                                                position: 'absolute',
+                                                                                bottom: 8,
+                                                                                left: '50%',
+                                                                                transform: 'translateX(-50%)',
+                                                                                display: 'flex',
+                                                                                gap: 0.5,
+                                                                                zIndex: 1,
+                                                                                backgroundColor: alpha('#000000', 0.5),
+                                                                                padding: '3px 6px',
+                                                                                borderRadius: '16px'
+                                                                            }}>
                                                                                 {images.map((_, idx) => (
-                                                                                    <Box key={idx} onClick={(e) => { e.stopPropagation(); setActiveImageIndex(prev => ({ ...prev, [service.id]: idx })); }} sx={{ width: { xs: 5, sm: 6 }, height: { xs: 5, sm: 6 }, borderRadius: '50%', backgroundColor: idx === currentIndex ? '#FF9800' : 'white', cursor: 'pointer', transition: 'all 0.3s ease', '&:hover': { transform: 'scale(1.2)' } }} />
+                                                                                    <Box
+                                                                                        key={idx}
+                                                                                        onClick={(e) => { e.stopPropagation(); setActiveImageIndex(prev => ({ ...prev, [service.id]: idx })); }}
+                                                                                        sx={{
+                                                                                            width: { xs: 5, sm: 6 },
+                                                                                            height: { xs: 5, sm: 6 },
+                                                                                            borderRadius: '50%',
+                                                                                            backgroundColor: idx === currentIndex ? '#FF6B35' : 'white',
+                                                                                            cursor: 'pointer',
+                                                                                            transition: 'all 0.3s ease',
+                                                                                            '&:hover': { transform: 'scale(1.2)' }
+                                                                                        }}
+                                                                                    />
                                                                                 ))}
                                                                             </Box>
 
-                                                                            <Chip label={`${currentIndex + 1} / ${images.length}`} size="small" sx={{ position: 'absolute', top: 8, right: 8, bgcolor: alpha('#000000', 0.7), color: 'white', fontWeight: 500, fontSize: '0.65rem', height: 20, zIndex: 1 }} />
+                                                                            <Chip
+                                                                                label={`${currentIndex + 1} / ${images.length}`}
+                                                                                size="small"
+                                                                                sx={{
+                                                                                    position: 'absolute',
+                                                                                    top: 8,
+                                                                                    right: 8,
+                                                                                    bgcolor: alpha('#000000', 0.7),
+                                                                                    color: 'white',
+                                                                                    fontWeight: 500,
+                                                                                    fontSize: '0.65rem',
+                                                                                    height: 20,
+                                                                                    zIndex: 1
+                                                                                }}
+                                                                            />
                                                                         </>
                                                                     )}
                                                                 </>
                                                             ) : (
                                                                 <Box sx={{ textAlign: 'center', p: { xs: 2, sm: 3 } }}>
-                                                                    <ImageIcon sx={{ fontSize: { xs: 50, sm: 80 }, color: alpha('#FF9800', 0.3), mb: 1 }} />
+                                                                    <ImageIcon sx={{ fontSize: { xs: 50, sm: 80 }, color: alpha('#FF6B35', 0.3), mb: 1 }} />
                                                                     <Typography variant="body2" sx={{ color: '#8A99A8', fontSize: { xs: '0.75rem', sm: '0.85rem' } }}>
                                                                         No images available
                                                                     </Typography>
@@ -653,8 +844,15 @@ const FavoritesPage = () => {
                                 page={page + 1}
                                 onChange={(e, newPage) => setPage(newPage - 1)}
                                 sx={{
-                                    '& .MuiPaginationItem-root': { color: '#5A6874', borderRadius: '12px' },
-                                    '& .Mui-selected': { bgcolor: '#FF9800 !important', color: 'white', '&:hover': { bgcolor: '#FF9800' } }
+                                    '& .MuiPaginationItem-root': {
+                                        color: '#5A6874',
+                                        borderRadius: '12px'
+                                    },
+                                    '& .Mui-selected': {
+                                        bgcolor: '#FF6B35 !important',
+                                        color: 'white',
+                                        '&:hover': { bgcolor: '#FF6B35' }
+                                    }
                                 }}
                             />
                         </Box>
@@ -662,8 +860,21 @@ const FavoritesPage = () => {
                 </Box>
 
                 {/* Snackbar */}
-                <Snackbar open={snackbar.open} autoHideDuration={4000} onClose={() => setSnackbar({ ...snackbar, open: false })} anchorOrigin={{ vertical: 'bottom', horizontal: 'center' }}>
-                    <Alert severity={snackbar.severity} sx={{ bgcolor: '#FFFFFF', color: '#1A2733', border: `1px solid ${snackbar.severity === 'success' ? '#4CAF50' : '#f44336'}`, borderRadius: '12px' }}>
+                <Snackbar
+                    open={snackbar.open}
+                    autoHideDuration={4000}
+                    onClose={() => setSnackbar({ ...snackbar, open: false })}
+                    anchorOrigin={{ vertical: 'bottom', horizontal: 'center' }}
+                >
+                    <Alert
+                        severity={snackbar.severity}
+                        sx={{
+                            bgcolor: '#FFFFFF',
+                            color: '#1A2733',
+                            border: `1px solid ${snackbar.severity === 'success' ? '#4CAF50' : snackbar.severity === 'error' ? '#f44336' : '#FF6B35'}`,
+                            borderRadius: '12px'
+                        }}
+                    >
                         {snackbar.message}
                     </Alert>
                 </Snackbar>

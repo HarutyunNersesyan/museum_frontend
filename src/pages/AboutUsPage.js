@@ -1,3 +1,5 @@
+// src/pages/AboutUsPage.js
+
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import {
@@ -54,7 +56,8 @@ import {
     EmojiPeople as EmojiPeopleIcon,
     EventAvailable as EventAvailableIcon,
     ThumbUpAlt as ThumbUpAltIcon,
-    People as PeopleIcon
+    People as PeopleIcon,
+    Bookmark as BookmarkIcon
 } from '@mui/icons-material';
 import { useAuth } from '../context/AuthContext';
 
@@ -121,6 +124,29 @@ const gradientShift = keyframes`
     100% { background-position: 0% 50%; }
 `;
 
+// Scrollbar styles
+const scrollbarStyles = {
+    '*::-webkit-scrollbar': {
+        width: '10px',
+        height: '10px',
+    },
+    '*::-webkit-scrollbar-track': {
+        background: '#F5F0E8',
+        borderRadius: '10px',
+    },
+    '*::-webkit-scrollbar-thumb': {
+        background: '#FF6B35',
+        borderRadius: '10px',
+        '&:hover': {
+            background: '#E55A2B',
+        },
+    },
+    '*': {
+        scrollbarColor: '#FF6B35 #F5F0E8',
+        scrollbarWidth: 'thin',
+    },
+};
+
 const AboutUsPage = () => {
     const navigate = useNavigate();
     const { user, logout, isAdmin } = useAuth();
@@ -129,6 +155,7 @@ const AboutUsPage = () => {
 
     const [backgroundPosition, setBackgroundPosition] = useState({ x: 0, y: 0 });
     const [anchorEl, setAnchorEl] = useState(null);
+    const [favoritesCount, setFavoritesCount] = useState(0);
     const [userInitial, setUserInitial] = useState('');
     const [counters, setCounters] = useState({
         happy_clients: 0,
@@ -176,6 +203,24 @@ const AboutUsPage = () => {
     useEffect(() => {
         if (user && user.userName) {
             setUserInitial(user.userName.charAt(0).toUpperCase());
+        }
+    }, [user]);
+
+    // Load favorites count
+    const loadFavoritesCount = async () => {
+        if (!user) return;
+        try {
+            const serviceAPI = (await import('../services/serviceAPI')).default;
+            const response = await serviceAPI.getFavorites(0, 100);
+            setFavoritesCount(response.data.totalElements || 0);
+        } catch (error) {
+            console.error('Error loading favorites count:', error);
+        }
+    };
+
+    useEffect(() => {
+        if (user) {
+            loadFavoritesCount();
         }
     }, [user]);
 
@@ -283,6 +328,10 @@ const AboutUsPage = () => {
         navigate('/signup');
     };
 
+    const handleFavoritesClick = () => {
+        navigate('/favorites');
+    };
+
     // Categories based on the Category enum from backend (without RENTALS)
     const categories = [
         { icon: <CelebrationIcon />, title: 'Party / Celebration', desc: 'Professional party planning services for any celebration', color: '#FF6B35', enumValue: 'PARTY' },
@@ -354,7 +403,7 @@ const AboutUsPage = () => {
                 ))}
             </Box>
 
-            {/* Header - FULL WIDTH */}
+            {/* Header - SAME AS HOMEPAGE */}
             <Box sx={{
                 position: 'sticky',
                 top: 0,
@@ -362,148 +411,184 @@ const AboutUsPage = () => {
                 backgroundColor: alpha('#FFFFFF', 0.95),
                 backdropFilter: 'blur(10px)',
                 borderBottom: '1px solid rgba(0,0,0,0.08)',
-                boxShadow: '0 2px 20px rgba(0,0,0,0.03)',
-                px: { xs: 2, sm: 3, md: 4, lg: 6 }
+                boxShadow: '0 2px 20px rgba(0,0,0,0.03)'
             }}>
-                <Box sx={{
-                    display: 'flex',
-                    alignItems: 'center',
-                    justifyContent: 'space-between',
-                    height: 70,
-                    maxWidth: '100%',
-                    width: '100%'
-                }}>
-                    <Box
-                        onClick={() => navigate('/')}
-                        sx={{
-                            display: 'flex',
-                            alignItems: 'center',
-                            gap: 1.5,
-                            cursor: 'pointer'
-                        }}
-                    >
-                        <Box sx={{
-                            width: 38,
-                            height: 38,
-                            borderRadius: '12px',
-                            background: 'linear-gradient(135deg, #FF6B35 0%, #FFB347 100%)',
-                            display: 'flex',
-                            alignItems: 'center',
-                            justifyContent: 'center'
-                        }}>
-                            <CelebrationIcon sx={{ color: 'white', fontSize: 22 }} />
+                <Container maxWidth="xl">
+                    <Box sx={{
+                        display: 'flex',
+                        alignItems: 'center',
+                        justifyContent: 'space-between',
+                        height: 70,
+                    }}>
+                        <Box
+                            onClick={() => navigate('/')}
+                            sx={{
+                                display: 'flex',
+                                alignItems: 'center',
+                                gap: 1.5,
+                                cursor: 'pointer'
+                            }}
+                        >
+                            <Box sx={{
+                                width: 38,
+                                height: 38,
+                                borderRadius: '12px',
+                                background: 'linear-gradient(135deg, #FF6B35 0%, #FFB347 100%)',
+                                display: 'flex',
+                                alignItems: 'center',
+                                justifyContent: 'center'
+                            }}>
+                                <CelebrationIcon sx={{ color: 'white', fontSize: 22 }} />
+                            </Box>
+                            <Typography variant="h6" sx={{
+                                fontWeight: 800,
+                                background: 'linear-gradient(135deg, #FF6B35 0%, #FFB347 100%)',
+                                WebkitBackgroundClip: 'text',
+                                WebkitTextFillColor: 'transparent',
+                                letterSpacing: '-0.5px'
+                            }}>
+                                Festivy
+                            </Typography>
                         </Box>
-                        <Typography variant="h6" sx={{
-                            fontWeight: 800,
-                            background: 'linear-gradient(135deg, #FF6B35 0%, #FFB347 100%)',
-                            WebkitBackgroundClip: 'text',
-                            WebkitTextFillColor: 'transparent',
-                            letterSpacing: '-0.5px'
-                        }}>
-                            Festivy
-                        </Typography>
-                    </Box>
 
-                    <Box sx={{ display: { xs: 'none', md: 'flex' }, alignItems: 'center', gap: 3 }}>
-                        <Button
-                            startIcon={<InfoIcon />}
-                            sx={{ fontWeight: 500, color: '#FF6B35', borderBottom: '2px solid #FF6B35', borderRadius: 0 }}
-                            onClick={handleAboutClick}
-                        >
-                            About Us
-                        </Button>
-                        <Button
-                            startIcon={<HowToRegIcon />}
-                            sx={{ fontWeight: 500, color: '#4A4A4A', '&:hover': { color: '#FF6B35' } }}
-                            onClick={() => handleScrollToSection('how-it-works')}
-                        >
-                            How It Works
-                        </Button>
-                        <Button
-                            startIcon={<CelebrationIcon />}
-                            sx={{ fontWeight: 500, color: '#4A4A4A', '&:hover': { color: '#FF6B35' } }}
-                            onClick={handleServicesClick}
-                        >
-                            Services
-                        </Button>
-                        {isAdmin && (
-                            <Button sx={{ fontWeight: 500, color: '#FF9800' }} onClick={handleAdminPanel}>
-                                Admin
+                        <Box sx={{ display: { xs: 'none', md: 'flex' }, alignItems: 'center', gap: 3 }}>
+                            <Button
+                                startIcon={<InfoIcon />}
+                                sx={{ fontWeight: 500, color: '#FF6B35', borderBottom: '2px solid #FF6B35', borderRadius: 0 }}
+                                onClick={handleAboutClick}
+                            >
+                                About Us
                             </Button>
-                        )}
-                    </Box>
+                            <Button
+                                startIcon={<HowToRegIcon />}
+                                sx={{ fontWeight: 500, color: '#4A4A4A', '&:hover': { color: '#FF6B35' } }}
+                                onClick={() => handleScrollToSection('how-it-works')}
+                            >
+                                How It Works
+                            </Button>
+                            <Button
+                                startIcon={<CelebrationIcon />}
+                                sx={{ fontWeight: 500, color: '#4A4A4A', '&:hover': { color: '#FF6B35' } }}
+                                onClick={handleServicesClick}
+                            >
+                                Services
+                            </Button>
+                        </Box>
 
-                    <Box sx={{ display: 'flex', alignItems: 'center', gap: 2 }}>
-                        {user ? (
-                            <>
-                                <Chip
-                                    label={`Welcome, ${user.userName}`}
-                                    size="small"
-                                    sx={{
-                                        display: { xs: 'none', sm: 'flex' },
-                                        bgcolor: alpha('#FF6B35', 0.1),
-                                        color: '#FF6B35',
-                                        border: `1px solid ${alpha('#FF6B35', 0.2)}`
-                                    }}
-                                />
-                                <IconButton
-                                    onClick={handleMenuOpen}
-                                    sx={{
-                                        background: 'linear-gradient(135deg, #FF6B35 0%, #FFB347 100%)',
-                                        width: 38,
-                                        height: 38,
-                                        '&:hover': { transform: 'scale(1.05)' }
-                                    }}
-                                >
-                                    <Avatar sx={{ width: 38, height: 38, bgcolor: 'transparent', color: 'white' }}>
-                                        {userInitial || <AccountCircleIcon />}
-                                    </Avatar>
-                                </IconButton>
-                                <Menu
-                                    anchorEl={anchorEl}
-                                    open={Boolean(anchorEl)}
-                                    onClose={handleMenuClose}
-                                    PaperProps={{
-                                        sx: {
-                                            bgcolor: '#FFFFFF',
-                                            color: '#1A1A1A',
-                                            border: '1px solid #E0E0E0',
-                                            minWidth: 200,
-                                            borderRadius: '16px',
-                                            boxShadow: '0 4px 20px rgba(0,0,0,0.1)'
-                                        }
-                                    }}
-                                >
-                                    <MenuItem onClick={handleProfile}><PersonIcon sx={{ mr: 2, fontSize: 20, color: '#FF6B35' }} />Profile</MenuItem>
-                                    {isAdmin && (
-                                        <MenuItem onClick={handleAdminPanel}><SecurityIcon sx={{ mr: 2, fontSize: 20, color: '#FF9800' }} />Admin Panel</MenuItem>
-                                    )}
-                                    <Divider />
-                                    <MenuItem onClick={handleLogout}><LogoutIcon sx={{ mr: 2, fontSize: 20, color: '#FF6B35' }} />Logout</MenuItem>
-                                </Menu>
-                            </>
-                        ) : (
-                            <>
-                                <Button sx={{ fontWeight: 500, color: '#4A4A4A', '&:hover': { color: '#FF6B35' } }} onClick={handleLoginClick}>
-                                    Sign In
-                                </Button>
-                                <Button
-                                    variant="contained"
-                                    sx={{
-                                        fontWeight: 600,
-                                        borderRadius: '12px',
-                                        background: 'linear-gradient(135deg, #FF6B35 0%, #FFB347 100%)',
-                                        boxShadow: '0 4px 12px rgba(255,107,53,0.25)',
-                                        '&:hover': { transform: 'translateY(-2px)', boxShadow: '0 6px 16px rgba(255,107,53,0.35)' }
-                                    }}
-                                    onClick={handleSignupClick}
-                                >
-                                    Get Started
-                                </Button>
-                            </>
-                        )}
+                        <Box sx={{ display: 'flex', alignItems: 'center', gap: 2 }}>
+                            {user ? (
+                                <>
+                                    {/* Welcome Chip */}
+                                    <Chip
+                                        label={`Welcome, ${user.userName}`}
+                                        size="small"
+                                        sx={{
+                                            display: { xs: 'none', sm: 'flex' },
+                                            bgcolor: alpha('#FF6B35', 0.1),
+                                            color: '#FF6B35',
+                                            border: `1px solid ${alpha('#FF6B35', 0.2)}`
+                                        }}
+                                    />
+
+                                    {/* Saved Button with Bookmark Icon */}
+                                    <Tooltip title="Saved Services">
+                                        <IconButton
+                                            onClick={handleFavoritesClick}
+                                            sx={{
+                                                position: 'relative',
+                                                bgcolor: alpha('#FF6B35', 0.1),
+                                                '&:hover': {
+                                                    bgcolor: alpha('#FF6B35', 0.2),
+                                                    transform: 'scale(1.05)'
+                                                }
+                                            }}
+                                        >
+                                            <BookmarkIcon sx={{ color: '#FF6B35' }} />
+                                            {favoritesCount > 0 && (
+                                                <Box
+                                                    sx={{
+                                                        position: 'absolute',
+                                                        top: -5,
+                                                        right: -5,
+                                                        bgcolor: '#FF5722',
+                                                        color: 'white',
+                                                        borderRadius: '50%',
+                                                        width: 20,
+                                                        height: 20,
+                                                        display: 'flex',
+                                                        alignItems: 'center',
+                                                        justifyContent: 'center',
+                                                        fontSize: '11px',
+                                                        fontWeight: 'bold'
+                                                    }}
+                                                >
+                                                    {favoritesCount > 99 ? '99+' : favoritesCount}
+                                                </Box>
+                                            )}
+                                        </IconButton>
+                                    </Tooltip>
+
+                                    {/* Profile Icon */}
+                                    <IconButton
+                                        onClick={handleMenuOpen}
+                                        sx={{
+                                            background: 'linear-gradient(135deg, #FF6B35 0%, #FFB347 100%)',
+                                            width: 38,
+                                            height: 38,
+                                            '&:hover': { transform: 'scale(1.05)' }
+                                        }}
+                                    >
+                                        <Avatar sx={{ width: 38, height: 38, bgcolor: 'transparent', color: 'white' }}>
+                                            {userInitial || <AccountCircleIcon />}
+                                        </Avatar>
+                                    </IconButton>
+
+                                    <Menu
+                                        anchorEl={anchorEl}
+                                        open={Boolean(anchorEl)}
+                                        onClose={handleMenuClose}
+                                        PaperProps={{
+                                            sx: {
+                                                bgcolor: '#FFFFFF',
+                                                color: '#1A1A1A',
+                                                border: '1px solid #E0E0E0',
+                                                minWidth: 200,
+                                                borderRadius: '16px',
+                                                boxShadow: '0 4px 20px rgba(0,0,0,0.1)'
+                                            }
+                                        }}
+                                    >
+                                        <MenuItem onClick={handleProfile}><PersonIcon sx={{ mr: 2, fontSize: 20, color: '#FF6B35' }} />Profile</MenuItem>
+                                        {isAdmin && (
+                                            <MenuItem onClick={handleAdminPanel}><SecurityIcon sx={{ mr: 2, fontSize: 20, color: '#FF9800' }} />Admin Panel</MenuItem>
+                                        )}
+                                        <Divider />
+                                        <MenuItem onClick={handleLogout}><LogoutIcon sx={{ mr: 2, fontSize: 20, color: '#FF6B35' }} />Logout</MenuItem>
+                                    </Menu>
+                                </>
+                            ) : (
+                                <>
+                                    <Button sx={{ fontWeight: 500, color: '#4A4A4A', '&:hover': { color: '#FF6B35' } }} onClick={handleLoginClick}>
+                                        Sign In
+                                    </Button>
+                                    <Button
+                                        variant="contained"
+                                        sx={{
+                                            fontWeight: 600,
+                                            borderRadius: '12px',
+                                            background: 'linear-gradient(135deg, #FF6B35 0%, #FFB347 100%)',
+                                            boxShadow: '0 4px 12px rgba(255,107,53,0.25)',
+                                            '&:hover': { transform: 'translateY(-2px)', boxShadow: '0 6px 16px rgba(255,107,53,0.35)' }
+                                        }}
+                                        onClick={handleSignupClick}
+                                    >
+                                        Get Started
+                                    </Button>
+                                </>
+                            )}
+                        </Box>
                     </Box>
-                </Box>
+                </Container>
             </Box>
 
             {/* Main Content - FULL WIDTH */}
@@ -550,10 +635,6 @@ const AboutUsPage = () => {
                         {/* Right side - Text starts from image top edge */}
                         <Grid item xs={12} md={6}>
                             <Box sx={{ p: { xs: 2, md: 4 }, pt: { xs: 2, md: 0 } }}>
-                                {/* "About Festivy" title REMOVED */}
-                                {/* Orange line REMOVED */}
-
-                                {/* Text content - starts directly */}
                                 <Typography variant="body1" sx={{
                                     color: '#3A3A3A',
                                     fontSize: { xs: 16, md: 18 },
@@ -768,29 +849,6 @@ const AboutUsPage = () => {
             </Box>
         </Box>
     );
-};
-
-// Scrollbar styles
-const scrollbarStyles = {
-    '*::-webkit-scrollbar': {
-        width: '10px',
-        height: '10px',
-    },
-    '*::-webkit-scrollbar-track': {
-        background: '#F5F0E8',
-        borderRadius: '10px',
-    },
-    '*::-webkit-scrollbar-thumb': {
-        background: '#FF6B35',
-        borderRadius: '10px',
-        '&:hover': {
-            background: '#E55A2B',
-        },
-    },
-    '*': {
-        scrollbarColor: '#FF6B35 #F5F0E8',
-        scrollbarWidth: 'thin',
-    },
 };
 
 export default AboutUsPage;

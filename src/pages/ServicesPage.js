@@ -70,7 +70,7 @@ import { useAuth } from '../context/AuthContext';
 import serviceAPI from '../services/serviceAPI';
 import { alpha, keyframes, styled } from '@mui/material/styles';
 
-// Custom animations (same as HomePage)
+// Custom animations
 const float = keyframes`
     0%, 100% { transform: translateY(0px) rotate(0deg); }
     25% { transform: translateY(-15px) rotate(3deg); }
@@ -83,7 +83,7 @@ const pulse = keyframes`
     50% { opacity: 0.7; transform: scale(1.05); }
 `;
 
-// Global scrollbar styles (same as HomePage)
+// Global scrollbar styles
 const scrollbarStyles = {
     '*::-webkit-scrollbar': {
         width: '10px',
@@ -623,7 +623,7 @@ const ServicesPage = () => {
                                             }}
                                         />
 
-                                        {/* Saved Button with Bookmark Icon */}
+                                        {/* Saved Button with Bookmark Icon - NAVBAR */}
                                         <Tooltip title="Saved Services">
                                             <IconButton
                                                 onClick={() => navigate('/favorites')}
@@ -1073,25 +1073,37 @@ const ServicesPage = () => {
                                                                 }}>
                                                                     {service.name}
                                                                 </Typography>
-                                                                <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
+
+                                                                {/* Save and Like Icons - Side by Side */}
+                                                                <Box sx={{ display: 'flex', alignItems: 'center', gap: 2 }}>
+                                                                    {/* Bookmark Icon - Save to favorites (NO NUMBER) */}
                                                                     <Tooltip title={isLiked ? "Remove from saved" : "Save to favorites"}>
                                                                         <IconButton
                                                                             onClick={(e) => handleLikeToggle(service.id, e)}
                                                                             sx={{
-                                                                                bgcolor: 'transparent',
-                                                                                p: 0,
                                                                                 '&:hover': {
-                                                                                    bgcolor: 'transparent',
                                                                                     transform: 'scale(1.05)'
                                                                                 }
                                                                             }}
                                                                         >
-                                                                            <WhatshotIcon sx={{ color: isLiked ? '#FF6B35' : '#8A99A8', fontSize: 28 }} />
+                                                                            <BookmarkIcon sx={{ color: isLiked ? '#FF6B35' : '#8A99A8', fontSize: 28 }} />
                                                                         </IconButton>
                                                                     </Tooltip>
-                                                                    <Typography variant="body1" sx={{ fontWeight: 600, color: isLiked ? '#FF6B35' : '#5A6874', minWidth: '45px' }}>
-                                                                        {service.likeCount || 0}
-                                                                    </Typography>
+
+                                                                    {/* Fire Icon - With like count */}
+                                                                    <Box sx={{ display: 'flex', alignItems: 'center', gap: 0.5 }}>
+                                                                        <Tooltip title="Likes">
+                                                                            <WhatshotIcon sx={{ color: '#FF6B35', fontSize: 28 }} />
+                                                                        </Tooltip>
+                                                                        <Typography variant="body1" sx={{
+                                                                            fontWeight: 600,
+                                                                            color: '#FF6B35',
+                                                                            minWidth: '35px',
+                                                                            fontSize: '1rem'
+                                                                        }}>
+                                                                            {service.likeCount || 0}
+                                                                        </Typography>
+                                                                    </Box>
                                                                 </Box>
                                                             </Box>
 
