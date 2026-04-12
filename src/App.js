@@ -1,3 +1,5 @@
+// App.js
+
 import React from 'react';
 import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-dom';
 import { AuthProvider } from './context/AuthContext';
@@ -10,6 +12,7 @@ import SignUpPage from './pages/SignUpPage';
 import VerifyCodePage from './pages/VerifyCodePage';
 import ServicesPage from './pages/ServicesPage';
 import ServiceDetailPage from './pages/ServiceDetailPage';
+import FavoritesPage from './pages/FavoritesPage'; // ADD THIS IMPORT
 import AdminLoginPage from './pages/AdminLoginPage';
 import AdminDashboardPage from './pages/AdminDashboardPage';
 import './App.css';
@@ -55,6 +58,16 @@ const AppContent = () => {
                     element={
                         <ProtectedRoute>
                             <ServiceDetailPage />
+                        </ProtectedRoute>
+                    }
+                />
+
+                {/* Favorites Page - ADD THIS ROUTE */}
+                <Route
+                    path="/favorites"
+                    element={
+                        <ProtectedRoute>
+                            <FavoritesPage />
                         </ProtectedRoute>
                     }
                 />

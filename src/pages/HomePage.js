@@ -57,11 +57,13 @@ import InfoIcon from '@mui/icons-material/Info';
 import HowToRegIcon from '@mui/icons-material/HowToReg';
 import SearchIcon from '@mui/icons-material/Search';
 import WhatshotIcon from '@mui/icons-material/Whatshot';
+import BookmarkIcon from '@mui/icons-material/Bookmark';
 import { alpha, keyframes } from '@mui/material/styles';
 import LoginPage from './LoginPage';
 import SignUpPage from './SignUpPage';
 import VerifyCodePage from './VerifyCodePage';
 import { useAuth } from '../context/AuthContext';
+import serviceAPI from '../services/serviceAPI';
 
 // Custom animations
 const float = keyframes`
@@ -211,6 +213,7 @@ function HomePage() {
     const [anchorEl, setAnchorEl] = useState(null);
     const [backgroundPosition, setBackgroundPosition] = useState({ x: 0, y: 0 });
     const [hoveredCategory, setHoveredCategory] = useState(null);
+    const [favoritesCount, setFavoritesCount] = useState(0);
 
     // Search states
     const [searchQuery, setSearchQuery] = useState('');
@@ -226,6 +229,22 @@ function HomePage() {
         window.addEventListener('mousemove', handleMouseMove);
         return () => window.removeEventListener('mousemove', handleMouseMove);
     }, []);
+
+    // Load favorites count when user is logged in
+    useEffect(() => {
+        if (user) {
+            loadFavoritesCount();
+        }
+    }, [user]);
+
+    const loadFavoritesCount = async () => {
+        try {
+            const response = await serviceAPI.getFavorites(0, 100);
+            setFavoritesCount(response.data.totalElements || 0);
+        } catch (error) {
+            console.error('Error loading favorites count:', error);
+        }
+    };
 
     const handleMenuOpen = (event) => setAnchorEl(event.currentTarget);
     const handleMenuClose = () => setAnchorEl(null);
@@ -255,7 +274,6 @@ function HomePage() {
         }
 
         if (sortByPopular) {
-            // Navigate to services page with popular tab active
             navigate('/services?tab=popular');
         } else if (categoryId) {
             navigate(`/services?category=${categoryId}`);
@@ -271,16 +289,13 @@ function HomePage() {
             return;
         }
 
-        // Build search params object
         const searchParams = {};
         if (searchQuery.trim()) searchParams.query = searchQuery.trim();
         if (selectedCategory) searchParams.category = selectedCategory;
         if (selectedLocation) searchParams.location = selectedLocation;
 
-        // Save to sessionStorage for persistence
         sessionStorage.setItem('servicesSearchParams', JSON.stringify(searchParams));
 
-        // Navigate to services page with search params in URL
         const urlParams = new URLSearchParams();
         if (searchQuery.trim()) urlParams.append('query', searchQuery.trim());
         if (selectedCategory) urlParams.append('category', selectedCategory);
@@ -547,6 +562,7 @@ function HomePage() {
                         <Box sx={{ display: 'flex', alignItems: 'center', gap: 2 }}>
                             {user ? (
                                 <>
+                                    {/* Welcome Chip */}
                                     <Chip
                                         label={`Welcome, ${user.userName}`}
                                         size="small"
@@ -557,6 +573,46 @@ function HomePage() {
                                             border: `1px solid ${alpha('#FF6B35', 0.2)}`
                                         }}
                                     />
+
+                                    {/* Saved Button with Bookmark Icon - Now between Welcome text and Profile */}
+                                    <Tooltip title="Saved Services">
+                                        <IconButton
+                                            onClick={() => navigate('/favorites')}
+                                            sx={{
+                                                position: 'relative',
+                                                bgcolor: alpha('#FF6B35', 0.1),
+                                                '&:hover': {
+                                                    bgcolor: alpha('#FF6B35', 0.2),
+                                                    transform: 'scale(1.05)'
+                                                }
+                                            }}
+                                        >
+                                            <BookmarkIcon sx={{ color: '#FF6B35' }} />
+                                            {favoritesCount > 0 && (
+                                                <Box
+                                                    sx={{
+                                                        position: 'absolute',
+                                                        top: -5,
+                                                        right: -5,
+                                                        bgcolor: '#FF5722',
+                                                        color: 'white',
+                                                        borderRadius: '50%',
+                                                        width: 20,
+                                                        height: 20,
+                                                        display: 'flex',
+                                                        alignItems: 'center',
+                                                        justifyContent: 'center',
+                                                        fontSize: '11px',
+                                                        fontWeight: 'bold'
+                                                    }}
+                                                >
+                                                    {favoritesCount > 99 ? '99+' : favoritesCount}
+                                                </Box>
+                                            )}
+                                        </IconButton>
+                                    </Tooltip>
+
+                                    {/* Profile Icon */}
                                     <IconButton
                                         onClick={handleMenuOpen}
                                         sx={{
@@ -570,6 +626,7 @@ function HomePage() {
                                             {userInitial || <AccountCircleIcon />}
                                         </Avatar>
                                     </IconButton>
+
                                     <Menu
                                         anchorEl={anchorEl}
                                         open={Boolean(anchorEl)}
@@ -618,7 +675,7 @@ function HomePage() {
                 </Container>
             </Box>
 
-            {/* Main Content */}
+            {/* Main Content - Rest of the component remains the same */}
             <Box sx={{ position: 'relative', zIndex: 3 }}>
                 {/* Hero Section */}
                 <Box sx={{

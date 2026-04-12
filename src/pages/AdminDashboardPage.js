@@ -1,3 +1,5 @@
+// src/pages/AdminDashboardPage.js
+
 import React, { useState, useEffect, useRef } from 'react';
 import { useNavigate } from 'react-router-dom';
 import {
@@ -43,7 +45,8 @@ import {
     ImageListItem,
     Fade,
     Grow,
-    GlobalStyles
+    GlobalStyles,
+    Pagination  // ADD THIS - was missing
 } from '@mui/material';
 import { LocalizationProvider } from '@mui/x-date-pickers/LocalizationProvider';
 import { AdapterDayjs } from '@mui/x-date-pickers/AdapterDayjs';
@@ -81,18 +84,6 @@ import adminAPI from '../services/adminAPI';
 import { isAdmin } from '../utils/jwtUtils';
 
 // Styled components for light design
-const GlassCard = styled(Card)(({ theme }) => ({
-    background: '#FFFFFF',
-    borderRadius: '24px',
-    border: 'none',
-    transition: 'all 0.3s ease',
-    boxShadow: 'none',
-    '&:hover': {
-        transform: 'translateY(-4px)',
-        boxShadow: '0 12px 28px rgba(255, 152, 0, 0.12)'
-    }
-}));
-
 const GradientButton = styled(Button)(({ theme }) => ({
     background: 'linear-gradient(135deg, #FF9800 0%, #FF5722 100%)',
     borderRadius: '12px',
@@ -120,7 +111,7 @@ const OutlinedButton = styled(Button)(({ theme }) => ({
     }
 }));
 
-const StatCard = styled(Paper)(({ theme, color }) => ({
+const StatCard = styled(Paper)(({ theme }) => ({
     background: '#FFFFFF',
     borderRadius: '20px',
     padding: '24px',
@@ -129,7 +120,7 @@ const StatCard = styled(Paper)(({ theme, color }) => ({
     boxShadow: '0 2px 8px rgba(0, 0, 0, 0.04)',
     '&:hover': {
         transform: 'translateY(-4px)',
-        boxShadow: `0 12px 28px ${color}15`
+        boxShadow: '0 12px 28px rgba(255, 152, 0, 0.12)'
     }
 }));
 
@@ -282,6 +273,7 @@ const AdminDashboardPage = () => {
     const [totalPages, setTotalPages] = useState(0);
     const [anchorEl, setAnchorEl] = useState(null);
     const [userInitial, setUserInitial] = useState('');
+    const [activeImageIndex, setActiveImageIndex] = useState({});
 
     const [imageFiles, setImageFiles] = useState([]);
     const [imagePreviews, setImagePreviews] = useState([]);
@@ -294,9 +286,6 @@ const AdminDashboardPage = () => {
     const [contactEmail, setContactEmail] = useState('');
     const [newPhoneNumber, setNewPhoneNumber] = useState('');
     const [phoneError, setPhoneError] = useState('');
-
-    // State for image carousel
-    const [activeImageIndex, setActiveImageIndex] = useState({});
 
     const [formData, setFormData] = useState({
         name: '',
@@ -445,16 +434,12 @@ const AdminDashboardPage = () => {
         setImageFiles([]);
         setImagePreviews([]);
 
-        // Load social networks
         setSocialNetworks(service.socialNetworks?.map(sn => ({
             platform: sn.platform,
             url: sn.url
         })) || []);
 
-        // Load phone numbers
         setPhoneNumbersList(service.phoneNumbers || []);
-
-        // Load contact email
         setContactEmail(service.contactEmail || '');
 
         setDialogOpen(true);
@@ -613,6 +598,17 @@ const AdminDashboardPage = () => {
         return category ? category.label : categoryValue;
     };
 
+    // Helper function to get social media icon
+    const getSocialIcon = (platform) => {
+        switch(platform?.toUpperCase()) {
+            case 'FACEBOOK': return <FacebookIcon sx={{ fontSize: 16 }} />;
+            case 'INSTAGRAM': return <InstagramIcon sx={{ fontSize: 16 }} />;
+            case 'YOUTUBE': return <YouTubeIcon sx={{ fontSize: 16 }} />;
+            case 'LINKEDIN': return <LinkedInIcon sx={{ fontSize: 16 }} />;
+            default: return <LanguageIcon sx={{ fontSize: 16 }} />;
+        }
+    };
+
     // Handle next image
     const handleNextImage = (serviceId, totalImages) => {
         setActiveImageIndex(prev => ({
@@ -639,7 +635,6 @@ const AdminDashboardPage = () => {
 
     return (
         <LocalizationProvider dateAdapter={AdapterDayjs}>
-            {/* Global styles for orange scrollbars */}
             <GlobalStyles
                 styles={{
                     '*::-webkit-scrollbar': {
@@ -665,18 +660,17 @@ const AdminDashboardPage = () => {
             />
             <Box sx={{
                 minHeight: '100vh',
-                background: '#F5F7FA',
+                background: '#FFFFFF',
                 color: '#1A2733',
                 position: 'relative'
             }}>
-                {/* Header - FULL WIDTH */}
+                {/* Header */}
                 <Box sx={{
                     position: 'sticky',
                     top: 0,
                     zIndex: 1000,
                     backgroundColor: '#FFFFFF',
-                    borderBottom: 'none',
-                    boxShadow: '0 1px 4px rgba(0, 0, 0, 0.04)',
+                    borderBottom: '1px solid #E8ECF0',
                     px: { xs: 2, sm: 3, md: 4, lg: 6 }
                 }}>
                     <Box sx={{
@@ -747,21 +741,18 @@ const AdminDashboardPage = () => {
                     </MenuItem>
                 </Menu>
 
-                {/* Main Content - FULL WIDTH */}
+                {/* Main Content */}
                 <Box sx={{
                     position: 'relative',
                     zIndex: 1,
                     py: { xs: 2, sm: 3, md: 4 },
                     px: { xs: 2, sm: 3, md: 4, lg: 6 }
                 }}>
-                    {/* Stats Cards - Total Services and Available Services inside form */}
-                    <Box sx={{
-                        width: '100%',
-                        mb: 4
-                    }}>
+                    {/* Stats Cards */}
+                    <Box sx={{ width: '100%', mb: 4 }}>
                         <Grid container spacing={{ xs: 2, sm: 3 }} sx={{ width: '100%', m: 0 }}>
                             <Grid item xs={12} sm={6}>
-                                <StatCard color="#FF9800">
+                                <StatCard>
                                     <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', flexWrap: 'wrap', gap: 2 }}>
                                         <Box>
                                             <Typography variant="body2" sx={{ color: '#8A99A8', mb: 1 }}>
@@ -778,7 +769,7 @@ const AdminDashboardPage = () => {
                                 </StatCard>
                             </Grid>
                             <Grid item xs={12} sm={6}>
-                                <StatCard color="#4CAF50">
+                                <StatCard>
                                     <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', flexWrap: 'wrap', gap: 2 }}>
                                         <Box>
                                             <Typography variant="body2" sx={{ color: '#8A99A8', mb: 1 }}>
@@ -797,61 +788,43 @@ const AdminDashboardPage = () => {
                         </Grid>
                     </Box>
 
-                    {/* Services Section - FULL WIDTH */}
-                    <Box sx={{
-                        background: '#FFFFFF',
-                        borderRadius: '20px',
-                        overflow: 'hidden',
-                        border: 'none',
-                        boxShadow: '0 2px 8px rgba(0, 0, 0, 0.04)',
-                        width: '100%'
-                    }}>
-                        <Box sx={{ p: { xs: 2, sm: 3 } }}>
-                            <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 3, flexWrap: 'wrap', gap: 2 }}>
-                                <Typography variant="h6" sx={{ fontWeight: 600, color: '#1A2733' }}>
-                                    All Services ({services.length})
-                                </Typography>
-                                <GradientButton startIcon={<AddIcon />} onClick={handleOpenCreateDialog} sx={{ py: { xs: 1, sm: 1.5 }, px: { xs: 2, sm: 3 } }}>
-                                    Add New Service
-                                </GradientButton>
+                    {/* Services Section - FLAT DESIGN like FavoritesPage */}
+                    <Box sx={{ width: '100%' }}>
+                        <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 3, flexWrap: 'wrap', gap: 2 }}>
+                            <Typography variant="h6" sx={{ fontWeight: 600, color: '#1A2733' }}>
+                                All Services ({services.length})
+                            </Typography>
+                            <GradientButton startIcon={<AddIcon />} onClick={handleOpenCreateDialog} sx={{ py: { xs: 1, sm: 1.5 }, px: { xs: 2, sm: 3 } }}>
+                                Add New Service
+                            </GradientButton>
+                        </Box>
+
+                        {loading ? (
+                            <Box sx={{ display: 'flex', justifyContent: 'center', py: 8 }}>
+                                <CircularProgress sx={{ color: '#FF9800' }} />
                             </Box>
+                        ) : services.length === 0 ? (
+                            <Box sx={{ textAlign: 'center', py: 8 }}>
+                                <Typography sx={{ color: '#8A99A8' }}>No services found</Typography>
+                                <Button onClick={handleOpenCreateDialog} sx={{ mt: 2, color: '#FF9800' }}>
+                                    Create your first service
+                                </Button>
+                            </Box>
+                        ) : (
+                            <Box sx={{ display: 'flex', flexDirection: 'column', gap: 0 }}>
+                                {services.map((service, index) => {
+                                    const images = service.imageUrls || [];
+                                    const currentIndex = activeImageIndex[service.id] || 0;
 
-                            {loading ? (
-                                <Box sx={{ display: 'flex', justifyContent: 'center', py: 8 }}>
-                                    <CircularProgress sx={{ color: '#FF9800' }} />
-                                </Box>
-                            ) : services.length === 0 ? (
-                                <Box sx={{ textAlign: 'center', py: 8 }}>
-                                    <Typography sx={{ color: '#8A99A8' }}>No services found</Typography>
-                                    <Button onClick={handleOpenCreateDialog} sx={{ mt: 2, color: '#FF9800' }}>
-                                        Create your first service
-                                    </Button>
-                                </Box>
-                            ) : (
-                                <Box sx={{ display: 'flex', flexDirection: 'column', gap: 3, width: '100%' }}>
-                                    {services.map((service, index) => {
-                                        const images = service.imageUrls || [];
-                                        const currentIndex = activeImageIndex[service.id] || 0;
-
-                                        return (
-                                            <Grow in={true} style={{ transitionDelay: `${index * 50}ms` }} key={service.id}>
-                                                <Paper sx={{
-                                                    borderRadius: '20px',
-                                                    overflow: 'hidden',
-                                                    border: 'none',
-                                                    boxShadow: '0 2px 8px rgba(0, 0, 0, 0.04)',
-                                                    transition: 'all 0.3s ease',
-                                                    width: '100%',
-                                                    '&:hover': {
-                                                        transform: 'translateY(-2px)',
-                                                        boxShadow: '0 8px 20px rgba(255, 152, 0, 0.12)'
-                                                    }
-                                                }}>
+                                    return (
+                                        <Grow in={true} style={{ transitionDelay: `${index * 50}ms` }} key={service.id}>
+                                            <Box>
+                                                <Box sx={{ width: '100%', py: 3 }}>
                                                     <Grid container sx={{ width: '100%', m: 0 }}>
                                                         {/* Left side - Information */}
                                                         <Grid item xs={12} md={7}>
-                                                            <Box sx={{ p: { xs: 2, sm: 3, md: '31px' } }}>
-                                                                <Box sx={{ display: 'flex', alignItems: 'flex-start', justifyContent: 'space-between', mb: '26px', flexWrap: 'wrap', gap: 2 }}>
+                                                            <Box sx={{ pr: { md: 4 } }}>
+                                                                <Box sx={{ display: 'flex', alignItems: 'flex-start', justifyContent: 'space-between', mb: 2, flexWrap: 'wrap', gap: 2 }}>
                                                                     <Typography variant="h5" sx={{ fontWeight: 700, color: '#1A2733', fontSize: { xs: '1.3rem', sm: '1.5rem', md: '1.8rem' } }}>
                                                                         {service.name}
                                                                     </Typography>
@@ -862,50 +835,50 @@ const AdminDashboardPage = () => {
                                                                             bgcolor: service.isAvailable ? alpha('#FF9800', 0.1) : alpha('#f44336', 0.1),
                                                                             color: service.isAvailable ? '#FF9800' : '#f44336',
                                                                             fontWeight: 600,
-                                                                            fontSize: '0.8rem'
+                                                                            fontSize: '0.75rem'
                                                                         }}
                                                                     />
                                                                 </Box>
 
-                                                                <Typography variant="body1" sx={{ color: '#5A6874', mb: '26px', lineHeight: 1.6, fontSize: { xs: '0.9rem', sm: '1rem' } }}>
+                                                                <Typography variant="body1" sx={{ color: '#5A6874', mb: 3, lineHeight: 1.6, fontSize: { xs: '0.9rem', sm: '1rem' } }}>
                                                                     {service.description}
                                                                 </Typography>
 
-                                                                <Grid container spacing={2} sx={{ mb: '26px' }}>
+                                                                <Grid container spacing={2} sx={{ mb: 3 }}>
                                                                     <Grid item xs={6} sm={4}>
                                                                         <Box>
-                                                                            <Typography variant="body2" sx={{ color: '#8A99A8', display: 'block', fontSize: '0.75rem' }}>Price</Typography>
+                                                                            <Typography variant="body2" sx={{ color: '#8A99A8', display: 'block', fontSize: '0.75rem', mb: 0.5 }}>
+                                                                                Price
+                                                                            </Typography>
                                                                             <Typography variant="body1" sx={{ color: '#4CAF50', fontWeight: 600, fontSize: { xs: '0.9rem', sm: '1rem' } }}>
                                                                                 From {service.price?.toLocaleString()} ֏
                                                                             </Typography>
                                                                         </Box>
                                                                     </Grid>
                                                                     <Grid item xs={6} sm={4}>
-                                                                        <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
-                                                                            <CategoryIcon sx={{ fontSize: 20, color: '#FF9800' }} />
-                                                                            <Box>
-                                                                                <Typography variant="body2" sx={{ color: '#8A99A8', display: 'block', fontSize: '0.75rem' }}>Category</Typography>
-                                                                                <Typography variant="body1" sx={{ color: '#1A2733', fontSize: { xs: '0.85rem', sm: '0.9rem' } }}>
-                                                                                    {getCategoryDisplayName(service.category)}
-                                                                                </Typography>
-                                                                            </Box>
+                                                                        <Box>
+                                                                            <Typography variant="body2" sx={{ color: '#8A99A8', display: 'block', fontSize: '0.75rem', mb: 0.5 }}>
+                                                                                Category
+                                                                            </Typography>
+                                                                            <Typography variant="body1" sx={{ color: '#1A2733', fontSize: { xs: '0.85rem', sm: '0.9rem' } }}>
+                                                                                {getCategoryDisplayName(service.category)}
+                                                                            </Typography>
                                                                         </Box>
                                                                     </Grid>
                                                                     <Grid item xs={6} sm={4}>
-                                                                        <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
-                                                                            <LocationIcon sx={{ fontSize: 20, color: '#FF9800' }} />
-                                                                            <Box>
-                                                                                <Typography variant="body2" sx={{ color: '#8A99A8', display: 'block', fontSize: '0.75rem' }}>Location</Typography>
-                                                                                <Typography variant="body1" sx={{ color: '#1A2733', fontSize: { xs: '0.85rem', sm: '0.9rem' } }}>
-                                                                                    {service.location}
-                                                                                </Typography>
-                                                                            </Box>
+                                                                        <Box>
+                                                                            <Typography variant="body2" sx={{ color: '#8A99A8', display: 'block', fontSize: '0.75rem', mb: 0.5 }}>
+                                                                                Location
+                                                                            </Typography>
+                                                                            <Typography variant="body1" sx={{ color: '#1A2733', fontSize: { xs: '0.85rem', sm: '0.9rem' } }}>
+                                                                                {service.location}
+                                                                            </Typography>
                                                                         </Box>
                                                                     </Grid>
                                                                 </Grid>
 
                                                                 {service.duration && service.duration > 0 && (
-                                                                    <Box sx={{ display: 'flex', alignItems: 'center', gap: 1.5, mb: '26px' }}>
+                                                                    <Box sx={{ display: 'flex', alignItems: 'center', gap: 1.5, mb: 2 }}>
                                                                         <AccessTimeIcon sx={{ fontSize: 20, color: '#8A99A8' }} />
                                                                         <Typography variant="body1" sx={{ color: '#5A6874', fontSize: { xs: '0.85rem', sm: '0.9rem' } }}>
                                                                             Duration: {service.duration} hours
@@ -948,41 +921,30 @@ const AdminDashboardPage = () => {
                                                                             <Box sx={{ display: 'flex', alignItems: 'center', gap: 1.5, mb: 1.5, flexWrap: 'wrap' }}>
                                                                                 <LanguageIcon sx={{ fontSize: 18, color: '#8A99A8' }} />
                                                                                 <Box sx={{ display: 'flex', gap: 1, flexWrap: 'wrap' }}>
-                                                                                    {service.socialNetworks.map((social, idx) => {
-                                                                                        const getSocialIcon = (platform) => {
-                                                                                            switch(platform?.toUpperCase()) {
-                                                                                                case 'FACEBOOK': return <FacebookIcon sx={{ fontSize: 16 }} />;
-                                                                                                case 'INSTAGRAM': return <InstagramIcon sx={{ fontSize: 16 }} />;
-                                                                                                case 'YOUTUBE': return <YouTubeIcon sx={{ fontSize: 16 }} />;
-                                                                                                case 'LINKEDIN': return <LinkedInIcon sx={{ fontSize: 16 }} />;
-                                                                                                default: return <LanguageIcon sx={{ fontSize: 16 }} />;
-                                                                                            }
-                                                                                        };
-                                                                                        return (
-                                                                                            <Button
-                                                                                                key={idx}
-                                                                                                size="small"
-                                                                                                href={social.url}
-                                                                                                target="_blank"
-                                                                                                startIcon={getSocialIcon(social.platform)}
-                                                                                                sx={{
-                                                                                                    textTransform: 'none',
-                                                                                                    color: '#1A2733',
-                                                                                                    fontSize: '0.7rem',
-                                                                                                    '&:hover': { bgcolor: alpha('#FF9800', 0.1) }
-                                                                                                }}
-                                                                                            >
-                                                                                                {social.platform}
-                                                                                            </Button>
-                                                                                        );
-                                                                                    })}
+                                                                                    {service.socialNetworks.map((social, idx) => (
+                                                                                        <Button
+                                                                                            key={idx}
+                                                                                            size="small"
+                                                                                            href={social.url}
+                                                                                            target="_blank"
+                                                                                            startIcon={getSocialIcon(social.platform)}
+                                                                                            sx={{
+                                                                                                textTransform: 'none',
+                                                                                                color: '#1A2733',
+                                                                                                fontSize: '0.7rem',
+                                                                                                '&:hover': { bgcolor: alpha('#FF9800', 0.1) }
+                                                                                            }}
+                                                                                        >
+                                                                                            {social.platform}
+                                                                                        </Button>
+                                                                                    ))}
                                                                                 </Box>
                                                                             </Box>
                                                                         )}
                                                                     </Box>
                                                                 )}
 
-                                                                <Divider sx={{ borderColor: '#E8ECF0', my: '20px' }} />
+                                                                <Divider sx={{ borderColor: '#E8ECF0', my: 2 }} />
 
                                                                 <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: 2 }}>
                                                                     <FormControlLabel
@@ -1037,15 +999,14 @@ const AdminDashboardPage = () => {
                                                         <Grid item xs={12} md={5}>
                                                             <Box sx={{
                                                                 height: '100%',
-                                                                minHeight: { xs: '250px', sm: '300px', md: '364px' },
+                                                                minHeight: { xs: '250px', sm: '300px', md: '320px' },
                                                                 background: '#FFFFFF',
                                                                 display: 'flex',
                                                                 flexDirection: 'column',
                                                                 alignItems: 'center',
                                                                 justifyContent: 'center',
                                                                 position: 'relative',
-                                                                overflow: 'hidden',
-                                                                p: { xs: 1, sm: 2 }
+                                                                overflow: 'hidden'
                                                             }}>
                                                                 {images.length > 0 ? (
                                                                     <>
@@ -1059,7 +1020,7 @@ const AdminDashboardPage = () => {
                                                                             borderRadius: '12px',
                                                                             overflow: 'hidden',
                                                                             position: 'relative',
-                                                                            flex: 1
+                                                                            minHeight: { xs: '250px', sm: '300px', md: '320px' }
                                                                         }}>
                                                                             <ServiceImage
                                                                                 src={images[currentIndex]}
@@ -1173,13 +1134,29 @@ const AdminDashboardPage = () => {
                                                             </Box>
                                                         </Grid>
                                                     </Grid>
-                                                </Paper>
-                                            </Grow>
-                                        );
-                                    })}
-                                </Box>
-                            )}
-                        </Box>
+                                                </Box>
+                                                {index < services.length - 1 && <Divider sx={{ borderColor: '#E8ECF0' }} />}
+                                            </Box>
+                                        </Grow>
+                                    );
+                                })}
+                            </Box>
+                        )}
+
+                        {/* Pagination */}
+                        {totalPages > 1 && (
+                            <Box sx={{ display: 'flex', justifyContent: 'center', mt: 4 }}>
+                                <Pagination
+                                    count={totalPages}
+                                    page={page + 1}
+                                    onChange={(e, newPage) => setPage(newPage - 1)}
+                                    sx={{
+                                        '& .MuiPaginationItem-root': { color: '#5A6874', borderRadius: '12px' },
+                                        '& .Mui-selected': { bgcolor: '#FF9800 !important', color: 'white', '&:hover': { bgcolor: '#FF9800' } }
+                                    }}
+                                />
+                            </Box>
+                        )}
                     </Box>
                 </Box>
 
