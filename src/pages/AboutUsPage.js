@@ -22,7 +22,8 @@ import {
     Tooltip,
     alpha,
     keyframes,
-    GlobalStyles
+    GlobalStyles,
+    SvgIcon
 } from '@mui/material';
 import {
     Security as SecurityIcon,
@@ -42,9 +43,59 @@ import {
     Cake as CakeIcon,
     EmojiEvents as EmojiEventsIcon,
     Star as StarIcon,
-    AutoAwesome as AutoAwesomeIcon
+    AutoAwesome as AutoAwesomeIcon,
+    Business as BusinessIcon,
+    Favorite as FavoriteIcon,
+    School as SchoolIcon,
+    LocalFlorist as LocalFloristIcon,
+    EmojiNature as EmojiNatureIcon,
+    Chair as ChairIcon,
+    WbIncandescent as WbIncandescentIcon,
+    EmojiPeople as EmojiPeopleIcon,
+    EventAvailable as EventAvailableIcon,
+    ThumbUpAlt as ThumbUpAltIcon,
+    People as PeopleIcon
 } from '@mui/icons-material';
 import { useAuth } from '../context/AuthContext';
+
+// Custom Engagement Icon - Diamond Ring with Love Key & Romantic Stars
+const EngagementRingIcon = (props) => (
+    <SvgIcon {...props} viewBox="0 0 24 24">
+        <path d="M12 3 L14 7 L10 7 Z" fill="currentColor" stroke="currentColor" strokeWidth="0.5" />
+        <path d="M12 2 L14 7 L12 9 L10 7 Z" fill="none" stroke="currentColor" strokeWidth="1.2" />
+        <path d="M12 4 L13 7 L11 7 Z" fill="white" opacity="0.6" />
+        <circle cx="12" cy="13" r="4" stroke="currentColor" strokeWidth="1.8" fill="none" />
+        <path d="M12 9 L12 11" stroke="currentColor" strokeWidth="1.2" />
+        <path d="M10 9.5 L10.5 11" stroke="currentColor" strokeWidth="1" />
+        <path d="M14 9.5 L13.5 11" stroke="currentColor" strokeWidth="1" />
+        <path d="M12 1 L12 2" stroke="currentColor" strokeWidth="1" strokeLinecap="round" />
+        <path d="M10.5 2.5 L11 3" stroke="currentColor" strokeWidth="0.8" strokeLinecap="round" />
+        <path d="M13.5 2.5 L13 3" stroke="currentColor" strokeWidth="0.8" strokeLinecap="round" />
+        <path d="M6 6 L6.3 6.8 L7 7 L6.3 7.2 L6 8 L5.7 7.2 L5 7 L5.7 6.8 Z" fill="currentColor" />
+        <path d="M18 6 L18.3 6.8 L19 7 L18.3 7.2 L18 8 L17.7 7.2 L17 7 L17.7 6.8 Z" fill="currentColor" />
+        <path d="M7 17 L7.2 17.5 L7.7 17.6 L7.3 17.9 L7.4 18.4 L7 18.1 L6.6 18.4 L6.7 17.9 L6.3 17.6 L6.8 17.5 Z" fill="currentColor" opacity="0.8" />
+        <path d="M17 16 L17.2 16.5 L17.7 16.6 L17.3 16.9 L17.4 17.4 L17 17.1 L16.6 17.4 L16.7 16.9 L16.3 16.6 L16.8 16.5 Z" fill="currentColor" opacity="0.7" />
+        <circle cx="12" cy="5" r="3" fill="currentColor" opacity="0.1" />
+    </SvgIcon>
+);
+
+// Custom Anniversary Icon - Gift with ribbon and cake/candle elements
+const AnniversaryGiftIcon = (props) => (
+    <SvgIcon {...props} viewBox="0 0 24 24">
+        <rect x="6" y="8" width="12" height="10" rx="1.5" stroke="currentColor" strokeWidth="1.5" fill="none" />
+        <path d="M12 8 L12 18" stroke="currentColor" strokeWidth="1.5" />
+        <path d="M6 13 L18 13" stroke="currentColor" strokeWidth="1.5" />
+        <path d="M12 8 Q9 4 7 7 Q9 8 12 8" stroke="currentColor" strokeWidth="1.2" fill="none" />
+        <path d="M12 8 Q15 4 17 7 Q15 8 12 8" stroke="currentColor" strokeWidth="1.2" fill="none" />
+        <circle cx="12" cy="8" r="1" fill="currentColor" />
+        <rect x="11.5" y="4" width="1" height="3" rx="0.3" fill="currentColor" />
+        <path d="M12 3 Q12.5 4 12 4.5 Q11.5 4 12 3" fill="#FF6B35" />
+        <circle cx="8" cy="10" r="0.8" fill="#FFB347" />
+        <circle cx="16" cy="11" r="0.6" fill="#FF6B35" />
+        <circle cx="10" cy="16" r="0.5" fill="#FF8C42" />
+        <circle cx="15" cy="15" r="0.7" fill="#FFB347" />
+    </SvgIcon>
+);
 
 // Custom animations
 const float = keyframes`
@@ -79,29 +130,48 @@ const AboutUsPage = () => {
     const [backgroundPosition, setBackgroundPosition] = useState({ x: 0, y: 0 });
     const [anchorEl, setAnchorEl] = useState(null);
     const [userInitial, setUserInitial] = useState('');
+    const [counters, setCounters] = useState({
+        happy_clients: 0,
+        events_organized: 0,
+        expert_planners: 0,
+        satisfaction_rate: 0
+    });
 
-    // Scrollbar styles
-    const scrollbarStyles = {
-        '*::-webkit-scrollbar': {
-            width: '10px',
-            height: '10px',
+    // Statistics data
+    const statistics = [
+        {
+            icon: <PeopleIcon sx={{ fontSize: 48 }} />,
+            value: 5000,
+            label: 'Happy Clients',
+            suffix: '+',
+            color: '#FF6B35',
+            key: 'happy_clients'
         },
-        '*::-webkit-scrollbar-track': {
-            background: '#F5F0E8',
-            borderRadius: '10px',
+        {
+            icon: <EventAvailableIcon sx={{ fontSize: 48 }} />,
+            value: 10000,
+            label: 'Events Organized',
+            suffix: '+',
+            color: '#FFB347',
+            key: 'events_organized'
         },
-        '*::-webkit-scrollbar-thumb': {
-            background: '#FF6B35',
-            borderRadius: '10px',
-            '&:hover': {
-                background: '#E55A2B',
-            },
+        {
+            icon: <EmojiPeopleIcon sx={{ fontSize: 48 }} />,
+            value: 200,
+            label: 'Expert Planners',
+            suffix: '+',
+            color: '#FF8C42',
+            key: 'expert_planners'
         },
-        '*': {
-            scrollbarColor: '#FF6B35 #F5F0E8',
-            scrollbarWidth: 'thin',
-        },
-    };
+        {
+            icon: <ThumbUpAltIcon sx={{ fontSize: 48 }} />,
+            value: 98,
+            label: 'Satisfaction Rate',
+            suffix: '%',
+            color: '#FF9F4A',
+            key: 'satisfaction_rate'
+        }
+    ];
 
     useEffect(() => {
         if (user && user.userName) {
@@ -118,6 +188,45 @@ const AboutUsPage = () => {
 
         window.addEventListener('mousemove', handleMouseMove);
         return () => window.removeEventListener('mousemove', handleMouseMove);
+    }, []);
+
+    // Animate counters on scroll
+    useEffect(() => {
+        const observer = new IntersectionObserver(
+            (entries) => {
+                entries.forEach((entry) => {
+                    if (entry.isIntersecting) {
+                        statistics.forEach((stat) => {
+                            let start = 0;
+                            const end = stat.value;
+                            const duration = 2000;
+                            const increment = end / (duration / 16);
+
+                            const timer = setInterval(() => {
+                                start += increment;
+                                if (start >= end) {
+                                    start = end;
+                                    clearInterval(timer);
+                                }
+                                setCounters(prev => ({
+                                    ...prev,
+                                    [stat.key]: Math.floor(start)
+                                }));
+                            }, 16);
+                        });
+                        observer.disconnect();
+                    }
+                });
+            },
+            { threshold: 0.3 }
+        );
+
+        const statsSection = document.getElementById('statistics-section');
+        if (statsSection) {
+            observer.observe(statsSection);
+        }
+
+        return () => observer.disconnect();
     }, []);
 
     const handleMenuOpen = (event) => {
@@ -174,6 +283,22 @@ const AboutUsPage = () => {
         navigate('/signup');
     };
 
+    // Categories based on the Category enum from backend (without RENTALS)
+    const categories = [
+        { icon: <CelebrationIcon />, title: 'Party / Celebration', desc: 'Professional party planning services for any celebration', color: '#FF6B35', enumValue: 'PARTY' },
+        { icon: <CakeIcon />, title: 'Birthday Party', desc: 'Discover amazing birthday party packages and services', color: '#FFB347', enumValue: 'BIRTHDAY' },
+        { icon: <BrushIcon />, title: 'Decoration', desc: 'Professional decoration services for all occasions', color: '#FF8C42', enumValue: 'DECORATION' },
+        { icon: <CameraAltIcon />, title: 'Photography', desc: 'Capture your special moments with professional photographers', color: '#FF9F4A', enumValue: 'PHOTOGRAPHY' },
+        { icon: <FavoriteIcon />, title: 'Wedding', desc: 'Plan your dream wedding with our expert wedding planners', color: '#FF6B35', enumValue: 'WEDDING' },
+        { icon: <BusinessIcon />, title: 'Corporate Event', desc: 'Professional corporate event planning and management', color: '#FFB347', enumValue: 'CORPORATE' },
+        { icon: <EngagementRingIcon />, title: 'Engagement', desc: 'Make your engagement unforgettable with our services', color: '#FF8C42', enumValue: 'ENGAGEMENT' },
+        { icon: <AnniversaryGiftIcon />, title: 'Anniversary', desc: 'Celebrate your love story with amazing anniversary services', color: '#FF9F4A', enumValue: 'ANNIVERSARY' },
+        { icon: <SchoolIcon />, title: 'Graduation Party', desc: 'Honor your achievements with a memorable graduation party', color: '#FF6B35', enumValue: 'GRADUATION_CEREMONY' },
+        { icon: <LocalFloristIcon />, title: 'Floral Design', desc: 'Beautiful floral arrangements for any occasion', color: '#FFB347', enumValue: 'FLOWERS' },
+        { icon: <WbIncandescentIcon />, title: 'Lighting', desc: 'Professional lighting setup for events', color: '#FF8C42', enumValue: 'LIGHTING' },
+        { icon: <EmojiEventsIcon />, title: 'Stage Setup', desc: 'Stage design and setup services', color: '#FF9F4A', enumValue: 'STAGE_SETUP' }
+    ];
+
     return (
         <Box sx={{
             minHeight: '100vh',
@@ -229,7 +354,7 @@ const AboutUsPage = () => {
                 ))}
             </Box>
 
-            {/* Header */}
+            {/* Header - FULL WIDTH */}
             <Box sx={{
                 position: 'sticky',
                 top: 0,
@@ -237,164 +362,172 @@ const AboutUsPage = () => {
                 backgroundColor: alpha('#FFFFFF', 0.95),
                 backdropFilter: 'blur(10px)',
                 borderBottom: '1px solid rgba(0,0,0,0.08)',
-                boxShadow: '0 2px 20px rgba(0,0,0,0.03)'
+                boxShadow: '0 2px 20px rgba(0,0,0,0.03)',
+                px: { xs: 2, sm: 3, md: 4, lg: 6 }
             }}>
-                <Container maxWidth="xl">
-                    <Box sx={{
-                        display: 'flex',
-                        alignItems: 'center',
-                        justifyContent: 'space-between',
-                        height: 70,
-                    }}>
-                        <Box
-                            onClick={() => navigate('/')}
-                            sx={{
-                                display: 'flex',
-                                alignItems: 'center',
-                                gap: 1.5,
-                                cursor: 'pointer'
-                            }}
-                        >
-                            <Box sx={{
-                                width: 38,
-                                height: 38,
-                                borderRadius: '12px',
-                                background: 'linear-gradient(135deg, #FF6B35 0%, #FFB347 100%)',
-                                display: 'flex',
-                                alignItems: 'center',
-                                justifyContent: 'center'
-                            }}>
-                                <CelebrationIcon sx={{ color: 'white', fontSize: 22 }} />
-                            </Box>
-                            <Typography variant="h6" sx={{
-                                fontWeight: 800,
-                                background: 'linear-gradient(135deg, #FF6B35 0%, #FFB347 100%)',
-                                WebkitBackgroundClip: 'text',
-                                WebkitTextFillColor: 'transparent',
-                                letterSpacing: '-0.5px'
-                            }}>
-                                Festivy
-                            </Typography>
+                <Box sx={{
+                    display: 'flex',
+                    alignItems: 'center',
+                    justifyContent: 'space-between',
+                    height: 70,
+                    maxWidth: '100%',
+                    width: '100%'
+                }}>
+                    <Box
+                        onClick={() => navigate('/')}
+                        sx={{
+                            display: 'flex',
+                            alignItems: 'center',
+                            gap: 1.5,
+                            cursor: 'pointer'
+                        }}
+                    >
+                        <Box sx={{
+                            width: 38,
+                            height: 38,
+                            borderRadius: '12px',
+                            background: 'linear-gradient(135deg, #FF6B35 0%, #FFB347 100%)',
+                            display: 'flex',
+                            alignItems: 'center',
+                            justifyContent: 'center'
+                        }}>
+                            <CelebrationIcon sx={{ color: 'white', fontSize: 22 }} />
                         </Box>
-
-                        <Box sx={{ display: { xs: 'none', md: 'flex' }, alignItems: 'center', gap: 3 }}>
-                            <Button
-                                startIcon={<InfoIcon />}
-                                sx={{ fontWeight: 500, color: '#FF6B35', borderBottom: '2px solid #FF6B35', borderRadius: 0 }}
-                                onClick={handleAboutClick}
-                            >
-                                About Us
-                            </Button>
-                            <Button
-                                startIcon={<HowToRegIcon />}
-                                sx={{ fontWeight: 500, color: '#4A4A4A', '&:hover': { color: '#FF6B35' } }}
-                                onClick={() => handleScrollToSection('how-it-works')}
-                            >
-                                How It Works
-                            </Button>
-                            <Button
-                                startIcon={<CelebrationIcon />}
-                                sx={{ fontWeight: 500, color: '#4A4A4A', '&:hover': { color: '#FF6B35' } }}
-                                onClick={handleServicesClick}
-                            >
-                                Services
-                            </Button>
-                            {isAdmin && (
-                                <Button sx={{ fontWeight: 500, color: '#FF9800' }} onClick={handleAdminPanel}>
-                                    Admin
-                                </Button>
-                            )}
-                        </Box>
-
-                        <Box sx={{ display: 'flex', alignItems: 'center', gap: 2 }}>
-                            {user ? (
-                                <>
-                                    <Chip
-                                        label={`Welcome, ${user.userName}`}
-                                        size="small"
-                                        sx={{
-                                            display: { xs: 'none', sm: 'flex' },
-                                            bgcolor: alpha('#FF6B35', 0.1),
-                                            color: '#FF6B35',
-                                            border: `1px solid ${alpha('#FF6B35', 0.2)}`
-                                        }}
-                                    />
-                                    <IconButton
-                                        onClick={handleMenuOpen}
-                                        sx={{
-                                            background: 'linear-gradient(135deg, #FF6B35 0%, #FFB347 100%)',
-                                            width: 38,
-                                            height: 38,
-                                            '&:hover': { transform: 'scale(1.05)' }
-                                        }}
-                                    >
-                                        <Avatar sx={{ width: 38, height: 38, bgcolor: 'transparent', color: 'white' }}>
-                                            {userInitial || <AccountCircleIcon />}
-                                        </Avatar>
-                                    </IconButton>
-                                    <Menu
-                                        anchorEl={anchorEl}
-                                        open={Boolean(anchorEl)}
-                                        onClose={handleMenuClose}
-                                        PaperProps={{
-                                            sx: {
-                                                bgcolor: '#FFFFFF',
-                                                color: '#1A1A1A',
-                                                border: '1px solid #E0E0E0',
-                                                minWidth: 200,
-                                                borderRadius: '16px',
-                                                boxShadow: '0 4px 20px rgba(0,0,0,0.1)'
-                                            }
-                                        }}
-                                    >
-                                        <MenuItem onClick={handleProfile}><PersonIcon sx={{ mr: 2, fontSize: 20, color: '#FF6B35' }} />Profile</MenuItem>
-                                        {isAdmin && (
-                                            <MenuItem onClick={handleAdminPanel}><SecurityIcon sx={{ mr: 2, fontSize: 20, color: '#FF9800' }} />Admin Panel</MenuItem>
-                                        )}
-                                        <Divider />
-                                        <MenuItem onClick={handleLogout}><LogoutIcon sx={{ mr: 2, fontSize: 20, color: '#FF6B35' }} />Logout</MenuItem>
-                                    </Menu>
-                                </>
-                            ) : (
-                                <>
-                                    <Button sx={{ fontWeight: 500, color: '#4A4A4A', '&:hover': { color: '#FF6B35' } }} onClick={handleLoginClick}>
-                                        Sign In
-                                    </Button>
-                                    <Button
-                                        variant="contained"
-                                        sx={{
-                                            fontWeight: 600,
-                                            borderRadius: '12px',
-                                            background: 'linear-gradient(135deg, #FF6B35 0%, #FFB347 100%)',
-                                            boxShadow: '0 4px 12px rgba(255,107,53,0.25)',
-                                            '&:hover': { transform: 'translateY(-2px)', boxShadow: '0 6px 16px rgba(255,107,53,0.35)' }
-                                        }}
-                                        onClick={handleSignupClick}
-                                    >
-                                        Get Started
-                                    </Button>
-                                </>
-                            )}
-                        </Box>
+                        <Typography variant="h6" sx={{
+                            fontWeight: 800,
+                            background: 'linear-gradient(135deg, #FF6B35 0%, #FFB347 100%)',
+                            WebkitBackgroundClip: 'text',
+                            WebkitTextFillColor: 'transparent',
+                            letterSpacing: '-0.5px'
+                        }}>
+                            Festivy
+                        </Typography>
                     </Box>
-                </Container>
+
+                    <Box sx={{ display: { xs: 'none', md: 'flex' }, alignItems: 'center', gap: 3 }}>
+                        <Button
+                            startIcon={<InfoIcon />}
+                            sx={{ fontWeight: 500, color: '#FF6B35', borderBottom: '2px solid #FF6B35', borderRadius: 0 }}
+                            onClick={handleAboutClick}
+                        >
+                            About Us
+                        </Button>
+                        <Button
+                            startIcon={<HowToRegIcon />}
+                            sx={{ fontWeight: 500, color: '#4A4A4A', '&:hover': { color: '#FF6B35' } }}
+                            onClick={() => handleScrollToSection('how-it-works')}
+                        >
+                            How It Works
+                        </Button>
+                        <Button
+                            startIcon={<CelebrationIcon />}
+                            sx={{ fontWeight: 500, color: '#4A4A4A', '&:hover': { color: '#FF6B35' } }}
+                            onClick={handleServicesClick}
+                        >
+                            Services
+                        </Button>
+                        {isAdmin && (
+                            <Button sx={{ fontWeight: 500, color: '#FF9800' }} onClick={handleAdminPanel}>
+                                Admin
+                            </Button>
+                        )}
+                    </Box>
+
+                    <Box sx={{ display: 'flex', alignItems: 'center', gap: 2 }}>
+                        {user ? (
+                            <>
+                                <Chip
+                                    label={`Welcome, ${user.userName}`}
+                                    size="small"
+                                    sx={{
+                                        display: { xs: 'none', sm: 'flex' },
+                                        bgcolor: alpha('#FF6B35', 0.1),
+                                        color: '#FF6B35',
+                                        border: `1px solid ${alpha('#FF6B35', 0.2)}`
+                                    }}
+                                />
+                                <IconButton
+                                    onClick={handleMenuOpen}
+                                    sx={{
+                                        background: 'linear-gradient(135deg, #FF6B35 0%, #FFB347 100%)',
+                                        width: 38,
+                                        height: 38,
+                                        '&:hover': { transform: 'scale(1.05)' }
+                                    }}
+                                >
+                                    <Avatar sx={{ width: 38, height: 38, bgcolor: 'transparent', color: 'white' }}>
+                                        {userInitial || <AccountCircleIcon />}
+                                    </Avatar>
+                                </IconButton>
+                                <Menu
+                                    anchorEl={anchorEl}
+                                    open={Boolean(anchorEl)}
+                                    onClose={handleMenuClose}
+                                    PaperProps={{
+                                        sx: {
+                                            bgcolor: '#FFFFFF',
+                                            color: '#1A1A1A',
+                                            border: '1px solid #E0E0E0',
+                                            minWidth: 200,
+                                            borderRadius: '16px',
+                                            boxShadow: '0 4px 20px rgba(0,0,0,0.1)'
+                                        }
+                                    }}
+                                >
+                                    <MenuItem onClick={handleProfile}><PersonIcon sx={{ mr: 2, fontSize: 20, color: '#FF6B35' }} />Profile</MenuItem>
+                                    {isAdmin && (
+                                        <MenuItem onClick={handleAdminPanel}><SecurityIcon sx={{ mr: 2, fontSize: 20, color: '#FF9800' }} />Admin Panel</MenuItem>
+                                    )}
+                                    <Divider />
+                                    <MenuItem onClick={handleLogout}><LogoutIcon sx={{ mr: 2, fontSize: 20, color: '#FF6B35' }} />Logout</MenuItem>
+                                </Menu>
+                            </>
+                        ) : (
+                            <>
+                                <Button sx={{ fontWeight: 500, color: '#4A4A4A', '&:hover': { color: '#FF6B35' } }} onClick={handleLoginClick}>
+                                    Sign In
+                                </Button>
+                                <Button
+                                    variant="contained"
+                                    sx={{
+                                        fontWeight: 600,
+                                        borderRadius: '12px',
+                                        background: 'linear-gradient(135deg, #FF6B35 0%, #FFB347 100%)',
+                                        boxShadow: '0 4px 12px rgba(255,107,53,0.25)',
+                                        '&:hover': { transform: 'translateY(-2px)', boxShadow: '0 6px 16px rgba(255,107,53,0.35)' }
+                                    }}
+                                    onClick={handleSignupClick}
+                                >
+                                    Get Started
+                                </Button>
+                            </>
+                        )}
+                    </Box>
+                </Box>
             </Box>
 
-            {/* Main Content */}
-            <Container maxWidth="lg" sx={{ position: 'relative', zIndex: 3, py: { xs: 4, md: 6 } }}>
-                {/* Hero Section */}
+            {/* Main Content - FULL WIDTH */}
+            <Box sx={{
+                position: 'relative',
+                zIndex: 3,
+                py: { xs: 4, md: 6 },
+                px: { xs: 2, sm: 3, md: 4, lg: 6 }
+            }}>
+                {/* Hero Section - FULL WIDTH with CENTERED title - NO BACKGROUND */}
                 <Fade in timeout={1000}>
                     <Box sx={{
                         textAlign: 'center',
                         mb: { xs: 6, md: 8 },
-                        animation: `${slideIn} 0.8s ease-out`
+                        animation: `${slideIn} 0.8s ease-out`,
+                        width: '100%'
                     }}>
                         <Typography variant="h1" sx={{
                             fontSize: { xs: 36, sm: 48, md: 64, lg: 72 },
                             fontWeight: 800,
                             lineHeight: 1.2,
                             mb: 3,
-                            letterSpacing: '-0.02em'
+                            letterSpacing: '-0.02em',
+                            textAlign: 'center'
                         }}>
                             <Box component="span" sx={{ color: '#2C2C2C' }}>
                                 About{' '}
@@ -416,32 +549,42 @@ const AboutUsPage = () => {
                             height: 3,
                             background: 'linear-gradient(90deg, #FF6B35, #FFB347)',
                             borderRadius: 2,
-                            mb: 4,
+                            mb: 5,
                             mx: 'auto'
                         }} />
 
-                        <Typography variant="h6" sx={{
-                            color: '#4A4A4A',
-                            maxWidth: '800px',
-                            mx: 'auto',
-                            fontSize: { xs: 16, md: 18 },
-                            lineHeight: 1.8,
-                            fontWeight: 500
+                        {/* Text without background */}
+                        <Box sx={{
+                            width: '100%',
+                            p: { xs: 3, md: 5 }
                         }}>
-                            Welcome to <Box component="span" sx={{ color: '#FF6B35', fontWeight: 700 }}>Festivy</Box> — your ultimate destination for creating unforgettable celebrations.
-                            We bring together the finest <Box component="span" sx={{ color: '#FFB347', fontWeight: 600 }}>party planners</Box>,
-                            <Box component="span" sx={{ color: '#FF8C42', fontWeight: 600 }}> entertainers</Box>, and
-                            <Box component="span" sx={{ color: '#FF9F4A', fontWeight: 600 }}> service providers</Box> to turn your vision into reality.
-                            Whether you're planning an intimate birthday or a grand festival, our platform connects you with professionals who
-                            bring <Box component="span" sx={{ color: '#FF6B35', fontWeight: 700 }}>passion</Box>,
-                            <Box component="span" sx={{ color: '#FFB347', fontWeight: 700 }}> creativity</Box>, and
-                            <Box component="span" sx={{ color: '#FF8C42', fontWeight: 700 }}> excellence</Box> to every event.
-                        </Typography>
+                            <Typography variant="body1" sx={{
+                                color: '#3A3A3A',
+                                fontSize: { xs: 16, md: 18 },
+                                lineHeight: 1.9,
+                                textAlign: 'left',
+                                fontWeight: 450,
+                                letterSpacing: '0.01em',
+                                width: '100%',
+                                '& span': {
+                                    fontWeight: 600
+                                }
+                            }}>
+                                Welcome to <span style={{ color: '#FF6B35' }}>Festivy</span> — your ultimate destination for creating unforgettable celebrations.
+                                We bring together the finest <span style={{ color: '#FFB347' }}>party planners</span>,
+                                <span style={{ color: '#FF8C42' }}> entertainers</span>, and
+                                <span style={{ color: '#FF9F4A' }}> service providers</span> to turn your vision into reality.
+                                Whether you're planning an intimate birthday or a grand festival, our platform connects you with professionals who
+                                bring <span style={{ color: '#FF6B35' }}>passion</span>,
+                                <span style={{ color: '#FFB347' }}> creativity</span>, and
+                                <span style={{ color: '#FF8C42' }}> excellence</span> to every event.
+                            </Typography>
+                        </Box>
                     </Box>
                 </Fade>
 
-                {/* Service Categories Section */}
-                <Box sx={{ mb: 8 }}>
+                {/* Service Categories Section - FULL WIDTH */}
+                <Box sx={{ mb: 8, width: '100%' }}>
                     <Typography variant="h3" sx={{
                         fontSize: { xs: 28, md: 38 },
                         fontWeight: 700,
@@ -460,18 +603,9 @@ const AboutUsPage = () => {
                         mb: 5
                     }} />
 
-                    <Grid container spacing={3}>
-                        {[
-                            { icon: <CelebrationIcon />, title: 'Party Services', desc: 'Find the perfect party planning services for any occasion', color: '#FF6B35' },
-                            { icon: <CakeIcon />, title: 'Birthday Celebrations', desc: 'Discover amazing birthday party packages and services', color: '#FFB347' },
-                            { icon: <EmojiEventsIcon />, title: 'Entertainment', desc: 'Book entertainment services including DJs, performers, and more', color: '#FF8C42' },
-                            { icon: <RestaurantIcon />, title: 'Catering', desc: 'Find catering services for your special events', color: '#FF9F4A' },
-                            { icon: <BrushIcon />, title: 'Decoration', desc: 'Professional decoration services for all occasions', color: '#FFA559' },
-                            { icon: <CameraAltIcon />, title: 'Photography', desc: 'Capture your special moments with professional photographers', color: '#FF6B35' },
-                            { icon: <MusicNoteIcon />, title: 'Music & DJ', desc: 'Professional music and DJ services for your events', color: '#FFB347' },
-                            { icon: <LocationOnIcon />, title: 'Venue', desc: 'Find the perfect venue for your special occasion', color: '#FF8C42' }
-                        ].map((category, index) => (
-                            <Grid item xs={12} sm={6} md={3} key={index}>
+                    <Grid container spacing={3} sx={{ width: '100%', m: 0 }}>
+                        {categories.map((category, index) => (
+                            <Grid item xs={12} sm={6} md={4} lg={3} key={index}>
                                 <Zoom in timeout={300 + index * 100}>
                                     <Card sx={{
                                         background: alpha(category.color, 0.04),
@@ -508,7 +642,8 @@ const AboutUsPage = () => {
                                             <Typography variant="h6" sx={{
                                                 color: category.color,
                                                 fontWeight: 600,
-                                                mb: 1
+                                                mb: 1,
+                                                fontSize: { xs: '0.95rem', sm: '1.05rem' }
                                             }}>
                                                 {category.title}
                                             </Typography>
@@ -523,19 +658,120 @@ const AboutUsPage = () => {
                     </Grid>
                 </Box>
 
-                {/* Footer */}
+                {/* Statistics Section - NEW */}
+                <Box id="statistics-section" sx={{
+                    mb: 8,
+                    width: '100%',
+                    py: 6,
+                    borderRadius: '48px',
+                    background: alpha('#FFFFFF', 0.5),
+                    backdropFilter: 'blur(10px)'
+                }}>
+                    <Typography variant="h3" sx={{
+                        fontSize: { xs: 28, md: 38 },
+                        fontWeight: 700,
+                        color: '#2C2C2C',
+                        textAlign: 'center',
+                        mb: 2
+                    }}>
+                        Our <span style={{ color: '#FF6B35' }}>Impact</span> in Numbers
+                    </Typography>
+                    <Box sx={{
+                        width: 60,
+                        height: 3,
+                        background: 'linear-gradient(90deg, #FF6B35, #FFB347)',
+                        borderRadius: 2,
+                        mx: 'auto',
+                        mb: 6
+                    }} />
+
+                    <Grid container spacing={4} sx={{ width: '100%', m: 0 }}>
+                        {statistics.map((stat, index) => (
+                            <Grid item xs={12} sm={6} md={3} key={index}>
+                                <Zoom in timeout={500 + index * 200}>
+                                    <Box sx={{
+                                        textAlign: 'center',
+                                        p: 3,
+                                        transition: 'all 0.3s ease',
+                                        '&:hover': {
+                                            transform: 'translateY(-10px)'
+                                        }
+                                    }}>
+                                        <Box sx={{
+                                            width: 80,
+                                            height: 80,
+                                            borderRadius: '50%',
+                                            background: `linear-gradient(135deg, ${stat.color}20, ${stat.color}05)`,
+                                            display: 'flex',
+                                            alignItems: 'center',
+                                            justifyContent: 'center',
+                                            mx: 'auto',
+                                            mb: 2,
+                                            color: stat.color,
+                                            border: `2px solid ${alpha(stat.color, 0.3)}`
+                                        }}>
+                                            {stat.icon}
+                                        </Box>
+                                        <Typography variant="h3" sx={{
+                                            fontSize: { xs: 36, md: 48 },
+                                            fontWeight: 800,
+                                            color: stat.color,
+                                            mb: 1,
+                                            fontFamily: 'monospace'
+                                        }}>
+                                            {counters[stat.key] || 0}{stat.suffix}
+                                        </Typography>
+                                        <Typography variant="body1" sx={{
+                                            color: '#5A5A5A',
+                                            fontWeight: 600,
+                                            fontSize: '1.1rem'
+                                        }}>
+                                            {stat.label}
+                                        </Typography>
+                                    </Box>
+                                </Zoom>
+                            </Grid>
+                        ))}
+                    </Grid>
+                </Box>
+
+                {/* Footer - FULL WIDTH */}
                 <Box sx={{
                     py: 4,
                     textAlign: 'center',
-                    borderTop: '1px solid rgba(0,0,0,0.08)'
+                    borderTop: '1px solid rgba(0,0,0,0.08)',
+                    width: '100%'
                 }}>
                     <Typography variant="body2" sx={{ color: '#8A8A8A' }}>
                         © 2026 Festivy. All rights reserved.
                     </Typography>
                 </Box>
-            </Container>
+            </Box>
         </Box>
     );
+};
+
+// Scrollbar styles
+const scrollbarStyles = {
+    '*::-webkit-scrollbar': {
+        width: '10px',
+        height: '10px',
+    },
+    '*::-webkit-scrollbar-track': {
+        background: '#F5F0E8',
+        borderRadius: '10px',
+    },
+    '*::-webkit-scrollbar-thumb': {
+        background: '#FF6B35',
+        borderRadius: '10px',
+        '&:hover': {
+            background: '#E55A2B',
+        },
+    },
+    '*': {
+        scrollbarColor: '#FF6B35 #F5F0E8',
+        scrollbarWidth: 'thin',
+    },
 };
 
 export default AboutUsPage;
