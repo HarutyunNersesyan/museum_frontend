@@ -186,6 +186,22 @@ const ServiceImage = styled('img')({
     borderRadius: '12px'
 });
 
+// Styled Switch for orange color
+const OrangeSwitch = styled(Switch)(({ theme }) => ({
+    '& .MuiSwitch-switchBase.Mui-checked': {
+        color: '#FF9800',
+        '&:hover': {
+            backgroundColor: alpha('#FF9800', 0.08),
+        },
+    },
+    '& .MuiSwitch-switchBase.Mui-checked + .MuiSwitch-track': {
+        backgroundColor: '#FF9800',
+    },
+    '& .MuiSwitch-track': {
+        backgroundColor: '#E0E4E8',
+    },
+}));
+
 // Armenian cities
 const ARMENIAN_CITIES = [
     { value: 'YEREVAN', label: 'Yerevan', region: 'Central' },
@@ -824,8 +840,8 @@ const AdminDashboardPage = () => {
                                                                         label={service.isAvailable ? '● Available' : '● Hidden'}
                                                                         size="medium"
                                                                         sx={{
-                                                                            bgcolor: service.isAvailable ? alpha('#4CAF50', 0.1) : alpha('#f44336', 0.1),
-                                                                            color: service.isAvailable ? '#4CAF50' : '#f44336',
+                                                                            bgcolor: service.isAvailable ? alpha('#FF9800', 0.1) : alpha('#f44336', 0.1),
+                                                                            color: service.isAvailable ? '#FF9800' : '#f44336',
                                                                             fontWeight: 600,
                                                                             fontSize: '0.9rem',
                                                                             py: 1
@@ -959,17 +975,19 @@ const AdminDashboardPage = () => {
                                                                 <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
                                                                     <FormControlLabel
                                                                         control={
-                                                                            <Switch
+                                                                            <OrangeSwitch
                                                                                 checked={service.isAvailable}
                                                                                 onChange={() => handleToggleAvailability(service.id, service.isAvailable)}
-                                                                                sx={{
-                                                                                    '& .MuiSwitch-switchBase.Mui-checked': { color: '#4CAF50' },
-                                                                                    '& .MuiSwitch-switchBase.Mui-checked + .MuiSwitch-track': { bgcolor: '#4CAF50' }
-                                                                                }}
                                                                             />
                                                                         }
                                                                         label="Visible"
-                                                                        sx={{ mr: 0 }}
+                                                                        sx={{
+                                                                            mr: 0,
+                                                                            '& .MuiFormControlLabel-label': {
+                                                                                color: service.isAvailable ? '#FF9800' : '#8A99A8',
+                                                                                fontWeight: service.isAvailable ? 600 : 400
+                                                                            }
+                                                                        }}
                                                                     />
                                                                     <Box>
                                                                         <Tooltip title="Edit">
