@@ -6,6 +6,7 @@
   <component name="ChangeListManager">
     <list default="true" id="52f9de53-701b-4b52-b101-40303d7b40ec" name="Changes" comment="">
       <change beforePath="$PROJECT_DIR$/src/pages/HomePage.js" beforeDir="false" afterPath="$PROJECT_DIR$/src/pages/HomePage.js" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/pages/ProfilePage.js" beforeDir="false" afterPath="$PROJECT_DIR$/src/pages/ProfilePage.js" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/pages/ServicesPage.js" beforeDir="false" afterPath="$PROJECT_DIR$/src/pages/ServicesPage.js" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
@@ -167,14 +168,7 @@
       <workItem from="1776087919950" duration="4000" />
       <workItem from="1776087951815" duration="2000" />
       <workItem from="1776087989494" duration="65000" />
-      <workItem from="1776092844443" duration="2813000" />
-    </task>
-    <task id="LOCAL-00009" summary="Created login, signup and home pages">
-      <created>1766657480446</created>
-      <option name="number" value="00009" />
-      <option name="presentableId" value="LOCAL-00009" />
-      <option name="project" value="LOCAL" />
-      <updated>1766657480446</updated>
+      <workItem from="1776092844443" duration="4657000" />
     </task>
     <task id="LOCAL-00010" summary="Created login, signup and home pages">
       <created>1766659829534</created>
@@ -512,7 +506,14 @@
       <option name="project" value="LOCAL" />
       <updated>1776096876044</updated>
     </task>
-    <option name="localTasksCounter" value="58" />
+    <task id="LOCAL-00058" summary="Bugs fix.">
+      <created>1776098746098</created>
+      <option name="number" value="00058" />
+      <option name="presentableId" value="LOCAL-00058" />
+      <option name="project" value="LOCAL" />
+      <updated>1776098746098</updated>
+    </task>
+    <option name="localTasksCounter" value="59" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
