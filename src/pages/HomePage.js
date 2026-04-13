@@ -1,4 +1,4 @@
-// src/pages/HomePage.js - Updated with exact same categories as ServicesPage
+// src/pages/HomePage.js - Complete updated file
 
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
@@ -31,7 +31,6 @@ import {
     InputLabel,
     GlobalStyles
 } from '@mui/material';
-import LockIcon from '@mui/icons-material/Lock';
 import CloseIcon from '@mui/icons-material/Close';
 import AccountCircleIcon from '@mui/icons-material/AccountCircle';
 import LogoutIcon from '@mui/icons-material/Logout';
@@ -39,19 +38,15 @@ import PersonIcon from '@mui/icons-material/Person';
 import CelebrationIcon from '@mui/icons-material/Celebration';
 import AdminPanelSettingsIcon from '@mui/icons-material/AdminPanelSettings';
 import ExploreIcon from '@mui/icons-material/Explore';
-import FavoriteIcon from '@mui/icons-material/Favorite';
 import EmailIcon from '@mui/icons-material/Email';
 import RocketLaunchIcon from '@mui/icons-material/RocketLaunch';
 import StarIcon from '@mui/icons-material/Star';
 import AutoAwesomeIcon from '@mui/icons-material/AutoAwesome';
 import CakeIcon from '@mui/icons-material/Cake';
 import EmojiEventsIcon from '@mui/icons-material/EmojiEvents';
-import RestaurantIcon from '@mui/icons-material/Restaurant';
 import BrushIcon from '@mui/icons-material/Brush';
 import CameraAltIcon from '@mui/icons-material/CameraAlt';
-import MusicNoteIcon from '@mui/icons-material/MusicNote';
 import LocationOnIcon from '@mui/icons-material/LocationOn';
-import MoreHorizIcon from '@mui/icons-material/MoreHoriz';
 import ArrowForwardIcon from '@mui/icons-material/ArrowForward';
 import InfoIcon from '@mui/icons-material/Info';
 import HowToRegIcon from '@mui/icons-material/HowToReg';
@@ -143,9 +138,6 @@ const CATEGORIES = [
     { value: 'STAGE_SETUP', label: 'Stage Setup', icon: <StageIcon />, color: '#FF6B35' },
     { value: 'RENTALS', label: 'Equipment Rental', icon: <RentalsIcon />, color: '#FF9F4A' }
 ];
-
-// Category values array for Select dropdown
-const CATEGORY_VALUES = CATEGORIES.map(cat => cat.value);
 
 // Helper function to get category icon (same as ServicesPage)
 const getCategoryIcon = (categoryValue) => {
@@ -574,7 +566,12 @@ function HomePage() {
                             <Button
                                 startIcon={<HowToRegIcon />}
                                 sx={{ fontWeight: 500, color: '#4A4A4A', '&:hover': { color: '#FF6B35' } }}
-                                onClick={() => handleServicesClick()}
+                                onClick={() => {
+                                    const element = document.getElementById('how-it-works');
+                                    if (element) {
+                                        element.scrollIntoView({ behavior: 'smooth' });
+                                    }
+                                }}
                             >
                                 How It Works
                             </Button>
@@ -991,7 +988,7 @@ function HomePage() {
                     )}
                 </Box>
 
-                {/* How It Works Section */}
+                {/* How It Works Section - UPDATED with justify text and new content */}
                 <Box id="how-it-works" sx={{
                     py: { xs: 8, md: 10 },
                     mt: -5,
@@ -1029,16 +1026,16 @@ function HomePage() {
                                     gradient: 'linear-gradient(135deg, #FF6B35 0%, #FF8C42 100%)'
                                 },
                                 {
-                                    icon: <FavoriteIcon sx={{ fontSize: 40 }} />,
-                                    title: 'Curate',
-                                    desc: 'Save your favorites, compare options, and build your dream team of service providers.',
+                                    icon: <BookmarkIcon sx={{ fontSize: 40 }} />,
+                                    title: 'Save',
+                                    desc: 'Bookmark your favorite services, compare prices and features side by side to make the best choice.',
                                     color: '#FFB347',
                                     gradient: 'linear-gradient(135deg, #FFB347 0%, #FF9F4A 100%)'
                                 },
                                 {
-                                    icon: <EmailIcon sx={{ fontSize: 40 }} />,
-                                    title: 'Connect',
-                                    desc: 'Reach out to providers directly and bring your celebration to life with ease.',
+                                    icon: <RocketLaunchIcon sx={{ fontSize: 40 }} />,
+                                    title: 'Celebrate',
+                                    desc: 'Connect with providers instantly, secure your booking, and enjoy a stress-free celebration!',
                                     color: '#FF8C42',
                                     gradient: 'linear-gradient(135deg, #FF8C42 0%, #FFA559 100%)'
                                 }
@@ -1095,7 +1092,8 @@ function HomePage() {
                                             <Typography sx={{
                                                 color: '#5A5A5A',
                                                 lineHeight: 1.6,
-                                                fontSize: '0.95rem'
+                                                fontSize: '0.95rem',
+                                                textAlign: 'justify'
                                             }}>
                                                 {step.desc}
                                             </Typography>
