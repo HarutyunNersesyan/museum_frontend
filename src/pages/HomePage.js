@@ -800,7 +800,6 @@ function HomePage() {
                                                         }
                                                     }}
                                                 >
-                                                    <MenuItem value="">All Categories</MenuItem>
                                                     {CATEGORIES.map((cat) => (
                                                         <MenuItem key={cat} value={cat}>{cat}</MenuItem>
                                                     ))}
@@ -822,7 +821,6 @@ function HomePage() {
                                                         }
                                                     }}
                                                 >
-                                                    <MenuItem value="">All Locations</MenuItem>
                                                     {ARMENIAN_LOCATIONS.map((location) => (
                                                         <MenuItem key={location.value} value={location.value}>{location.label}</MenuItem>
                                                     ))}

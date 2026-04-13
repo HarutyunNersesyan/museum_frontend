@@ -1,4 +1,4 @@
-// src/pages/ServicesPage.js
+// src/pages/ServicesPage.js - Updated with matching categories and icons
 
 import React, { useState, useEffect } from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
@@ -61,7 +61,21 @@ import {
     YouTube as YouTubeIcon,
     LinkedIn as LinkedInIcon,
     Bookmark as BookmarkIcon,
-    Lock as LockIcon
+    Lock as LockIcon,
+    // Category-specific icons
+    EmojiEvents as PartyIcon,
+    Cake as BirthdayIcon,
+    Brush as DecorationIcon,
+    CameraAlt as PhotographyIcon,
+    Favorite as WeddingIcon,
+    Business as CorporateIcon,
+    Diamond as EngagementIcon,
+    Star as AnniversaryIcon,
+    School as GraduationIcon,
+    LocalFlorist as FlowersIcon,
+    Highlight as LightingIcon,
+    TheaterComedy as StageIcon,
+    Inventory as RentalsIcon
 } from '@mui/icons-material';
 import { LocalizationProvider } from '@mui/x-date-pickers/LocalizationProvider';
 import { AdapterDayjs } from '@mui/x-date-pickers/AdapterDayjs';
@@ -167,10 +181,28 @@ const ARMENIAN_LOCATIONS = [
     { value: 'JERMUK', label: 'Jermuk' }
 ];
 
+// Updated CATEGORIES to match the Category enum exactly
 const CATEGORIES = [
-    'PARTY', 'BIRTHDAY', 'ENTERTAINMENT', 'CATERING',
-    'DECORATION', 'PHOTOGRAPHY', 'MUSIC', 'VENUE', 'OTHER'
+    { value: 'PARTY', label: 'Party / Celebration', icon: <PartyIcon /> },
+    { value: 'BIRTHDAY', label: 'Birthday Party', icon: <BirthdayIcon /> },
+    { value: 'DECORATION', label: 'Decoration', icon: <DecorationIcon /> },
+    { value: 'PHOTOGRAPHY', label: 'Photography', icon: <PhotographyIcon /> },
+    { value: 'WEDDING', label: 'Wedding', icon: <WeddingIcon /> },
+    { value: 'CORPORATE', label: 'Corporate Event', icon: <CorporateIcon /> },
+    { value: 'ENGAGEMENT', label: 'Engagement', icon: <EngagementIcon /> },
+    { value: 'ANNIVERSARY', label: 'Anniversary', icon: <AnniversaryIcon /> },
+    { value: 'GRADUATION_CEREMONY', label: 'Graduation Party', icon: <GraduationIcon /> },
+    { value: 'FLOWERS', label: 'Floral Design', icon: <FlowersIcon /> },
+    { value: 'LIGHTING', label: 'Lighting', icon: <LightingIcon /> },
+    { value: 'STAGE_SETUP', label: 'Stage Setup', icon: <StageIcon /> },
+    { value: 'RENTALS', label: 'Equipment Rental', icon: <RentalsIcon /> }
 ];
+
+// Helper function to get category icon by category value
+const getCategoryIcon = (categoryValue) => {
+    const category = CATEGORIES.find(c => c.value === categoryValue);
+    return category?.icon || <CategoryIcon />;
+};
 
 const ServicesPage = () => {
     const navigate = useNavigate();
@@ -584,6 +616,12 @@ const ServicesPage = () => {
         }
     };
 
+    // Helper to get display name for category value
+    const getCategoryDisplayName = (categoryValue) => {
+        const category = CATEGORIES.find(c => c.value === categoryValue);
+        return category?.label || categoryValue;
+    };
+
     return (
         <LocalizationProvider dateAdapter={AdapterDayjs}>
             <Box sx={{
@@ -876,8 +914,14 @@ const ServicesPage = () => {
                                             '& .MuiOutlinedInput-notchedOutline': { borderColor: '#E8E0D8' }
                                         }}
                                     >
-                                        <MenuItem value="">All Categories</MenuItem>
-                                        {CATEGORIES.map((cat) => <MenuItem key={cat} value={cat}>{cat}</MenuItem>)}
+                                        {CATEGORIES.map((cat) => (
+                                            <MenuItem key={cat.value} value={cat.value}>
+                                                <Box sx={{ display: 'flex', alignItems: 'center', gap: 1.5 }}>
+                                                    {React.cloneElement(cat.icon, { sx: { fontSize: 20, color: '#FF6B35' } })}
+                                                    <span>{cat.label}</span>
+                                                </Box>
+                                            </MenuItem>
+                                        ))}
                                     </Select>
                                 </FormControl>
                             </Grid>
@@ -894,7 +938,6 @@ const ServicesPage = () => {
                                             '& .MuiOutlinedInput-notchedOutline': { borderColor: '#E8E0D8' }
                                         }}
                                     >
-                                        <MenuItem value="">All Locations</MenuItem>
                                         {ARMENIAN_LOCATIONS.map((location) => <MenuItem key={location.value} value={location.value}>{location.label}</MenuItem>)}
                                     </Select>
                                 </FormControl>
@@ -1017,7 +1060,8 @@ const ServicesPage = () => {
                             )}
                             {selectedCategory && (
                                 <Chip
-                                    label={`Category: ${selectedCategory}`}
+                                    icon={getCategoryIcon(selectedCategory)}
+                                    label={`Category: ${getCategoryDisplayName(selectedCategory)}`}
                                     onDelete={() => { setSelectedCategory(''); handleSearch(); }}
                                     size="small"
                                     sx={{ bgcolor: alpha('#FF6B35', 0.1), color: '#FF6B35', borderRadius: '20px' }}
@@ -1057,7 +1101,7 @@ const ServicesPage = () => {
                         </Box>
                     )}
 
-                    {/* Services Grid */}
+                    {/* Services Grid - REMOVED onClick navigation */}
                     {loading ? (
                         <Box sx={{ display: 'flex', flexDirection: 'column', gap: 4 }}>
                             {[1, 2, 3].map((i) => (
@@ -1112,10 +1156,10 @@ const ServicesPage = () => {
                                                 sx={{
                                                     width: '100%',
                                                     py: 3,
-                                                    cursor: 'pointer',
                                                     transition: 'all 0.2s ease'
+                                                    // REMOVED: cursor: 'pointer'
+                                                    // REMOVED: onClick navigation
                                                 }}
-                                                onClick={() => navigate(`/services/${service.id}`)}
                                             >
                                                 <Grid container sx={{ width: '100%', m: 0 }}>
                                                     {/* Left side - Information */}
@@ -1132,7 +1176,7 @@ const ServicesPage = () => {
 
                                                                 {/* Bookmark (Save to favorites) and Fire (Like) Icons - Side by Side */}
                                                                 <Box sx={{ display: 'flex', alignItems: 'center', gap: 2 }}>
-                                                                    {/* Bookmark Icon - Save to favorites (NO affect on likeCount) */}
+                                                                    {/* Bookmark Icon - Save to favorites */}
                                                                     <Tooltip title={isFavorited ? "Remove from saved" : "Save to favorites"}>
                                                                         <IconButton
                                                                             onClick={(e) => handleFavoriteToggle(service.id, e)}
@@ -1146,7 +1190,7 @@ const ServicesPage = () => {
                                                                         </IconButton>
                                                                     </Tooltip>
 
-                                                                    {/* Fire Icon - Like button (affects likeCount only) */}
+                                                                    {/* Fire Icon - Like button */}
                                                                     <Box sx={{ display: 'flex', alignItems: 'center', gap: 0.5 }}>
                                                                         <Tooltip title={isLiked ? "Remove like" : "Like"}>
                                                                             <IconButton
@@ -1195,9 +1239,12 @@ const ServicesPage = () => {
                                                                         <Typography variant="body2" sx={{ color: '#8A99A8', display: 'block', fontSize: '0.75rem', mb: 0.5 }}>
                                                                             Category
                                                                         </Typography>
-                                                                        <Typography variant="body1" sx={{ color: '#1A2733', fontSize: { xs: '0.85rem', sm: '0.9rem' } }}>
-                                                                            {service.category}
-                                                                        </Typography>
+                                                                        <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
+                                                                            {getCategoryIcon(service.category)}
+                                                                            <Typography variant="body1" sx={{ color: '#1A2733', fontSize: { xs: '0.85rem', sm: '0.9rem' } }}>
+                                                                                {getCategoryDisplayName(service.category)}
+                                                                            </Typography>
+                                                                        </Box>
                                                                     </Box>
                                                                 </Grid>
                                                                 <Grid item xs={6} sm={4}>
