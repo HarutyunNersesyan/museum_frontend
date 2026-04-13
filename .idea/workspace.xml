@@ -6,9 +6,6 @@
   <component name="ChangeListManager">
     <list default="true" id="52f9de53-701b-4b52-b101-40303d7b40ec" name="Changes" comment="">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/pages/AboutUsPage.js" beforeDir="false" afterPath="$PROJECT_DIR$/src/pages/AboutUsPage.js" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/pages/FavoritesPage.js" beforeDir="false" afterPath="$PROJECT_DIR$/src/pages/FavoritesPage.js" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/pages/ServicesPage.js" beforeDir="false" afterPath="$PROJECT_DIR$/src/pages/ServicesPage.js" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -165,14 +162,11 @@
       <workItem from="1775811029429" duration="510000" />
       <workItem from="1775814531861" duration="4289000" />
       <workItem from="1775977680123" duration="8611000" />
-      <workItem from="1775995062077" duration="11720000" />
-    </task>
-    <task id="LOCAL-00007" summary="Created login, signup and home pages">
-      <created>1766642297106</created>
-      <option name="number" value="00007" />
-      <option name="presentableId" value="LOCAL-00007" />
-      <option name="project" value="LOCAL" />
-      <updated>1766642297106</updated>
+      <workItem from="1775995062077" duration="11746000" />
+      <workItem from="1776087919950" duration="4000" />
+      <workItem from="1776087951815" duration="2000" />
+      <workItem from="1776087989494" duration="65000" />
+      <workItem from="1776092844443" duration="1312000" />
     </task>
     <task id="LOCAL-00008" summary="Created login, signup and home pages">
       <created>1766645453429</created>
@@ -510,7 +504,14 @@
       <option name="project" value="LOCAL" />
       <updated>1776004860912</updated>
     </task>
-    <option name="localTasksCounter" value="56" />
+    <task id="LOCAL-00056" summary="Bugs fix.">
+      <created>1776007554842</created>
+      <option name="number" value="00056" />
+      <option name="presentableId" value="LOCAL-00056" />
+      <option name="project" value="LOCAL" />
+      <updated>1776007554842</updated>
+    </task>
+    <option name="localTasksCounter" value="57" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">

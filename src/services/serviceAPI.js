@@ -112,8 +112,6 @@ export const serviceAPI = {
             }
 
             // Add sorting parameters if provided
-            // For All Services tab: sortBy: 'startDate', sortDirection: 'ASC'
-            // For Popular tab: this is handled by getPopularServices method
             if (searchParams.sortBy) {
                 params.sortBy = searchParams.sortBy;
                 params.sortDirection = searchParams.sortDirection || 'ASC';
@@ -161,7 +159,9 @@ export const serviceAPI = {
         }
     },
 
-    // ==================== Favorites / Likes ====================
+    // ==================== FAVORITES (Bookmark - Save for later, stored in database per user) ====================
+
+    // Add service to favorites (Bookmark)
     addToFavorites: async (serviceId) => {
         try {
             const response = await axios.post(
@@ -176,6 +176,7 @@ export const serviceAPI = {
         }
     },
 
+    // Remove service from favorites (Bookmark)
     removeFromFavorites: async (serviceId) => {
         try {
             const response = await axios.delete(
@@ -189,6 +190,7 @@ export const serviceAPI = {
         }
     },
 
+    // Get user's favorite services
     getFavorites: async (page = 0, size = 20) => {
         try {
             const response = await axios.get(
@@ -202,6 +204,7 @@ export const serviceAPI = {
         }
     },
 
+    // Check if service is in user's favorites
     isFavorited: async (serviceId) => {
         try {
             const response = await axios.get(
@@ -215,6 +218,7 @@ export const serviceAPI = {
         }
     },
 
+    // Get number of favorites for a service
     getFavoriteCount: async (serviceId) => {
         try {
             const response = await axios.get(
@@ -228,7 +232,40 @@ export const serviceAPI = {
         }
     },
 
-    // ==================== Inquiries ====================
+    // ==================== LIKES (Fire - Just increments/decrements likeCount, no user tracking in DB) ====================
+
+    // Like a service (increments likeCount)
+    likeService: async (serviceId) => {
+        try {
+            const response = await axios.post(
+                `${API_BASE_URL}/services/${serviceId}/like`,
+                {},
+                { headers: getAuthHeaders() }
+            );
+            return response;
+        } catch (error) {
+            console.error('Like service error:', error);
+            throw error;
+        }
+    },
+
+    // Unlike a service (decrements likeCount)
+    unlikeService: async (serviceId) => {
+        try {
+            const response = await axios.delete(
+                `${API_BASE_URL}/services/${serviceId}/like`,
+                { headers: getAuthHeaders() }
+            );
+            return response;
+        } catch (error) {
+            console.error('Unlike service error:', error);
+            throw error;
+        }
+    },
+
+    // ==================== INQUIRIES ====================
+
+    // Send inquiry about a service
     sendInquiry: async (serviceId, inquiryData) => {
         try {
             const response = await axios.post(
@@ -243,6 +280,7 @@ export const serviceAPI = {
         }
     },
 
+    // Get user's inquiries
     getUserInquiries: async (page = 0, size = 20) => {
         try {
             const response = await axios.get(
@@ -259,6 +297,7 @@ export const serviceAPI = {
 
 // ==================== ADMIN API ====================
 export const adminAPI = {
+    // Get all services (admin)
     getAllServices: async (page = 0, size = 20) => {
         try {
             const response = await axios.get(
@@ -272,6 +311,28 @@ export const adminAPI = {
         }
     },
 
+    // Create service with JSON only
+    createServiceJSON: async (serviceData) => {
+        try {
+            const dataToSend = {
+                ...serviceData,
+                startDate: serviceData.startDate || null,
+                startTime: serviceData.startTime || null
+            };
+
+            const response = await axios.post(
+                `${API_BASE_URL}/private/admin/services`,
+                dataToSend,
+                { headers: getAuthHeaders() }
+            );
+            return response;
+        } catch (error) {
+            console.error('Create service JSON error:', error);
+            throw error;
+        }
+    },
+
+    // Create service with image upload
     createService: async (serviceData, imageFiles = []) => {
         try {
             const formData = new FormData();
@@ -285,9 +346,6 @@ export const adminAPI = {
             if (serviceData.duration) {
                 formData.append('duration', serviceData.duration.toString());
             }
-            if (serviceData.maxParticipants) {
-                formData.append('maxParticipants', serviceData.maxParticipants.toString());
-            }
             if (serviceData.tags) {
                 formData.append('tags', serviceData.tags);
             }
@@ -296,6 +354,17 @@ export const adminAPI = {
             }
             if (serviceData.startTime) {
                 formData.append('startTime', serviceData.startTime);
+            }
+            if (serviceData.contactEmail) {
+                formData.append('contactEmail', serviceData.contactEmail);
+            }
+            if (serviceData.phoneNumbers && serviceData.phoneNumbers.length > 0) {
+                serviceData.phoneNumbers.forEach(phone => {
+                    formData.append('phoneNumbers', phone);
+                });
+            }
+            if (serviceData.socialNetworks && serviceData.socialNetworks.length > 0) {
+                formData.append('socialNetworks', JSON.stringify(serviceData.socialNetworks));
             }
 
             imageFiles.forEach((file) => {
@@ -319,6 +388,28 @@ export const adminAPI = {
         }
     },
 
+    // Update service with JSON only
+    updateServiceJSON: async (serviceId, serviceData) => {
+        try {
+            const dataToSend = {
+                ...serviceData,
+                startDate: serviceData.startDate || null,
+                startTime: serviceData.startTime || null
+            };
+
+            const response = await axios.put(
+                `${API_BASE_URL}/private/admin/services/${serviceId}`,
+                dataToSend,
+                { headers: getAuthHeaders() }
+            );
+            return response;
+        } catch (error) {
+            console.error('Update service JSON error:', error);
+            throw error;
+        }
+    },
+
+    // Update service with images
     updateService: async (serviceId, serviceData, imageFiles = [], existingImageUrls = []) => {
         try {
             const formData = new FormData();
@@ -332,9 +423,6 @@ export const adminAPI = {
             if (serviceData.duration) {
                 formData.append('duration', serviceData.duration.toString());
             }
-            if (serviceData.maxParticipants) {
-                formData.append('maxParticipants', serviceData.maxParticipants.toString());
-            }
             if (serviceData.tags) {
                 formData.append('tags', serviceData.tags);
             }
@@ -343,6 +431,17 @@ export const adminAPI = {
             }
             if (serviceData.startTime) {
                 formData.append('startTime', serviceData.startTime);
+            }
+            if (serviceData.contactEmail) {
+                formData.append('contactEmail', serviceData.contactEmail);
+            }
+            if (serviceData.phoneNumbers && serviceData.phoneNumbers.length > 0) {
+                serviceData.phoneNumbers.forEach(phone => {
+                    formData.append('phoneNumbers', phone);
+                });
+            }
+            if (serviceData.socialNetworks && serviceData.socialNetworks.length > 0) {
+                formData.append('socialNetworks', JSON.stringify(serviceData.socialNetworks));
             }
 
             existingImageUrls.forEach((url) => {
@@ -370,6 +469,7 @@ export const adminAPI = {
         }
     },
 
+    // Delete service
     deleteService: async (serviceId) => {
         try {
             const response = await axios.delete(
@@ -383,6 +483,7 @@ export const adminAPI = {
         }
     },
 
+    // Toggle service availability
     toggleAvailability: async (serviceId) => {
         try {
             const response = await axios.patch(
@@ -397,6 +498,24 @@ export const adminAPI = {
         }
     },
 
+    // Delete image from service
+    deleteImage: async (serviceId, imageUrl) => {
+        try {
+            const response = await axios.delete(
+                `${API_BASE_URL}/private/admin/services/${serviceId}/images`,
+                {
+                    params: { imageUrl },
+                    headers: getAuthHeaders()
+                }
+            );
+            return response;
+        } catch (error) {
+            console.error('Delete image error:', error);
+            throw error;
+        }
+    },
+
+    // Get all inquiries (admin)
     getAllInquiries: async (page = 0, size = 20, status = null) => {
         try {
             const url = status
@@ -410,6 +529,7 @@ export const adminAPI = {
         }
     },
 
+    // Respond to inquiry
     respondToInquiry: async (inquiryId, responseData) => {
         try {
             const response = await axios.post(
@@ -424,6 +544,7 @@ export const adminAPI = {
         }
     },
 
+    // Get dashboard stats
     getStats: async () => {
         try {
             const response = await axios.get(

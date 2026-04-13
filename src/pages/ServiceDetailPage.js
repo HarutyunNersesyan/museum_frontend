@@ -1,4 +1,4 @@
-// src/pages/ServiceDetailPage.js - Without cart, without suggested services, without reviews, without capacity
+// src/pages/ServiceDetailPage.js
 
 import React, { useState, useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
@@ -52,7 +52,10 @@ import {
     Star as StarIcon,
     Share as ShareIcon,
     CheckCircle as CheckCircleIcon,
-    ArrowBack as ArrowBackIcon
+    ArrowBack as ArrowBackIcon,
+    Bookmark as BookmarkIcon,
+    BookmarkBorder as BookmarkBorderIcon,
+    Whatshot as WhatshotIcon
 } from '@mui/icons-material';
 import { useAuth } from '../context/AuthContext';
 import serviceAPI from '../services/serviceAPI';
@@ -123,8 +126,15 @@ const ServiceDetailPage = () => {
 
     const [service, setService] = useState(null);
     const [loading, setLoading] = useState(true);
+
+    // Favorites (Bookmark) - stored in database per user
     const [isFavorited, setIsFavorited] = useState(false);
     const [favoriteCount, setFavoriteCount] = useState(0);
+
+    // Likes (Fire) - stored in localStorage, just UI state
+    const [isLiked, setIsLiked] = useState(false);
+    const [likeCount, setLikeCount] = useState(0);
+
     const [inquiryDialogOpen, setInquiryDialogOpen] = useState(false);
     const [inquiryData, setInquiryData] = useState({
         subject: '',
@@ -144,6 +154,15 @@ const ServiceDetailPage = () => {
     const [userIsAdmin, setUserIsAdmin] = useState(false);
     const [backgroundPosition, setBackgroundPosition] = useState({ x: 0, y: 0 });
 
+    // Load liked status from localStorage
+    useEffect(() => {
+        const savedLikes = localStorage.getItem('userLikedServices');
+        if (savedLikes) {
+            const likedSet = new Set(JSON.parse(savedLikes));
+            setIsLiked(likedSet.has(parseInt(id)));
+        }
+    }, [id]);
+
     useEffect(() => {
         if (user && user.userName) {
             setUserInitial(user.userName.charAt(0).toUpperCase());
@@ -158,6 +177,7 @@ const ServiceDetailPage = () => {
         loadService();
         checkFavorite();
         getFavoriteCount();
+        getLikeCount();
     }, [id]);
 
     useEffect(() => {
@@ -175,6 +195,7 @@ const ServiceDetailPage = () => {
         try {
             const response = await serviceAPI.getServiceById(id);
             setService(response.data);
+            setLikeCount(response.data.likeCount || 0);
         } catch (error) {
             console.error('Error loading service:', error);
             setSnackbar({
@@ -189,6 +210,7 @@ const ServiceDetailPage = () => {
     };
 
     const checkFavorite = async () => {
+        if (!user) return;
         try {
             const response = await serviceAPI.isFavorited(id);
             setIsFavorited(response.data);
@@ -206,7 +228,22 @@ const ServiceDetailPage = () => {
         }
     };
 
+    const getLikeCount = async () => {
+        // Like count is already in the service object from loadService
+        // This is just for reference
+    };
+
+    // Handle favorite toggle (Bookmark - saves to database)
     const handleFavoriteToggle = async () => {
+        if (!user) {
+            setSnackbar({
+                open: true,
+                message: 'Please login to save favorites',
+                severity: 'warning'
+            });
+            return;
+        }
+
         try {
             if (isFavorited) {
                 await serviceAPI.removeFromFavorites(id);
@@ -214,7 +251,7 @@ const ServiceDetailPage = () => {
                 setFavoriteCount(prev => prev - 1);
                 setSnackbar({
                     open: true,
-                    message: 'Removed from favorites',
+                    message: 'Removed from saved',
                     severity: 'info'
                 });
             } else {
@@ -223,7 +260,7 @@ const ServiceDetailPage = () => {
                 setFavoriteCount(prev => prev + 1);
                 setSnackbar({
                     open: true,
-                    message: 'Added to favorites',
+                    message: 'Saved to favorites!',
                     severity: 'success'
                 });
             }
@@ -232,6 +269,50 @@ const ServiceDetailPage = () => {
             setSnackbar({
                 open: true,
                 message: 'Failed to update favorites',
+                severity: 'error'
+            });
+        }
+    };
+
+    // Handle like toggle (Fire - just increments/decrements counter)
+    const handleLikeToggle = async () => {
+        try {
+            if (isLiked) {
+                await serviceAPI.unlikeService(id);
+                setIsLiked(false);
+                setLikeCount(prev => Math.max(0, prev - 1));
+                // Update localStorage
+                const savedLikes = localStorage.getItem('userLikedServices');
+                if (savedLikes) {
+                    const likedSet = new Set(JSON.parse(savedLikes));
+                    likedSet.delete(parseInt(id));
+                    localStorage.setItem('userLikedServices', JSON.stringify([...likedSet]));
+                }
+                setSnackbar({
+                    open: true,
+                    message: 'Removed like',
+                    severity: 'info'
+                });
+            } else {
+                await serviceAPI.likeService(id);
+                setIsLiked(true);
+                setLikeCount(prev => prev + 1);
+                // Update localStorage
+                const savedLikes = localStorage.getItem('userLikedServices');
+                const likedSet = savedLikes ? new Set(JSON.parse(savedLikes)) : new Set();
+                likedSet.add(parseInt(id));
+                localStorage.setItem('userLikedServices', JSON.stringify([...likedSet]));
+                setSnackbar({
+                    open: true,
+                    message: 'Liked!',
+                    severity: 'success'
+                });
+            }
+        } catch (error) {
+            console.error('Error toggling like:', error);
+            setSnackbar({
+                open: true,
+                message: 'Failed to update like',
                 severity: 'error'
             });
         }
@@ -331,7 +412,7 @@ const ServiceDetailPage = () => {
                 transition: 'background 0.3s ease-out'
             }} />
 
-            {/* Header - Removed Home, Services, About Us buttons */}
+            {/* Header */}
             <Box component="header" sx={{
                 position: 'sticky',
                 top: 0,
@@ -353,7 +434,7 @@ const ServiceDetailPage = () => {
                                 alignItems: 'center',
                                 justifyContent: 'center'
                             }}>
-                                <LockIcon sx={{ color: 'white', fontSize: 22 }} />
+                                <CelebrationIcon sx={{ color: 'white', fontSize: 22 }} />
                             </Box>
                             <Typography variant="h6" sx={{
                                 fontWeight: 800,
@@ -362,11 +443,10 @@ const ServiceDetailPage = () => {
                                 WebkitTextFillColor: 'transparent',
                                 letterSpacing: '-0.5px'
                             }}>
-                                VeilVision
+                                Festivy
                             </Typography>
                         </Box>
 
-                        {/* Removed Home, About Us, Services buttons - only Admin button remains if admin */}
                         <Box sx={{ display: 'flex', alignItems: 'center', gap: '28px' }}>
                             {userIsAdmin && (
                                 <Button onClick={handleAdminPanel} sx={{ fontWeight: 500, color: '#FF9800' }}>Admin</Button>
@@ -401,7 +481,6 @@ const ServiceDetailPage = () => {
 
             {/* Main Content */}
             <Container maxWidth="lg" sx={{ position: 'relative', zIndex: 1, py: 5 }}>
-                {/* Removed Breadcrumbs - Home, Services links removed */}
 
                 <Grid container spacing={4}>
                     {/* Image Gallery */}
@@ -451,18 +530,31 @@ const ServiceDetailPage = () => {
                         <Fade in={true} timeout={500} delay={200}>
                             <Box>
                                 <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', mb: 2 }}>
-                                    {/* Removed service name/title */}
+                                    <Typography variant="h4" sx={{ fontWeight: 700, color: '#1A2733' }}>
+                                        {service.name}
+                                    </Typography>
                                     <Box sx={{ display: 'flex', gap: 1 }}>
-                                        <Tooltip title={isFavorited ? "Remove from favorites" : "Add to favorites"}>
+                                        {/* Bookmark Button (Save to favorites) */}
+                                        <Tooltip title={isFavorited ? "Remove from saved" : "Save to favorites"}>
                                             <IconButton onClick={handleFavoriteToggle} sx={{
                                                 bgcolor: '#FFFFFF',
                                                 boxShadow: '0 2px 8px rgba(0,0,0,0.08)',
                                                 '&:hover': { bgcolor: '#FFF5F0' }
                                             }}>
-                                                {isFavorited ? <FavoriteIcon sx={{ color: '#FF6B35' }} /> : <FavoriteBorderIcon sx={{ color: '#8A8A8A' }} />}
+                                                {isFavorited ? <BookmarkIcon sx={{ color: '#FF6B35' }} /> : <BookmarkBorderIcon sx={{ color: '#8A8A8A' }} />}
                                             </IconButton>
                                         </Tooltip>
-                                        {/* Removed Share button */}
+
+                                        {/* Fire Button (Like) */}
+                                        <Tooltip title={isLiked ? "Remove like" : "Like"}>
+                                            <IconButton onClick={handleLikeToggle} sx={{
+                                                bgcolor: '#FFFFFF',
+                                                boxShadow: '0 2px 8px rgba(0,0,0,0.08)',
+                                                '&:hover': { bgcolor: '#FFF5F0' }
+                                            }}>
+                                                <WhatshotIcon sx={{ color: isLiked ? '#FF6B35' : '#8A8A8A' }} />
+                                            </IconButton>
+                                        </Tooltip>
                                     </Box>
                                 </Box>
 
@@ -474,7 +566,10 @@ const ServiceDetailPage = () => {
                                         borderRadius: '12px'
                                     }} />
                                     <Typography variant="caption" sx={{ color: '#9A9A9A' }}>
-                                        ❤️ {favoriteCount} {favoriteCount === 1 ? 'person likes this' : 'people like this'}
+                                        🔥 {likeCount} {likeCount === 1 ? 'person likes this' : 'people like this'}
+                                    </Typography>
+                                    <Typography variant="caption" sx={{ color: '#9A9A9A' }}>
+                                        📌 {favoriteCount} {favoriteCount === 1 ? 'person saved this' : 'people saved this'}
                                     </Typography>
                                 </Box>
 
