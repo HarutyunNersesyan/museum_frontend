@@ -1,3 +1,5 @@
+// src/pages/ProfilePage.js
+
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import {
@@ -19,9 +21,9 @@ import {
     Menu,
     MenuItem,
     Card,
-    CardContent,
     Chip,
-    Tooltip
+    Tooltip,
+    GlobalStyles
 } from '@mui/material';
 import {
     Visibility,
@@ -37,15 +39,59 @@ import {
     Logout as LogoutIcon,
     Person as PersonIcon,
     Celebration as CelebrationIcon,
-    KeyboardArrowDown as KeyboardArrowDownIcon,
     Email as EmailIcon,
     Shield as ShieldIcon,
     VerifiedUser as VerifiedUserIcon,
     HowToReg as HowToRegIcon,
-    AdminPanelSettings as AdminPanelSettingsIcon
+    AdminPanelSettings as AdminPanelSettingsIcon,
+    Bookmark as BookmarkIcon
 } from '@mui/icons-material';
-import { alpha } from '@mui/material/styles';
+import { alpha, keyframes } from '@mui/material/styles';
 import { useAuth } from '../context/AuthContext';
+import serviceAPI from '../services/serviceAPI';
+
+// Custom animations (same as HomePage)
+const float = keyframes`
+    0%, 100% { transform: translateY(0px) rotate(0deg); }
+    25% { transform: translateY(-15px) rotate(3deg); }
+    50% { transform: translateY(-25px) rotate(-3deg); }
+    75% { transform: translateY(-10px) rotate(2deg); }
+`;
+
+const floatReverse = keyframes`
+    0%, 100% { transform: translateY(0px) rotate(0deg); }
+    25% { transform: translateY(15px) rotate(-3deg); }
+    50% { transform: translateY(25px) rotate(3deg); }
+    75% { transform: translateY(10px) rotate(-2deg); }
+`;
+
+const pulse = keyframes`
+    0%, 100% { opacity: 0.4; transform: scale(1); }
+    50% { opacity: 0.7; transform: scale(1.05); }
+`;
+
+// Global scrollbar styles (same as HomePage)
+const scrollbarStyles = {
+    '*::-webkit-scrollbar': {
+        width: '10px',
+        height: '10px',
+    },
+    '*::-webkit-scrollbar-track': {
+        background: '#F5F0E8',
+        borderRadius: '10px',
+    },
+    '*::-webkit-scrollbar-thumb': {
+        background: '#FF6B35',
+        borderRadius: '10px',
+        '&:hover': {
+            background: '#E55A2B',
+        },
+    },
+    '*': {
+        scrollbarColor: '#FF6B35 #F5F0E8',
+        scrollbarWidth: 'thin',
+    },
+};
 
 const ProfilePage = () => {
     const navigate = useNavigate();
@@ -65,6 +111,7 @@ const ProfilePage = () => {
     const [anchorEl, setAnchorEl] = useState(null);
     const [userInitial, setUserInitial] = useState('');
     const [backgroundPosition, setBackgroundPosition] = useState({ x: 0, y: 0 });
+    const [favoritesCount, setFavoritesCount] = useState(0);
 
     const [formData, setFormData] = useState({
         oldPassword: '',
@@ -86,6 +133,22 @@ const ProfilePage = () => {
             setUserInitial(user.userName.charAt(0).toUpperCase());
         }
     }, [user]);
+
+    // Load favorites count when user is logged in
+    useEffect(() => {
+        if (user) {
+            loadFavoritesCount();
+        }
+    }, [user]);
+
+    const loadFavoritesCount = async () => {
+        try {
+            const response = await serviceAPI.getFavorites(0, 100);
+            setFavoritesCount(response.data.totalElements || 0);
+        } catch (error) {
+            console.error('Error loading favorites count:', error);
+        }
+    };
 
     useEffect(() => {
         const handleMouseMove = (e) => {
@@ -150,6 +213,11 @@ const ProfilePage = () => {
     const handleAdminPanel = () => {
         handleMenuClose();
         navigate('/admin/dashboard');
+    };
+
+    const handleFavoritesClick = () => {
+        handleMenuClose();
+        navigate('/favorites');
     };
 
     const handleInputChange = (e) => {
@@ -306,6 +374,9 @@ const ProfilePage = () => {
             fontFamily: "'Inter', sans-serif",
             position: 'relative'
         }}>
+            {/* Global Scrollbar Styles */}
+            <GlobalStyles styles={scrollbarStyles} />
+
             {/* Animated Background */}
             <Box sx={{
                 position: 'fixed',
@@ -404,7 +475,7 @@ const ProfilePage = () => {
                             </Button>
                             <Button
                                 startIcon={<CelebrationIcon />}
-                                sx={{ fontWeight: 500, color: '#4A4A4A', '&:hover': { color: '#FF6B35' }  }}
+                                sx={{ fontWeight: 500, color: '#4A4A4A', '&:hover': { color: '#FF6B35' } }}
                                 onClick={handleServicesClick}
                             >
                                 Services
@@ -412,6 +483,7 @@ const ProfilePage = () => {
                         </Box>
 
                         <Box sx={{ display: 'flex', alignItems: 'center', gap: 2 }}>
+                            {/* Welcome Chip */}
                             <Chip
                                 label={`Welcome, ${user.userName}`}
                                 size="small"
@@ -422,6 +494,46 @@ const ProfilePage = () => {
                                     border: `1px solid ${alpha('#FF6B35', 0.2)}`
                                 }}
                             />
+
+                            {/* Saved Button with Bookmark Icon */}
+                            <Tooltip title="Saved Services">
+                                <IconButton
+                                    onClick={handleFavoritesClick}
+                                    sx={{
+                                        position: 'relative',
+                                        bgcolor: alpha('#FF6B35', 0.1),
+                                        '&:hover': {
+                                            bgcolor: alpha('#FF6B35', 0.2),
+                                            transform: 'scale(1.05)'
+                                        }
+                                    }}
+                                >
+                                    <BookmarkIcon sx={{ color: '#FF6B35' }} />
+                                    {favoritesCount > 0 && (
+                                        <Box
+                                            sx={{
+                                                position: 'absolute',
+                                                top: -5,
+                                                right: -5,
+                                                bgcolor: '#FF5722',
+                                                color: 'white',
+                                                borderRadius: '50%',
+                                                width: 20,
+                                                height: 20,
+                                                display: 'flex',
+                                                alignItems: 'center',
+                                                justifyContent: 'center',
+                                                fontSize: '11px',
+                                                fontWeight: 'bold'
+                                            }}
+                                        >
+                                            {favoritesCount > 99 ? '99+' : favoritesCount}
+                                        </Box>
+                                    )}
+                                </IconButton>
+                            </Tooltip>
+
+                            {/* Profile Icon */}
                             <IconButton
                                 onClick={handleMenuOpen}
                                 sx={{
@@ -435,6 +547,7 @@ const ProfilePage = () => {
                                     {userInitial || <AccountCircleIcon />}
                                 </Avatar>
                             </IconButton>
+
                             <Menu
                                 anchorEl={anchorEl}
                                 open={Boolean(anchorEl)}

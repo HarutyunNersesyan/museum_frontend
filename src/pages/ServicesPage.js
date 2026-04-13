@@ -1,4 +1,4 @@
-// src/pages/ServicesPage.js - Updated with matching categories and icons
+// src/pages/ServicesPage.js - Full updated file with enhanced price filter
 
 import React, { useState, useEffect } from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
@@ -986,42 +986,200 @@ const ServicesPage = () => {
                             </Grid>
                         </Grid>
 
-                        {/* Advanced Filters */}
+                        {/* Advanced Filters - Enhanced Price Section */}
                         <Collapse in={showAdvancedFilters}>
                             <Box sx={{ mt: 3, pt: 3, borderTop: '1px solid #F0E8E0' }}>
-                                <Typography variant="subtitle1" sx={{ fontWeight: 600, mb: 2, color: '#2C2C2C' }}>Price Range (AMD)</Typography>
+                                <Typography variant="subtitle1" sx={{ fontWeight: 600, mb: 2, color: '#2C2C2C' }}>
+                                    💰 Price Range (AMD)
+                                </Typography>
+
+                                {/* Price Range Display with visual representation */}
                                 <Box sx={{ px: 2, mb: 3 }}>
+                                    {/* Current price range display */}
+                                    <Box sx={{
+                                        display: 'flex',
+                                        justifyContent: 'space-between',
+                                        alignItems: 'center',
+                                        mb: 3,
+                                        p: 2,
+                                        background: 'linear-gradient(135deg, rgba(255,107,53,0.05) 0%, rgba(255,179,71,0.05) 100%)',
+                                        borderRadius: '16px',
+                                        border: '1px solid rgba(255,107,53,0.15)'
+                                    }}>
+                                        <Box sx={{ textAlign: 'center', flex: 1 }}>
+                                            <Typography variant="caption" sx={{ color: '#8A99A8', display: 'block', mb: 0.5 }}>
+                                                Min Price
+                                            </Typography>
+                                            <Typography variant="h6" sx={{
+                                                fontWeight: 700,
+                                                color: '#FF6B35',
+                                                fontSize: { xs: '1rem', sm: '1.25rem' }
+                                            }}>
+                                                {priceRange[0].toLocaleString()} ֏
+                                            </Typography>
+                                        </Box>
+                                        <Box sx={{
+                                            width: 40,
+                                            height: 2,
+                                            background: 'linear-gradient(90deg, #FF6B35, #FFB347)',
+                                            mx: 1
+                                        }} />
+                                        <Box sx={{ textAlign: 'center', flex: 1 }}>
+                                            <Typography variant="caption" sx={{ color: '#8A99A8', display: 'block', mb: 0.5 }}>
+                                                Max Price
+                                            </Typography>
+                                            <Typography variant="h6" sx={{
+                                                fontWeight: 700,
+                                                color: '#FF6B35',
+                                                fontSize: { xs: '1rem', sm: '1.25rem' }
+                                            }}>
+                                                {priceRange[1].toLocaleString()} ֏
+                                            </Typography>
+                                        </Box>
+                                    </Box>
+
+                                    {/* Enhanced Slider */}
                                     <Slider
                                         value={priceRange}
                                         onChange={handlePriceRangeChange}
-                                        valueLabelDisplay="auto"
+                                        valueLabelDisplay="on"
                                         valueLabelFormat={(value) => `${value.toLocaleString()} ֏`}
                                         min={0}
                                         max={1000000}
                                         step={10000}
-                                        sx={{ color: '#FF6B35' }}
+                                        sx={{
+                                            color: '#FF6B35',
+                                            height: 8,
+                                            '& .MuiSlider-track': {
+                                                background: 'linear-gradient(90deg, #FF6B35, #FFB347)',
+                                                border: 'none',
+                                            },
+                                            '& .MuiSlider-rail': {
+                                                backgroundColor: '#E8E0D8',
+                                                opacity: 0.5,
+                                            },
+                                            '& .MuiSlider-thumb': {
+                                                width: 20,
+                                                height: 20,
+                                                backgroundColor: '#FFFFFF',
+                                                border: '2px solid #FF6B35',
+                                                '&:hover, &.Mui-focusVisible': {
+                                                    boxShadow: '0 0 0 8px rgba(255,107,53,0.16)',
+                                                },
+                                                '&:before': {
+                                                    boxShadow: 'none',
+                                                },
+                                            },
+                                            '& .MuiSlider-valueLabel': {
+                                                backgroundColor: '#FF6B35',
+                                                borderRadius: '12px',
+                                                padding: '4px 12px',
+                                                fontSize: '0.75rem',
+                                                fontWeight: 600,
+                                                '&:before': {
+                                                    display: 'none',
+                                                },
+                                            },
+                                        }}
                                     />
-                                    <Grid container spacing={2} sx={{ mt: 1 }}>
-                                        <Grid item xs={6}>
+
+                                    {/* Quick price range buttons */}
+                                    <Box sx={{ display: 'flex', gap: 1, mt: 3, flexWrap: 'wrap' }}>
+                                        {[
+                                            { label: 'Under 100k', min: 0, max: 100000 },
+                                            { label: '100k - 300k', min: 100000, max: 300000 },
+                                            { label: '300k - 500k', min: 300000, max: 500000 },
+                                            { label: '500k - 1M', min: 500000, max: 1000000 }
+                                        ].map((preset) => (
+                                            <Button
+                                                key={preset.label}
+                                                size="small"
+                                                variant="outlined"
+                                                onClick={() => {
+                                                    setPriceRange([preset.min, preset.max]);
+                                                    setMinPrice(preset.min.toString());
+                                                    setMaxPrice(preset.max.toString());
+                                                }}
+                                                sx={{
+                                                    borderRadius: '20px',
+                                                    textTransform: 'none',
+                                                    fontSize: '0.75rem',
+                                                    borderColor: alpha('#FF6B35', 0.3),
+                                                    color: '#5A6874',
+                                                    '&:hover': {
+                                                        borderColor: '#FF6B35',
+                                                        backgroundColor: alpha('#FF6B35', 0.05),
+                                                        color: '#FF6B35'
+                                                    }
+                                                }}
+                                            >
+                                                {preset.label}
+                                            </Button>
+                                        ))}
+                                    </Box>
+
+                                    {/* Custom price inputs with better styling */}
+                                    <Grid container spacing={2} sx={{ mt: 2 }}>
+                                        <Grid item xs={12} sm={6}>
                                             <TextField
                                                 fullWidth
                                                 type="number"
-                                                label="Min Price"
+                                                label="Min Price (AMD)"
                                                 value={minPrice}
-                                                onChange={(e) => { setMinPrice(e.target.value); setPriceRange([parseInt(e.target.value) || 0, priceRange[1]]); }}
+                                                onChange={(e) => {
+                                                    const value = e.target.value;
+                                                    setMinPrice(value);
+                                                    const newMin = parseInt(value) || 0;
+                                                    setPriceRange([newMin, priceRange[1]]);
+                                                }}
                                                 size="small"
-                                                sx={{ '& .MuiOutlinedInput-root': { backgroundColor: '#FAFAFA', borderRadius: '20px', '& fieldset': { borderColor: '#E8E0D8' } } }}
+                                                InputProps={{
+                                                    startAdornment: <Typography sx={{ mr: 1, color: '#FF6B35', fontWeight: 600 }}>֏</Typography>,
+                                                }}
+                                                sx={{
+                                                    '& .MuiOutlinedInput-root': {
+                                                        backgroundColor: '#FAFAFA',
+                                                        borderRadius: '20px',
+                                                        '& fieldset': { borderColor: '#E8E0D8' },
+                                                        '&:hover fieldset': { borderColor: '#FF6B35' },
+                                                        '&.Mui-focused fieldset': { borderColor: '#FF6B35', borderWidth: '2px' }
+                                                    },
+                                                    '& .MuiInputLabel-root': {
+                                                        color: '#8A99A8',
+                                                        '&.Mui-focused': { color: '#FF6B35' }
+                                                    }
+                                                }}
                                             />
                                         </Grid>
-                                        <Grid item xs={6}>
+                                        <Grid item xs={12} sm={6}>
                                             <TextField
                                                 fullWidth
                                                 type="number"
-                                                label="Max Price"
+                                                label="Max Price (AMD)"
                                                 value={maxPrice}
-                                                onChange={(e) => { setMaxPrice(e.target.value); setPriceRange([priceRange[0], parseInt(e.target.value) || 1000000]); }}
+                                                onChange={(e) => {
+                                                    const value = e.target.value;
+                                                    setMaxPrice(value);
+                                                    const newMax = parseInt(value) || 1000000;
+                                                    setPriceRange([priceRange[0], newMax]);
+                                                }}
                                                 size="small"
-                                                sx={{ '& .MuiOutlinedInput-root': { backgroundColor: '#FAFAFA', borderRadius: '20px', '& fieldset': { borderColor: '#E8E0D8' } } }}
+                                                InputProps={{
+                                                    startAdornment: <Typography sx={{ mr: 1, color: '#FF6B35', fontWeight: 600 }}>֏</Typography>,
+                                                }}
+                                                sx={{
+                                                    '& .MuiOutlinedInput-root': {
+                                                        backgroundColor: '#FAFAFA',
+                                                        borderRadius: '20px',
+                                                        '& fieldset': { borderColor: '#E8E0D8' },
+                                                        '&:hover fieldset': { borderColor: '#FF6B35' },
+                                                        '&.Mui-focused fieldset': { borderColor: '#FF6B35', borderWidth: '2px' }
+                                                    },
+                                                    '& .MuiInputLabel-root': {
+                                                        color: '#8A99A8',
+                                                        '&.Mui-focused': { color: '#FF6B35' }
+                                                    }
+                                                }}
                                             />
                                         </Grid>
                                     </Grid>
@@ -1157,8 +1315,6 @@ const ServicesPage = () => {
                                                     width: '100%',
                                                     py: 3,
                                                     transition: 'all 0.2s ease'
-                                                    // REMOVED: cursor: 'pointer'
-                                                    // REMOVED: onClick navigation
                                                 }}
                                             >
                                                 <Grid container sx={{ width: '100%', m: 0 }}>
@@ -1174,9 +1330,8 @@ const ServicesPage = () => {
                                                                     {service.name}
                                                                 </Typography>
 
-                                                                {/* Bookmark (Save to favorites) and Fire (Like) Icons - Side by Side */}
+                                                                {/* Bookmark and Like Icons */}
                                                                 <Box sx={{ display: 'flex', alignItems: 'center', gap: 2 }}>
-                                                                    {/* Bookmark Icon - Save to favorites */}
                                                                     <Tooltip title={isFavorited ? "Remove from saved" : "Save to favorites"}>
                                                                         <IconButton
                                                                             onClick={(e) => handleFavoriteToggle(service.id, e)}
@@ -1190,7 +1345,6 @@ const ServicesPage = () => {
                                                                         </IconButton>
                                                                     </Tooltip>
 
-                                                                    {/* Fire Icon - Like button */}
                                                                     <Box sx={{ display: 'flex', alignItems: 'center', gap: 0.5 }}>
                                                                         <Tooltip title={isLiked ? "Remove like" : "Like"}>
                                                                             <IconButton
@@ -1220,7 +1374,7 @@ const ServicesPage = () => {
                                                             </Box>
 
                                                             <Typography variant="body1" sx={{ color: '#5A6874', mb: 3, lineHeight: 1.6, fontSize: { xs: '0.9rem', sm: '1rem' } }}>
-                                                                {service.description.length > 200 ? service.description.substring(0, 200) + '...' : service.description}
+                                                                {service.description?.length > 200 ? service.description.substring(0, 200) + '...' : service.description}
                                                             </Typography>
 
                                                             <Grid container spacing={2} sx={{ mb: 3 }}>

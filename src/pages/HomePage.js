@@ -1,4 +1,4 @@
-// src/pages/HomePage.js
+// src/pages/HomePage.js - Updated with exact same categories as ServicesPage
 
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
@@ -58,6 +58,20 @@ import HowToRegIcon from '@mui/icons-material/HowToReg';
 import SearchIcon from '@mui/icons-material/Search';
 import WhatshotIcon from '@mui/icons-material/Whatshot';
 import BookmarkIcon from '@mui/icons-material/Bookmark';
+// Category-specific icons (same as ServicesPage)
+import PartyIcon from '@mui/icons-material/EmojiEvents';
+import BirthdayIcon from '@mui/icons-material/Cake';
+import DecorationIcon from '@mui/icons-material/Brush';
+import PhotographyIcon from '@mui/icons-material/CameraAlt';
+import WeddingIcon from '@mui/icons-material/Favorite';
+import CorporateIcon from '@mui/icons-material/Business';
+import EngagementIcon from '@mui/icons-material/Diamond';
+import AnniversaryIcon from '@mui/icons-material/Star';
+import GraduationIcon from '@mui/icons-material/School';
+import FlowersIcon from '@mui/icons-material/LocalFlorist';
+import LightingIcon from '@mui/icons-material/Highlight';
+import StageIcon from '@mui/icons-material/TheaterComedy';
+import RentalsIcon from '@mui/icons-material/Inventory';
 import { alpha, keyframes } from '@mui/material/styles';
 import LoginPage from './LoginPage';
 import SignUpPage from './SignUpPage';
@@ -113,23 +127,37 @@ const scrollbarStyles = {
     },
 };
 
-// Category configurations
-const categories = [
-    { id: 'PARTY', name: 'Party / Celebration', icon: <CelebrationIcon />, color: '#FF6B35', description: 'Epic parties & celebrations' },
-    { id: 'BIRTHDAY', name: 'Birthday Party', icon: <CakeIcon />, color: '#FFB347', description: 'Magical birthday experiences' },
-    { id: 'ENTERTAINMENT', name: 'Entertainment', icon: <EmojiEventsIcon />, color: '#FF8C42', description: 'Engaging entertainment' },
-    { id: 'CATERING', name: 'Catering', icon: <RestaurantIcon />, color: '#FF9F4A', description: 'Exquisite cuisine' },
-    { id: 'DECORATION', name: 'Decoration', icon: <BrushIcon />, color: '#FFA559', description: 'Transform spaces' },
-    { id: 'PHOTOGRAPHY', name: 'Photography', icon: <CameraAltIcon />, color: '#FF6B35', description: 'Capture moments' },
-    { id: 'MUSIC', name: 'Music / DJ', icon: <MusicNoteIcon />, color: '#FFB347', description: 'Perfect vibes' },
-    { id: 'VENUE', name: 'Venue', icon: <LocationOnIcon />, color: '#FF8C42', description: 'Stunning venues' },
-    { id: 'OTHER', name: 'Other Services', icon: <MoreHorizIcon />, color: '#FF9F4A', description: 'Unique services' }
+// EXACT SAME CATEGORIES as ServicesPage.js
+const CATEGORIES = [
+    { value: 'PARTY', label: 'Party / Celebration', icon: <PartyIcon />, color: '#FF6B35' },
+    { value: 'BIRTHDAY', label: 'Birthday Party', icon: <BirthdayIcon />, color: '#FFB347' },
+    { value: 'DECORATION', label: 'Decoration', icon: <DecorationIcon />, color: '#FFA559' },
+    { value: 'PHOTOGRAPHY', label: 'Photography', icon: <PhotographyIcon />, color: '#FF6B35' },
+    { value: 'WEDDING', label: 'Wedding', icon: <WeddingIcon />, color: '#FF6B35' },
+    { value: 'CORPORATE', label: 'Corporate Event', icon: <CorporateIcon />, color: '#FF8C42' },
+    { value: 'ENGAGEMENT', label: 'Engagement', icon: <EngagementIcon />, color: '#FFB347' },
+    { value: 'ANNIVERSARY', label: 'Anniversary', icon: <AnniversaryIcon />, color: '#FF9F4A' },
+    { value: 'GRADUATION_CEREMONY', label: 'Graduation Party', icon: <GraduationIcon />, color: '#FF8C42' },
+    { value: 'FLOWERS', label: 'Floral Design', icon: <FlowersIcon />, color: '#FFA559' },
+    { value: 'LIGHTING', label: 'Lighting', icon: <LightingIcon />, color: '#FFB347' },
+    { value: 'STAGE_SETUP', label: 'Stage Setup', icon: <StageIcon />, color: '#FF6B35' },
+    { value: 'RENTALS', label: 'Equipment Rental', icon: <RentalsIcon />, color: '#FF9F4A' }
 ];
 
-const CATEGORIES = [
-    'PARTY', 'BIRTHDAY', 'ENTERTAINMENT', 'CATERING',
-    'DECORATION', 'PHOTOGRAPHY', 'MUSIC', 'VENUE', 'OTHER'
-];
+// Category values array for Select dropdown
+const CATEGORY_VALUES = CATEGORIES.map(cat => cat.value);
+
+// Helper function to get category icon (same as ServicesPage)
+const getCategoryIcon = (categoryValue) => {
+    const category = CATEGORIES.find(c => c.value === categoryValue);
+    return category?.icon || <CelebrationIcon />;
+};
+
+// Helper function to get category display name (same as ServicesPage)
+const getCategoryDisplayName = (categoryValue) => {
+    const category = CATEGORIES.find(c => c.value === categoryValue);
+    return category?.label || categoryValue;
+};
 
 const ARMENIAN_LOCATIONS = [
     { value: 'YEREVAN', label: 'Yerevan' },
@@ -341,10 +369,10 @@ function HomePage() {
 
     const userInitial = user?.userName ? user.userName.charAt(0).toUpperCase() : '';
 
-    // Create scattered category elements
+    // Create scattered category elements using the exact same categories as ServicesPage
     const scatteredCategories = [];
     for (let i = 0; i < 24; i++) {
-        const category = categories[i % categories.length];
+        const category = CATEGORIES[i % CATEGORIES.length];
         const pos = getRandomPosition(i);
         scatteredCategories.push(
             <Box
@@ -364,11 +392,11 @@ function HomePage() {
                         filter: 'drop-shadow(0 0 15px rgba(255,107,53,0.5))'
                     }
                 }}
-                onMouseEnter={() => setHoveredCategory(category.id)}
+                onMouseEnter={() => setHoveredCategory(category.value)}
                 onMouseLeave={() => setHoveredCategory(null)}
-                onClick={() => handleServicesClick(category.id, false)}
+                onClick={() => handleServicesClick(category.value, false)}
             >
-                <Tooltip title={category.name} placement="top" arrow>
+                <Tooltip title={category.label} placement="top" arrow>
                     <Box sx={{
                         display: 'flex',
                         flexDirection: 'column',
@@ -383,10 +411,10 @@ function HomePage() {
                             display: 'flex',
                             alignItems: 'center',
                             justifyContent: 'center',
-                            border: `2px solid ${alpha(category.color, hoveredCategory === category.id ? 0.8 : 0.3)}`,
+                            border: `2px solid ${alpha(category.color, hoveredCategory === category.value ? 0.8 : 0.3)}`,
                             backdropFilter: 'blur(8px)',
                             transition: 'all 0.3s',
-                            boxShadow: hoveredCategory === category.id ? `0 0 30px ${alpha(category.color, 0.4)}` : 'none'
+                            boxShadow: hoveredCategory === category.value ? `0 0 30px ${alpha(category.color, 0.4)}` : 'none'
                         }}>
                             <Box sx={{
                                 color: category.color,
@@ -397,7 +425,7 @@ function HomePage() {
                                 {category.icon}
                             </Box>
                         </Box>
-                        {hoveredCategory === category.id && (
+                        {hoveredCategory === category.value && (
                             <Typography sx={{
                                 fontSize: '12px',
                                 fontWeight: 600,
@@ -409,7 +437,7 @@ function HomePage() {
                                 whiteSpace: 'nowrap',
                                 backdropFilter: 'blur(4px)'
                             }}>
-                                {category.name}
+                                {category.label}
                             </Typography>
                         )}
                     </Box>
@@ -455,7 +483,7 @@ function HomePage() {
                 pointerEvents: 'none',
                 overflow: 'hidden'
             }}>
-                {categories.map((cat, idx) => (
+                {CATEGORIES.map((cat, idx) => (
                     <Box
                         key={`bg-circle-${idx}`}
                         sx={{
@@ -574,7 +602,7 @@ function HomePage() {
                                         }}
                                     />
 
-                                    {/* Saved Button with Bookmark Icon - Now between Welcome text and Profile */}
+                                    {/* Saved Button with Bookmark Icon */}
                                     <Tooltip title="Saved Services">
                                         <IconButton
                                             onClick={() => navigate('/favorites')}
@@ -675,7 +703,7 @@ function HomePage() {
                 </Container>
             </Box>
 
-            {/* Main Content - Rest of the component remains the same */}
+            {/* Main Content */}
             <Box sx={{ position: 'relative', zIndex: 3 }}>
                 {/* Hero Section */}
                 <Box sx={{
@@ -746,7 +774,7 @@ function HomePage() {
                                     </Box>
                                 </Typography>
 
-                                {/* Search Bar */}
+                                {/* Search Bar - WITH SAME CATEGORY STYLING AS SERVICESPAGE */}
                                 <Paper elevation={0} sx={{
                                     maxWidth: 900,
                                     mx: 'auto',
@@ -799,9 +827,23 @@ function HomePage() {
                                                             borderColor: '#E8E0D8'
                                                         }
                                                     }}
+                                                    renderValue={(selected) => {
+                                                        const category = CATEGORIES.find(c => c.value === selected);
+                                                        return category ? (
+                                                            <Box sx={{ display: 'flex', alignItems: 'center', gap: 1.5 }}>
+                                                                {React.cloneElement(category.icon, { sx: { fontSize: 20, color: '#FF6B35' } })}
+                                                                <span>{category.label}</span>
+                                                            </Box>
+                                                        ) : selected;
+                                                    }}
                                                 >
                                                     {CATEGORIES.map((cat) => (
-                                                        <MenuItem key={cat} value={cat}>{cat}</MenuItem>
+                                                        <MenuItem key={cat.value} value={cat.value}>
+                                                            <Box sx={{ display: 'flex', alignItems: 'center', gap: 1.5 }}>
+                                                                {React.cloneElement(cat.icon, { sx: { fontSize: 20, color: '#FF6B35' } })}
+                                                                <span>{cat.label}</span>
+                                                            </Box>
+                                                        </MenuItem>
                                                     ))}
                                                 </Select>
                                             </FormControl>
@@ -822,7 +864,12 @@ function HomePage() {
                                                     }}
                                                 >
                                                     {ARMENIAN_LOCATIONS.map((location) => (
-                                                        <MenuItem key={location.value} value={location.value}>{location.label}</MenuItem>
+                                                        <MenuItem key={location.value} value={location.value}>
+                                                            <Box sx={{ display: 'flex', alignItems: 'center', gap: 1.5 }}>
+                                                                <LocationOnIcon sx={{ fontSize: 20, color: '#FF6B35' }} />
+                                                                <span>{location.label}</span>
+                                                            </Box>
+                                                        </MenuItem>
                                                     ))}
                                                 </Select>
                                             </FormControl>
@@ -977,7 +1024,7 @@ function HomePage() {
                                 {
                                     icon: <ExploreIcon sx={{ fontSize: 40 }} />,
                                     title: 'Explore',
-                                    desc: 'Browse through 9+ curated service categories and discover the perfect vendors for your event.',
+                                    desc: 'Browse through 13+ curated service categories and discover the perfect vendors for your event.',
                                     color: '#FF6B35',
                                     gradient: 'linear-gradient(135deg, #FF6B35 0%, #FF8C42 100%)'
                                 },
