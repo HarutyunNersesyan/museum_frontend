@@ -4,12 +4,12 @@ import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-d
 import { AuthProvider } from './context/AuthContext';
 import ProtectedRoute from './components/ProtectedRoute';
 import HomePage from './pages/HomePage';
-import AboutUsPage from './pages/AboutUsPage';
 import ProfilePage from './pages/ProfilePage';
 import LoginPage from './pages/LoginPage';
 import SignUpPage from './pages/SignUpPage';
 import VerifyCodePage from './pages/VerifyCodePage';
 import EventsPage from './pages/EventsPage';
+import MuseumsPage from './pages/MuseumsPage';
 import AdminLoginPage from './pages/AdminLoginPage';
 import AdminDashboardPage from './pages/AdminDashboardPage';
 import './App.css';
@@ -21,8 +21,8 @@ const AppContent = () => {
                 {/* Home Page */}
                 <Route path="/" element={<HomePage />} />
 
-                {/* About Us Page - Public */}
-                <Route path="/about" element={<AboutUsPage />} />
+                {/* Museums Page - Public */}
+                <Route path="/museums" element={<MuseumsPage />} />
 
                 {/* Auth Pages (Public) */}
                 <Route path="/login" element={<LoginPage />} />

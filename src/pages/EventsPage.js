@@ -392,15 +392,8 @@ const EventsPage = () => {
         navigate('/admin/dashboard');
     };
 
-    const handleAboutClick = () => navigate('/about');
-    const handleHowItWorks = () => {
-        navigate('/');
-        setTimeout(() => {
-            const element = document.getElementById('how-it-works');
-            if (element) element.scrollIntoView({ behavior: 'smooth' });
-        }, 100);
-    };
     const handleHomeClick = () => navigate('/');
+    const handleMuseumsClick = () => navigate('/museums');
 
     const handleNextImage = (eventId, totalImages, e) => {
         e.stopPropagation();
@@ -431,14 +424,14 @@ const EventsPage = () => {
             }}>
                 <GlobalStyles styles={scrollbarStyles} />
 
-                {/* Header */}
+                {/* Header - Same as HomePage */}
                 <Box sx={{
                     position: 'sticky',
                     top: 0,
                     zIndex: 100,
                     backgroundColor: alpha('#FFFDF7', 0.95),
                     backdropFilter: 'blur(10px)',
-                    borderBottom: '1px solid #E8D5B7',
+                    borderBottom: `1px solid ${colors.border}`,
                     boxShadow: '0 2px 20px rgba(0,0,0,0.03)'
                 }}>
                     <Container maxWidth="xl">
@@ -448,6 +441,7 @@ const EventsPage = () => {
                             justifyContent: 'space-between',
                             height: 70,
                         }}>
+                            {/* Logo - Left side */}
                             <Box onClick={handleHomeClick} sx={{ display: 'flex', alignItems: 'center', gap: 1.5, cursor: 'pointer' }}>
                                 <Box sx={{
                                     width: 38,
@@ -458,7 +452,7 @@ const EventsPage = () => {
                                     alignItems: 'center',
                                     justifyContent: 'center'
                                 }}>
-                                    <CelebrationIcon sx={{ color: 'white', fontSize: 22 }} />
+                                    <MuseumIcon sx={{ color: 'white', fontSize: 22 }} />
                                 </Box>
                                 <Typography variant="h6" sx={{
                                     fontWeight: 800,
@@ -466,44 +460,70 @@ const EventsPage = () => {
                                     WebkitBackgroundClip: 'text',
                                     WebkitTextFillColor: 'transparent'
                                 }}>
-                                    Festivy
+                                    Museum
                                 </Typography>
                             </Box>
 
-                            <Box sx={{ display: { xs: 'none', md: 'flex' }, gap: 3 }}>
-                                <Button startIcon={<InfoIcon />} onClick={handleAboutClick} sx={{ fontWeight: 500, color: colors.textLight, '&:hover': { color: colors.primary } }}>About Us</Button>
-                                <Button startIcon={<HowToRegIcon />} onClick={handleHowItWorks} sx={{ fontWeight: 500, color: colors.textLight, '&:hover': { color: colors.primary } }}>How It Works</Button>
-                                <Button startIcon={<CelebrationIcon />} sx={{ fontWeight: 500, color: colors.primary, borderBottom: `2px solid ${colors.primary}`, borderRadius: 0 }}>Events</Button>
-                            </Box>
+                            {/* Right side - Navigation and User Menu */}
+                            <Box sx={{ display: 'flex', alignItems: 'center', gap: 4 }}>
+                                {/* Navigation Links */}
+                                <Box sx={{ display: { xs: 'none', md: 'flex' }, gap: 2 }}>
+                                    <Button
+                                        startIcon={<MuseumIcon />}
+                                        onClick={handleMuseumsClick}
+                                        sx={{
+                                            fontWeight: 500,
+                                            color: colors.textLight,
+                                            '&:hover': { color: colors.primary },
+                                            fontSize: '0.9rem'
+                                        }}
+                                    >
+                                        Museums
+                                    </Button>
+                                    <Button
+                                        startIcon={<EventIcon />}
+                                        sx={{
+                                            fontWeight: 500,
+                                            color: colors.primary,
+                                            borderBottom: `2px solid ${colors.primary}`,
+                                            borderRadius: 0,
+                                            fontSize: '0.9rem'
+                                        }}
+                                    >
+                                        Events
+                                    </Button>
+                                </Box>
 
-                            <Box sx={{ display: 'flex', alignItems: 'center', gap: 2 }}>
-                                {user ? (
-                                    <>
-                                        <Chip label={`Welcome, ${user.userName}`} size="small" sx={{ display: { xs: 'none', sm: 'flex' }, bgcolor: alpha(colors.primary, 0.1), color: colors.primary }} />
-                                        <IconButton onClick={handleMenuOpen} sx={{ background: colors.gradient, width: 38, height: 38 }}>
-                                            <Avatar sx={{ width: 38, height: 38, bgcolor: 'transparent', color: 'white' }}>{userInitial || <AccountCircleIcon />}</Avatar>
-                                        </IconButton>
-                                        <Menu anchorEl={anchorEl} open={Boolean(anchorEl)} onClose={handleMenuClose} PaperProps={{ sx: { bgcolor: '#FFFDF7', borderRadius: '16px', minWidth: 200 } }}>
-                                            <MenuItem onClick={handleProfile}><PersonIcon sx={{ mr: 2, color: colors.primary }} />Profile</MenuItem>
-                                            {isAdmin && <MenuItem onClick={handleAdminPanel}><AdminIcon sx={{ mr: 2, color: colors.primaryDark }} />Admin Panel</MenuItem>}
-                                            <Divider />
-                                            <MenuItem onClick={handleLogout}><LogoutIcon sx={{ mr: 2, color: colors.error }} />Logout</MenuItem>
-                                        </Menu>
-                                    </>
-                                ) : (
-                                    <>
-                                        <Button onClick={() => navigate('/login')} sx={{ fontWeight: 500, color: colors.textLight }}>Sign In</Button>
-                                        <Button variant="contained" onClick={() => navigate('/signup')} sx={{ fontWeight: 600, borderRadius: '12px', background: colors.gradient, '&:hover': { transform: 'translateY(-2px)' } }}>Sign Up</Button>
-                                    </>
-                                )}
+                                {/* User Menu */}
+                                <Box sx={{ display: 'flex', alignItems: 'center', gap: 2 }}>
+                                    {user ? (
+                                        <>
+                                            <IconButton onClick={handleMenuOpen} sx={{ background: colors.gradient, width: 38, height: 38 }}>
+                                                <Avatar sx={{ width: 38, height: 38, bgcolor: 'transparent', color: 'white' }}>
+                                                    {userInitial || <AccountCircleIcon />}
+                                                </Avatar>
+                                            </IconButton>
+                                            <Menu anchorEl={anchorEl} open={Boolean(anchorEl)} onClose={handleMenuClose} PaperProps={{ sx: { bgcolor: '#FFFDF7', borderRadius: '16px', minWidth: 200 } }}>
+                                                <MenuItem onClick={handleProfile}><PersonIcon sx={{ mr: 2, color: colors.primary }} />Profile</MenuItem>
+                                                {isAdmin && <MenuItem onClick={handleAdminPanel}><AdminIcon sx={{ mr: 2, color: colors.primaryDark }} />Admin Panel</MenuItem>}
+                                                <Divider />
+                                                <MenuItem onClick={handleLogout}><LogoutIcon sx={{ mr: 2, color: colors.error }} />Logout</MenuItem>
+                                            </Menu>
+                                        </>
+                                    ) : (
+                                        <>
+                                            <Button onClick={() => navigate('/login')} sx={{ fontWeight: 500, color: colors.textLight }}>Sign In</Button>
+                                            <Button variant="contained" onClick={() => navigate('/signup')} sx={{ fontWeight: 600, borderRadius: '12px', background: colors.gradient, '&:hover': { transform: 'translateY(-2px)' } }}>Sign Up</Button>
+                                        </>
+                                    )}
+                                </Box>
                             </Box>
                         </Box>
                     </Container>
                 </Box>
 
-                {/* Main Content */}
+                {/* Main Content - Same as before */}
                 <Box sx={{ py: 4, px: { xs: 2, sm: 3, md: 4, lg: 6 } }}>
-
                     {/* Search and Filters */}
                     <Paper elevation={0} sx={{
                         background: alpha('#FFFDF7', 0.95),
@@ -810,7 +830,6 @@ const EventsPage = () => {
                                                         {event.name}
                                                     </Typography>
 
-                                                    {/* Description with justify alignment */}
                                                     <Typography variant="body2" sx={{
                                                         color: colors.textLight,
                                                         mb: 3,

@@ -16,170 +16,51 @@ import {
     Divider,
     Avatar,
     Stack,
-    Chip,
     Fade,
-    Zoom,
     useMediaQuery,
     useTheme,
-    Tooltip,
     Paper,
-    TextField,
-    InputAdornment,
-    Select,
-    FormControl,
-    InputLabel,
-    GlobalStyles,
-    CircularProgress
+    GlobalStyles
 } from '@mui/material';
 import CloseIcon from '@mui/icons-material/Close';
 import AccountCircleIcon from '@mui/icons-material/AccountCircle';
 import LogoutIcon from '@mui/icons-material/Logout';
 import PersonIcon from '@mui/icons-material/Person';
-import CelebrationIcon from '@mui/icons-material/Celebration';
 import AdminPanelSettingsIcon from '@mui/icons-material/AdminPanelSettings';
-import ExploreIcon from '@mui/icons-material/Explore';
-import RocketLaunchIcon from '@mui/icons-material/RocketLaunch';
-import AutoAwesomeIcon from '@mui/icons-material/AutoAwesome';
+import MuseumIcon from '@mui/icons-material/Museum';
+import EventIcon from '@mui/icons-material/Event';
 import InfoIcon from '@mui/icons-material/Info';
-import HowToRegIcon from '@mui/icons-material/HowToReg';
-import SearchIcon from '@mui/icons-material/Search';
-import LocationOnIcon from '@mui/icons-material/LocationOn';
-import CategoryIcon from '@mui/icons-material/Category';
 import { alpha, keyframes } from '@mui/material/styles';
 import LoginPage from './LoginPage';
 import SignUpPage from './SignUpPage';
 import VerifyCodePage from './VerifyCodePage';
 import { useAuth } from '../context/AuthContext';
-import eventAPI from '../services/eventAPI';
 
 // Custom animations
-const float = keyframes`
-    0%, 100% { transform: translateY(0px) rotate(0deg); }
-    25% { transform: translateY(-15px) rotate(3deg); }
-    50% { transform: translateY(-25px) rotate(-3deg); }
-    75% { transform: translateY(-10px) rotate(2deg); }
-`;
-
-const floatReverse = keyframes`
-    0%, 100% { transform: translateY(0px) rotate(0deg); }
-    25% { transform: translateY(15px) rotate(-3deg); }
-    50% { transform: translateY(25px) rotate(3deg); }
-    75% { transform: translateY(10px) rotate(-2deg); }
-`;
-
 const pulse = keyframes`
     0%, 100% { opacity: 0.4; transform: scale(1); }
     50% { opacity: 0.7; transform: scale(1.05); }
 `;
 
-const slideIn = keyframes`
-    from { opacity: 0; transform: translateX(-50px); }
-    to { opacity: 1; transform: translateX(0); }
-`;
+// Warm brown color palette for museum theme
+const colors = {
+    primary: '#C4A484',
+    primaryDark: '#A0522D',
+    primaryLight: '#D2B48C',
+    secondary: '#8B7355',
+    background: '#FFF8F0',
+    surface: '#FFFDF7',
+    text: '#4A3728',
+    textLight: '#7A5C4A',
+    border: '#E8D5B7',
+    gradient: 'linear-gradient(135deg, #C4A484 0%, #D2B48C 50%, #DEB887 100%)'
+};
 
 // Global scrollbar styles
 const scrollbarStyles = {
-    '*::-webkit-scrollbar': {
-        width: '10px',
-        height: '10px',
-    },
-    '*::-webkit-scrollbar-track': {
-        background: '#F5F0E8',
-        borderRadius: '10px',
-    },
-    '*::-webkit-scrollbar-thumb': {
-        background: '#FF6B35',
-        borderRadius: '10px',
-        '&:hover': {
-            background: '#E55A2B',
-        },
-    },
-    '*': {
-        scrollbarColor: '#FF6B35 #F5F0E8',
-        scrollbarWidth: 'thin',
-    },
-};
-
-// Event Categories (from backend EventCategory enum)
-const EVENT_CATEGORIES = [
-    { value: 'ART', label: 'Art' },
-    { value: 'HISTORY', label: 'History' },
-    { value: 'SCIENCE', label: 'Science' },
-    { value: 'NATURAL_HISTORY', label: 'Natural History' },
-    { value: 'TECHNOLOGY', label: 'Technology' },
-    { value: 'MILITARY', label: 'Military' },
-    { value: 'ARCHAEOLOGY', label: 'Archaeology' },
-    { value: 'CULTURAL', label: 'Cultural' },
-    { value: 'MARITIME', label: 'Maritime' },
-    { value: 'SPACE', label: 'Space' },
-    { value: 'TRANSPORT', label: 'Transport' },
-    { value: 'RELIGIOUS', label: 'Religious' },
-    { value: 'ETHNOGRAPHIC', label: 'Ethnographic' },
-    { value: 'OPEN_AIR', label: 'Open Air' }
-];
-
-// Locations (from backend Location enum)
-const ARMENIAN_LOCATIONS = [
-    { value: 'YEREVAN', label: 'Yerevan' },
-    { value: 'GYUMRI', label: 'Gyumri' },
-    { value: 'VANADZOR', label: 'Vanadzor' },
-    { value: 'VAGHARSHAPAT', label: 'Vagharshapat (Ejmiatsin)' },
-    { value: 'ABOVYAN', label: 'Abovyan' },
-    { value: 'KAPAN', label: 'Kapan' },
-    { value: 'HRAZDAN', label: 'Hrazdan' },
-    { value: 'ARMAVIR', label: 'Armavir' },
-    { value: 'ARTASHAT', label: 'Artashat' },
-    { value: 'IJEVAN', label: 'Ijevan' },
-    { value: 'GAVAR', label: 'Gavar' },
-    { value: 'GORIS', label: 'Goris' },
-    { value: 'CHARENTSAVAN', label: 'Charentsavan' },
-    { value: 'ARARAT', label: 'Ararat' },
-    { value: 'MASIS', label: 'Masis' },
-    { value: 'SEVAN', label: 'Sevan' },
-    { value: 'ASHTARAK', label: 'Ashtarak' },
-    { value: 'DILIJAN', label: 'Dilijan' },
-    { value: 'SISIAN', label: 'Sisian' },
-    { value: 'ALAVERDI', label: 'Alaverdi' },
-    { value: 'STEPANAVAN', label: 'Stepanavan' },
-    { value: 'MARTUNI', label: 'Martuni' },
-    { value: 'VARDENIS', label: 'Vardenis' },
-    { value: 'YEGHVARD', label: 'Yeghvard' },
-    { value: 'METSAMOR', label: 'Metsamor' },
-    { value: 'BERD', label: 'Berd' },
-    { value: 'TASHIR', label: 'Tashir' },
-    { value: 'APARAN', label: 'Aparan' },
-    { value: 'VAYK', label: 'Vayk' },
-    { value: 'JERMUK', label: 'Jermuk' }
-];
-
-const getRandomPosition = (index) => {
-    const positions = [
-        { top: '12%', left: '5%', size: 90, anim: float, delay: 0, duration: 7, color: '#FF6B35' },
-        { top: '18%', right: '3%', size: 75, anim: floatReverse, delay: 0.5, duration: 8, color: '#FFB347' },
-        { top: '35%', left: '8%', size: 65, anim: float, delay: 1, duration: 6, color: '#FF8C42' },
-        { top: '28%', right: '10%', size: 85, anim: floatReverse, delay: 1.5, duration: 9, color: '#FF9F4A' },
-        { top: '50%', left: '15%', size: 70, anim: float, delay: 0.8, duration: 7.5, color: '#FF6B35' },
-        { top: '45%', right: '5%', size: 80, anim: floatReverse, delay: 2, duration: 8.5, color: '#FFB347' },
-        { top: '65%', left: '3%', size: 60, anim: float, delay: 1.2, duration: 6.5, color: '#FF8C42' },
-        { top: '60%', right: '8%', size: 95, anim: floatReverse, delay: 0.3, duration: 7.8, color: '#FF9F4A' },
-        { top: '78%', left: '12%', size: 70, anim: float, delay: 1.8, duration: 8.2, color: '#FF6B35' },
-        { top: '20%', left: '25%', size: 55, anim: floatReverse, delay: 2.2, duration: 5.5, color: '#FFB347' },
-        { top: '40%', left: '35%', size: 45, anim: float, delay: 0.6, duration: 6.8, color: '#FF8C42' },
-        { top: '55%', left: '45%', size: 50, anim: floatReverse, delay: 1.4, duration: 7.2, color: '#FF9F4A' },
-        { top: '70%', left: '55%', size: 40, anim: float, delay: 2.5, duration: 5.8, color: '#FF6B35' },
-        { top: '15%', right: '20%', size: 60, anim: floatReverse, delay: 0.9, duration: 8.8, color: '#FFB347' },
-        { top: '30%', right: '30%', size: 50, anim: float, delay: 1.7, duration: 6.3, color: '#FF8C42' },
-        { top: '48%', right: '40%', size: 45, anim: floatReverse, delay: 2.1, duration: 7.6, color: '#FF9F4A' },
-        { top: '62%', left: '28%', size: 55, anim: float, delay: 0.4, duration: 9.2, color: '#FF6B35' },
-        { top: '80%', right: '20%', size: 65, anim: floatReverse, delay: 1.1, duration: 6.9, color: '#FFB347' },
-        { top: '85%', left: '35%', size: 50, anim: float, delay: 2.3, duration: 7.4, color: '#FF8C42' },
-        { top: '10%', left: '45%', size: 48, anim: floatReverse, delay: 0.7, duration: 8.1, color: '#FF9F4A' },
-        { top: '90%', right: '45%', size: 42, anim: float, delay: 1.9, duration: 5.9, color: '#FF6B35' },
-        { top: '5%', right: '50%', size: 38, anim: floatReverse, delay: 2.4, duration: 6.4, color: '#FFB347' },
-        { top: '72%', left: '65%', size: 48, anim: float, delay: 0.2, duration: 7.7, color: '#FF8C42' },
-        { top: '42%', left: '60%', size: 52, anim: floatReverse, delay: 1.6, duration: 8.3, color: '#FF9F4A' },
-    ];
-    return positions[index % positions.length];
+    '*::-webkit-scrollbar': { width: '10px', height: '10px' },
+    '*::-webkit-scrollbar-track': { background: '#E8D5B7', borderRadius: '10px' },
+    '*::-webkit-scrollbar-thumb': { background: '#C4A484', borderRadius: '10px', '&:hover': { background: '#A0522D' } },
 };
 
 function HomePage() {
@@ -188,34 +69,27 @@ function HomePage() {
     const theme = useTheme();
     const isMobile = useMediaQuery(theme.breakpoints.down('md'));
 
-    const [snackbar, setSnackbar] = useState({
-        open: false,
-        message: '',
-        severity: 'success'
-    });
+    const [snackbar, setSnackbar] = useState({ open: false, message: '', severity: 'success' });
     const [loginModalOpen, setLoginModalOpen] = useState(false);
     const [signupModalOpen, setSignupModalOpen] = useState(false);
     const [verifyModalOpen, setVerifyModalOpen] = useState(false);
     const [verifyEmail, setVerifyEmail] = useState('');
     const [anchorEl, setAnchorEl] = useState(null);
     const [backgroundPosition, setBackgroundPosition] = useState({ x: 0, y: 0 });
-    const [hoveredCategory, setHoveredCategory] = useState(null);
-    const [searchLoading, setSearchLoading] = useState(false);
-
-    // Search states
-    const [searchQuery, setSearchQuery] = useState('');
-    const [selectedCategory, setSelectedCategory] = useState('');
-    const [selectedLocation, setSelectedLocation] = useState('');
 
     useEffect(() => {
         const handleMouseMove = (e) => {
-            const x = e.clientX / window.innerWidth;
-            const y = e.clientY / window.innerHeight;
-            setBackgroundPosition({ x, y });
+            setBackgroundPosition({ x: e.clientX / window.innerWidth, y: e.clientY / window.innerHeight });
         };
         window.addEventListener('mousemove', handleMouseMove);
         return () => window.removeEventListener('mousemove', handleMouseMove);
     }, []);
+
+    useEffect(() => {
+        if (user && user.userName) {
+            setUserInitial(user.userName.charAt(0).toUpperCase());
+        }
+    }, [user]);
 
     const handleMenuOpen = (event) => setAnchorEl(event.currentTarget);
     const handleMenuClose = () => setAnchorEl(null);
@@ -246,52 +120,9 @@ function HomePage() {
         navigate('/events');
     };
 
-    const handleSearch = async () => {
-        if (!user) {
-            setSnackbar({ open: true, message: 'Please sign in to search events', severity: 'warning' });
-            handleOpenLoginModal();
-            return;
-        }
-
-        setSearchLoading(true);
-
-        try {
-            // Build search params object
-            const searchParams = {};
-            if (searchQuery.trim()) searchParams.query = searchQuery.trim();
-            if (selectedCategory) searchParams.category = selectedCategory;
-            if (selectedLocation) searchParams.location = selectedLocation;
-
-            // Save to session storage for EventsPage to use
-            sessionStorage.setItem('eventsSearchParams', JSON.stringify(searchParams));
-
-            // Build URL with query parameters
-            const urlParams = new URLSearchParams();
-            if (searchQuery.trim()) urlParams.append('query', searchQuery.trim());
-            if (selectedCategory) urlParams.append('category', selectedCategory);
-            if (selectedLocation) urlParams.append('location', selectedLocation);
-
-            // Navigate to events page with search params
-            navigate(`/events?${urlParams.toString()}`);
-        } catch (error) {
-            console.error('Search error:', error);
-            setSnackbar({
-                open: true,
-                message: 'Failed to perform search',
-                severity: 'error'
-            });
-        } finally {
-            setSearchLoading(false);
-        }
+    const handleMuseumsClick = () => {
+        navigate('/museums');
     };
-
-    const handleClearSearch = () => {
-        setSearchQuery('');
-        setSelectedCategory('');
-        setSelectedLocation('');
-    };
-
-    const handleAboutClick = () => navigate('/about');
 
     const handleCloseSnackbar = () => setSnackbar({ ...snackbar, open: false });
 
@@ -320,89 +151,12 @@ function HomePage() {
         setTimeout(() => handleOpenVerifyModal(email), 300);
     };
 
-    const userInitial = user?.userName ? user.userName.charAt(0).toUpperCase() : '';
-
-    // Create scattered category elements
-    const scatteredCategories = [];
-    for (let i = 0; i < 24; i++) {
-        const category = EVENT_CATEGORIES[i % EVENT_CATEGORIES.length];
-        const pos = getRandomPosition(i);
-        scatteredCategories.push(
-            <Box
-                key={`scattered-${i}`}
-                sx={{
-                    position: 'absolute',
-                    top: pos.top,
-                    left: pos.left,
-                    right: pos.right,
-                    zIndex: 1,
-                    cursor: 'pointer',
-                    animation: `${pos.anim} ${pos.duration}s ease-in-out infinite`,
-                    animationDelay: `${pos.delay}s`,
-                    transition: 'all 0.3s ease',
-                    '&:hover': {
-                        transform: 'scale(1.15) !important',
-                        filter: 'drop-shadow(0 0 15px rgba(255,107,53,0.5))'
-                    }
-                }}
-                onMouseEnter={() => setHoveredCategory(category.value)}
-                onMouseLeave={() => setHoveredCategory(null)}
-                onClick={() => {
-                    if (user) {
-                        setSelectedCategory(category.value);
-                        setTimeout(() => handleSearch(), 100);
-                    } else {
-                        handleOpenLoginModal();
-                    }
-                }}
-            >
-                <Tooltip title={category.label} placement="top" arrow>
-                    <Box sx={{
-                        display: 'flex',
-                        flexDirection: 'column',
-                        alignItems: 'center',
-                        gap: 1
-                    }}>
-                        <Box sx={{
-                            width: pos.size,
-                            height: pos.size,
-                            borderRadius: '50%',
-                            background: `linear-gradient(135deg, ${pos.color}20, ${pos.color}05)`,
-                            display: 'flex',
-                            alignItems: 'center',
-                            justifyContent: 'center',
-                            border: `2px solid ${alpha(pos.color, hoveredCategory === category.value ? 0.8 : 0.3)}`,
-                            backdropFilter: 'blur(8px)',
-                            transition: 'all 0.3s',
-                            boxShadow: hoveredCategory === category.value ? `0 0 30px ${alpha(pos.color, 0.4)}` : 'none'
-                        }}>
-                            <CategoryIcon sx={{ color: pos.color, fontSize: pos.size * 0.4 }} />
-                        </Box>
-                        {hoveredCategory === category.value && (
-                            <Typography sx={{
-                                fontSize: '12px',
-                                fontWeight: 600,
-                                color: pos.color,
-                                bgcolor: alpha('#FFFFFF', 0.9),
-                                px: 1.5,
-                                py: 0.5,
-                                borderRadius: 20,
-                                whiteSpace: 'nowrap',
-                                backdropFilter: 'blur(4px)'
-                            }}>
-                                {category.label}
-                            </Typography>
-                        )}
-                    </Box>
-                </Tooltip>
-            </Box>
-        );
-    }
+    const [userInitial, setUserInitial] = useState('');
 
     return (
         <Box sx={{
             minHeight: '100vh',
-            background: 'linear-gradient(135deg, #FFF9F0 0%, #F5F0E8 100%)',
+            background: 'linear-gradient(135deg, #FFF8F0 0%, #F5EDE3 100%)',
             position: 'relative',
             overflowX: 'hidden',
             fontFamily: 'Inter, sans-serif'
@@ -418,8 +172,8 @@ function HomePage() {
                 height: '100%',
                 zIndex: 0,
                 background: `
-                    radial-gradient(circle at ${backgroundPosition.x * 100}% ${backgroundPosition.y * 100}%, rgba(255,107,53,0.08) 0%, transparent 50%),
-                    radial-gradient(circle at ${100 - backgroundPosition.x * 100}% ${100 - backgroundPosition.y * 100}%, rgba(255,193,7,0.08) 0%, transparent 50%)
+                    radial-gradient(circle at ${backgroundPosition.x * 100}% ${backgroundPosition.y * 100}%, rgba(196,164,132,0.08) 0%, transparent 50%),
+                    radial-gradient(circle at ${100 - backgroundPosition.x * 100}% ${100 - backgroundPosition.y * 100}%, rgba(210,180,140,0.08) 0%, transparent 50%)
                 `,
                 transition: 'background 0.3s ease-out'
             }} />
@@ -436,35 +190,18 @@ function HomePage() {
                 overflow: 'hidden'
             }}>
                 {[...Array(12)].map((_, idx) => (
-                    <Box
-                        key={`bg-circle-${idx}`}
-                        sx={{
-                            position: 'absolute',
-                            top: `${(idx * 13) % 100}%`,
-                            left: `${(idx * 17) % 100}%`,
-                            width: `${150 + (idx * 20)}px`,
-                            height: `${150 + (idx * 20)}px`,
-                            borderRadius: '50%',
-                            background: `radial-gradient(circle, ${alpha(['#FF6B35', '#FFB347', '#FF8C42', '#FF9F4A'][idx % 4], 0.06)} 0%, transparent 70%)`,
-                            animation: `${pulse} ${8 + idx}s ease-in-out infinite`,
-                            pointerEvents: 'none'
-                        }}
-                    />
+                    <Box key={`bg-circle-${idx}`} sx={{
+                        position: 'absolute',
+                        top: `${(idx * 13) % 100}%`,
+                        left: `${(idx * 17) % 100}%`,
+                        width: `${150 + (idx * 20)}px`,
+                        height: `${150 + (idx * 20)}px`,
+                        borderRadius: '50%',
+                        background: `radial-gradient(circle, ${alpha(['#C4A484', '#D2B48C', '#DEB887', '#8B7355'][idx % 4], 0.06)} 0%, transparent 70%)`,
+                        animation: `${pulse} ${8 + idx}s ease-in-out infinite`,
+                        pointerEvents: 'none'
+                    }} />
                 ))}
-            </Box>
-
-            {/* Scattered Categories - Interactive layer */}
-            <Box sx={{
-                position: 'fixed',
-                top: 0,
-                left: 0,
-                right: 0,
-                bottom: 0,
-                zIndex: 2,
-                pointerEvents: 'none',
-                overflow: 'hidden'
-            }}>
-                {!isMobile && scatteredCategories}
             </Box>
 
             {/* Header */}
@@ -472,149 +209,84 @@ function HomePage() {
                 position: 'sticky',
                 top: 0,
                 zIndex: 100,
-                backgroundColor: alpha('#FFFFFF', 0.95),
+                backgroundColor: alpha('#FFFDF7', 0.95),
                 backdropFilter: 'blur(10px)',
-                borderBottom: '1px solid rgba(0,0,0,0.08)',
+                borderBottom: `1px solid ${colors.border}`,
                 boxShadow: '0 2px 20px rgba(0,0,0,0.03)'
             }}>
                 <Container maxWidth="xl">
-                    <Box sx={{
-                        display: 'flex',
-                        alignItems: 'center',
-                        justifyContent: 'space-between',
-                        height: 70,
-                    }}>
-                        <Box
-                            onClick={() => navigate('/')}
-                            sx={{
-                                display: 'flex',
-                                alignItems: 'center',
-                                gap: 1.5,
-                                cursor: 'pointer'
-                            }}
-                        >
+                    <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', height: 70 }}>
+                        {/* Logo - Left side */}
+                        <Box onClick={() => navigate('/')} sx={{ display: 'flex', alignItems: 'center', gap: 1.5, cursor: 'pointer' }}>
                             <Box sx={{
-                                width: 38,
-                                height: 38,
-                                borderRadius: '12px',
-                                background: 'linear-gradient(135deg, #FF6B35 0%, #FFB347 100%)',
-                                display: 'flex',
-                                alignItems: 'center',
-                                justifyContent: 'center'
+                                width: 38, height: 38, borderRadius: '12px', background: colors.gradient,
+                                display: 'flex', alignItems: 'center', justifyContent: 'center'
                             }}>
-                                <CelebrationIcon sx={{ color: 'white', fontSize: 22 }} />
+                                <MuseumIcon sx={{ color: 'white', fontSize: 22 }} />
                             </Box>
                             <Typography variant="h6" sx={{
-                                fontWeight: 800,
-                                background: 'linear-gradient(135deg, #FF6B35 0%, #FFB347 100%)',
-                                WebkitBackgroundClip: 'text',
-                                WebkitTextFillColor: 'transparent',
-                                letterSpacing: '-0.5px'
+                                fontWeight: 800, background: colors.gradient,
+                                WebkitBackgroundClip: 'text', WebkitTextFillColor: 'transparent'
                             }}>
-                                Festivy
+                                Museum
                             </Typography>
                         </Box>
 
-                        <Box sx={{ display: { xs: 'none', md: 'flex' }, alignItems: 'center', gap: 3 }}>
-                            <Button
-                                startIcon={<InfoIcon />}
-                                sx={{ fontWeight: 500, color: '#4A4A4A', '&:hover': { color: '#FF6B35' } }}
-                                onClick={handleAboutClick}
-                            >
-                                About Us
-                            </Button>
-                            <Button
-                                startIcon={<HowToRegIcon />}
-                                sx={{ fontWeight: 500, color: '#4A4A4A', '&:hover': { color: '#FF6B35' } }}
-                                onClick={() => {
-                                    const element = document.getElementById('how-it-works');
-                                    if (element) {
-                                        element.scrollIntoView({ behavior: 'smooth' });
-                                    }
-                                }}
-                            >
-                                How It Works
-                            </Button>
-                            <Button
-                                startIcon={<CelebrationIcon />}
-                                sx={{ fontWeight: 500, color: '#4A4A4A', '&:hover': { color: '#FF6B35' } }}
-                                onClick={handleEventsClick}
-                            >
-                                Events
-                            </Button>
-                        </Box>
+                        {/* Right side - Navigation and User Menu */}
+                        <Box sx={{ display: 'flex', alignItems: 'center', gap: 4 }}>
+                            {/* Navigation Links */}
+                            <Box sx={{ display: { xs: 'none', md: 'flex' }, gap: 2 }}>
+                                <Button
+                                    startIcon={<MuseumIcon />}
+                                    onClick={handleMuseumsClick}
+                                    sx={{
+                                        fontWeight: 500,
+                                        color: colors.textLight,
+                                        '&:hover': { color: colors.primary },
+                                        fontSize: '0.9rem'
+                                    }}
+                                >
+                                    Museums
+                                </Button>
+                                <Button
+                                    startIcon={<EventIcon />}
+                                    onClick={handleEventsClick}
+                                    sx={{
+                                        fontWeight: 500,
+                                        color: colors.textLight,
+                                        '&:hover': { color: colors.primary },
+                                        fontSize: '0.9rem'
+                                    }}
+                                >
+                                    Events
+                                </Button>
+                            </Box>
 
-                        <Box sx={{ display: 'flex', alignItems: 'center', gap: 2 }}>
-                            {user ? (
-                                <>
-                                    <Chip
-                                        label={`Welcome, ${user.userName}`}
-                                        size="small"
-                                        sx={{
-                                            display: { xs: 'none', sm: 'flex' },
-                                            bgcolor: alpha('#FF6B35', 0.1),
-                                            color: '#FF6B35',
-                                            border: `1px solid ${alpha('#FF6B35', 0.2)}`
-                                        }}
-                                    />
+                            {/* User Menu */}
+                            <Box sx={{ display: 'flex', alignItems: 'center', gap: 2 }}>
+                                {user ? (
+                                    <>
+                                        {/* Profile Icon */}
+                                        <IconButton onClick={handleMenuOpen} sx={{ background: colors.gradient, width: 38, height: 38 }}>
+                                            <Avatar sx={{ width: 38, height: 38, bgcolor: 'transparent', color: 'white' }}>
+                                                {userInitial || <AccountCircleIcon />}
+                                            </Avatar>
+                                        </IconButton>
 
-                                    <IconButton
-                                        onClick={handleMenuOpen}
-                                        sx={{
-                                            background: 'linear-gradient(135deg, #FF6B35 0%, #FFB347 100%)',
-                                            width: 38,
-                                            height: 38,
-                                            '&:hover': { transform: 'scale(1.05)' }
-                                        }}
-                                    >
-                                        <Avatar sx={{ width: 38, height: 38, bgcolor: 'transparent', color: 'white' }}>
-                                            {userInitial || <AccountCircleIcon />}
-                                        </Avatar>
-                                    </IconButton>
-
-                                    <Menu
-                                        anchorEl={anchorEl}
-                                        open={Boolean(anchorEl)}
-                                        onClose={handleMenuClose}
-                                        PaperProps={{
-                                            sx: {
-                                                bgcolor: '#FFFFFF',
-                                                color: '#1A1A1A',
-                                                border: '1px solid #E0E0E0',
-                                                minWidth: 200,
-                                                borderRadius: '16px',
-                                                boxShadow: '0 4px 20px rgba(0,0,0,0.1)'
-                                            }
-                                        }}
-                                    >
-                                        <MenuItem onClick={handleProfile}><PersonIcon sx={{ mr: 2, fontSize: 20, color: '#FF6B35' }} />Profile</MenuItem>
-                                        {isAdmin && (
-                                            <MenuItem onClick={handleAdminPanel}><AdminPanelSettingsIcon sx={{ mr: 2, fontSize: 20, color: '#FF9800' }} />Admin Panel</MenuItem>
-                                        )}
-                                        <Divider />
-                                        <MenuItem onClick={handleLogout}><LogoutIcon sx={{ mr: 2, fontSize: 20, color: '#FF6B35' }} />Logout</MenuItem>
-                                    </Menu>
-                                </>
-                            ) : (
-                                <>
-                                    <Button sx={{ fontWeight: 500, color: '#4A4A4A', '&:hover': { color: '#FF6B35' } }} onClick={handleOpenLoginModal}>
-                                        Sign In
-                                    </Button>
-                                    <Button
-                                        variant="contained"
-                                        sx={{
-                                            fontWeight: 600,
-                                            borderRadius: '12px',
-                                            background: 'linear-gradient(135deg, #FF6B35 0%, #FFB347 100%)',
-                                            boxShadow: '0 4px 12px rgba(255,107,53,0.25)',
-                                            '&:hover': { transform: 'translateY(-2px)', boxShadow: '0 6px 16px rgba(255,107,53,0.35)' }
-                                        }}
-                                        onClick={handleOpenSignupModal}
-                                    >
-                                        Sign Up
-                                    </Button>
-                                </>
-                            )}
+                                        <Menu anchorEl={anchorEl} open={Boolean(anchorEl)} onClose={handleMenuClose} PaperProps={{ sx: { bgcolor: '#FFFDF7', borderRadius: '16px', minWidth: 200 } }}>
+                                            <MenuItem onClick={handleProfile}><PersonIcon sx={{ mr: 2, color: colors.primary }} />Profile</MenuItem>
+                                            {isAdmin && <MenuItem onClick={handleAdminPanel}><AdminPanelSettingsIcon sx={{ mr: 2, color: colors.primaryDark }} />Admin Panel</MenuItem>}
+                                            <Divider />
+                                            <MenuItem onClick={handleLogout}><LogoutIcon sx={{ mr: 2, color: colors.error }} />Logout</MenuItem>
+                                        </Menu>
+                                    </>
+                                ) : (
+                                    <>
+                                        <Button onClick={() => navigate('/login')} sx={{ fontWeight: 500, color: colors.textLight }}>Sign In</Button>
+                                        <Button variant="contained" onClick={() => navigate('/signup')} sx={{ fontWeight: 600, borderRadius: '12px', background: colors.gradient, '&:hover': { transform: 'translateY(-2px)' } }}>Sign Up</Button>
+                                    </>
+                                )}
+                            </Box>
                         </Box>
                     </Box>
                 </Container>
@@ -622,426 +294,107 @@ function HomePage() {
 
             {/* Main Content */}
             <Box sx={{ position: 'relative', zIndex: 3 }}>
-                {/* Hero Section */}
-                <Box sx={{
-                    minHeight: { xs: 'auto', md: 'auto' },
-                    display: 'flex',
-                    alignItems: 'center',
-                    py: { xs: 4, md: 3 },
-                    position: 'relative'
-                }}>
-                    <Container maxWidth={false} sx={{ px: { xs: 3, md: 8, lg: 12 } }}>
+                {/* About Us Section - Museum Theme */}
+                <Box id="about-us" sx={{ py: { xs: 8, md: 10 }, borderTop: `1px solid ${alpha(colors.border, 0.5)}`, borderBottom: `1px solid ${alpha(colors.border, 0.5)}`, background: 'transparent' }}>
+                    <Container maxWidth="lg">
                         <Fade in timeout={1000}>
-                            <Box sx={{
-                                width: '100%',
-                                animation: `${slideIn} 0.8s ease-out`,
-                                textAlign: 'center'
-                            }}>
-                                <Typography
-                                    variant="h1"
-                                    sx={{
-                                        fontSize: { xs: 36, sm: 48, md: 64, lg: 80 },
-                                        fontWeight: 800,
-                                        lineHeight: 1.2,
-                                        mb: 2,
-                                        letterSpacing: '-0.02em',
-                                        textAlign: 'center'
-                                    }}
-                                >
-                                    <Box component="span" sx={{ color: '#2C2C2C' }}>
-                                        Discover Amazing{' '}
-                                    </Box>
-                                    <Box component="span" sx={{
-                                        background: 'linear-gradient(135deg, #FF6B35 0%, #FFB347 100%)',
-                                        backgroundClip: 'text',
-                                        WebkitBackgroundClip: 'text',
-                                        color: 'transparent'
+                            <Grid container spacing={6} alignItems="flex-start">
+                                {/* Left side - Image */}
+                                <Grid item xs={12} md={6}>
+                                    <Box sx={{
+                                        position: 'relative',
+                                        borderRadius: '32px',
+                                        overflow: 'hidden',
+                                        boxShadow: '0 20px 40px rgba(0,0,0,0.1)',
+                                        transition: 'transform 0.3s ease',
+                                        '&:hover': { transform: 'scale(1.02)' }
                                     }}>
-                                        Events
+                                        <img
+                                            src="https://images.unsplash.com/photo-1534432586043-ead5b99229fb?ixlib=rb-4.0.3&auto=format&fit=crop&w=1170&q=80"
+                                            alt="Museum interior with ancient artifacts"
+                                            style={{ width: '100%', height: 'auto', display: 'block', objectFit: 'cover' }}
+                                        />
                                     </Box>
-                                </Typography>
+                                </Grid>
 
-                                <Box sx={{
-                                    width: 60,
-                                    height: 3,
-                                    background: 'linear-gradient(90deg, #FF6B35, #FFB347)',
-                                    borderRadius: 2,
-                                    mb: 3,
-                                    mx: 'auto'
-                                }} />
+                                {/* Right side - Text */}
+                                <Grid item xs={12} md={6}>
+                                    <Box sx={{ p: { xs: 2, md: 4 }, pt: { xs: 2, md: 0 } }}>
+                                        <Typography variant="h3" sx={{ fontSize: { xs: 28, md: 38 }, fontWeight: 700, color: colors.text, mb: 3 }}>
+                                            About <span style={{ color: colors.primary }}>Museum Events</span>
+                                        </Typography>
+                                        <Typography variant="body1" sx={{
+                                            color: colors.textLight,
+                                            fontSize: { xs: 16, md: 18 },
+                                            lineHeight: 1.9,
+                                            fontWeight: 450,
+                                            letterSpacing: '0.01em',
+                                            mb: 3
+                                        }}>
+                                            <span style={{ fontWeight: 600, color: colors.primary }}>Museum Events</span> is your premier platform for discovering and experiencing the rich cultural heritage of Armenia. We bring together the finest museums, exhibitions, and cultural events across the country, making it easy for you to explore art, history, science, and tradition in one place.
+                                        </Typography>
 
-                                <Typography
-                                    sx={{
-                                        fontSize: { xs: 18, md: 22, lg: 24 },
-                                        fontWeight: 500,
-                                        color: '#4A4A4A',
-                                        lineHeight: 1.5,
-                                        mb: 3,
-                                        maxWidth: 700,
-                                        mx: 'auto',
-                                        textAlign: 'center'
-                                    }}
-                                >
-                                    Your next cultural experience is just a click away.
-                                    <Box component="span" sx={{ display: 'inline-block', ml: 1, animation: `${pulse} 2s infinite` }}>
-                                        🎉
+                                        <Typography variant="body1" sx={{
+                                            color: colors.textLight,
+                                            fontSize: { xs: 16, md: 18 },
+                                            lineHeight: 1.9,
+                                            fontWeight: 450,
+                                            letterSpacing: '0.01em',
+                                            mb: 3
+                                        }}>
+                                            From ancient archaeological treasures to contemporary art exhibitions, from natural history displays to interactive science centers — our platform connects you with Armenia's most prestigious cultural institutions. Whether you're a history enthusiast, art lover, student, or curious traveler, you'll find events and exhibitions that inspire and educate.
+                                        </Typography>
+
+                                        <Typography variant="body1" sx={{
+                                            color: colors.textLight,
+                                            fontSize: { xs: 16, md: 18 },
+                                            lineHeight: 1.9,
+                                            fontWeight: 450,
+                                            letterSpacing: '0.01em',
+                                            fontStyle: 'italic'
+                                        }}>
+                                            Let <span style={{ fontWeight: 600, color: colors.primary }}>Museum Events</span> be your guide to Armenia's cultural treasures — where history comes alive, art speaks volumes, and every visit becomes an unforgettable journey through time.
+                                        </Typography>
                                     </Box>
-                                </Typography>
-
-                                {/* Search Bar */}
-                                <Paper elevation={0} sx={{
-                                    maxWidth: 1000,
-                                    mx: 'auto',
-                                    mb: 4,
-                                    p: 2.5,
-                                    borderRadius: '60px',
-                                    background: alpha('#FFFFFF', 0.95),
-                                    backdropFilter: 'blur(10px)',
-                                    boxShadow: '0 10px 30px rgba(0,0,0,0.08)',
-                                    border: '1px solid rgba(255,107,53,0.15)'
-                                }}>
-                                    <Grid container spacing={2} alignItems="center">
-                                        <Grid item xs={12} md={4}>
-                                            <TextField
-                                                fullWidth
-                                                placeholder="Search events by name or description..."
-                                                value={searchQuery}
-                                                onChange={(e) => setSearchQuery(e.target.value)}
-                                                onKeyPress={(e) => e.key === 'Enter' && handleSearch()}
-                                                InputProps={{
-                                                    startAdornment: (
-                                                        <InputAdornment position="start">
-                                                            <SearchIcon sx={{ color: '#FF6B35' }} />
-                                                        </InputAdornment>
-                                                    ),
-                                                    sx: {
-                                                        borderRadius: '40px',
-                                                        bgcolor: '#FAFAFA',
-                                                        '& .MuiOutlinedInput-notchedOutline': {
-                                                            borderColor: '#E8E0D8'
-                                                        },
-                                                        '&:hover .MuiOutlinedInput-notchedOutline': {
-                                                            borderColor: '#FFB347'
-                                                        }
-                                                    }
-                                                }}
-                                            />
-                                        </Grid>
-                                        <Grid item xs={12} md={3}>
-                                            <FormControl fullWidth>
-                                                <InputLabel sx={{ color: '#8A8A8A' }}>Category</InputLabel>
-                                                <Select
-                                                    value={selectedCategory}
-                                                    onChange={(e) => setSelectedCategory(e.target.value)}
-                                                    label="Category"
-                                                    sx={{
-                                                        borderRadius: '40px',
-                                                        bgcolor: '#FAFAFA',
-                                                        '& .MuiOutlinedInput-notchedOutline': {
-                                                            borderColor: '#E8E0D8'
-                                                        }
-                                                    }}
-                                                    renderValue={(selected) => {
-                                                        const category = EVENT_CATEGORIES.find(c => c.value === selected);
-                                                        return category ? category.label : selected;
-                                                    }}
-                                                >
-                                                    <MenuItem value="">
-                                                        <em>All Categories</em>
-                                                    </MenuItem>
-                                                    {EVENT_CATEGORIES.map((cat) => (
-                                                        <MenuItem key={cat.value} value={cat.value}>
-                                                            <Box sx={{ display: 'flex', alignItems: 'center', gap: 1.5 }}>
-                                                                <CategoryIcon sx={{ fontSize: 20, color: '#FF6B35' }} />
-                                                                <span>{cat.label}</span>
-                                                            </Box>
-                                                        </MenuItem>
-                                                    ))}
-                                                </Select>
-                                            </FormControl>
-                                        </Grid>
-                                        <Grid item xs={12} md={3}>
-                                            <FormControl fullWidth>
-                                                <InputLabel sx={{ color: '#8A8A8A' }}>Location</InputLabel>
-                                                <Select
-                                                    value={selectedLocation}
-                                                    onChange={(e) => setSelectedLocation(e.target.value)}
-                                                    label="Location"
-                                                    sx={{
-                                                        borderRadius: '40px',
-                                                        bgcolor: '#FAFAFA',
-                                                        '& .MuiOutlinedInput-notchedOutline': {
-                                                            borderColor: '#E8E0D8'
-                                                        }
-                                                    }}
-                                                    renderValue={(selected) => {
-                                                        const location = ARMENIAN_LOCATIONS.find(l => l.value === selected);
-                                                        return location ? location.label : selected;
-                                                    }}
-                                                >
-                                                    <MenuItem value="">
-                                                        <em>All Locations</em>
-                                                    </MenuItem>
-                                                    {ARMENIAN_LOCATIONS.map((location) => (
-                                                        <MenuItem key={location.value} value={location.value}>
-                                                            <Box sx={{ display: 'flex', alignItems: 'center', gap: 1.5 }}>
-                                                                <LocationOnIcon sx={{ fontSize: 20, color: '#FF6B35' }} />
-                                                                <span>{location.label}</span>
-                                                            </Box>
-                                                        </MenuItem>
-                                                    ))}
-                                                </Select>
-                                            </FormControl>
-                                        </Grid>
-                                        <Grid item xs={12} md={2}>
-                                            <Stack direction="row" spacing={1}>
-                                                <Button
-                                                    fullWidth
-                                                    variant="contained"
-                                                    onClick={handleSearch}
-                                                    disabled={searchLoading}
-                                                    sx={{
-                                                        background: 'linear-gradient(135deg, #FF6B35 0%, #FFB347 100%)',
-                                                        height: '56px',
-                                                        borderRadius: '40px',
-                                                        textTransform: 'none',
-                                                        fontWeight: 600,
-                                                        fontSize: '15px',
-                                                        boxShadow: '0 4px 12px rgba(255,107,53,0.25)',
-                                                        '&:hover': {
-                                                            transform: 'translateY(-2px)',
-                                                            boxShadow: '0 6px 16px rgba(255,107,53,0.35)'
-                                                        }
-                                                    }}
-                                                >
-                                                    {searchLoading ? <CircularProgress size={24} sx={{ color: 'white' }} /> : 'Search'}
-                                                </Button>
-                                                {(searchQuery || selectedCategory || selectedLocation) && (
-                                                    <Tooltip title="Clear filters">
-                                                        <IconButton
-                                                            onClick={handleClearSearch}
-                                                            sx={{
-                                                                height: '56px',
-                                                                width: '56px',
-                                                                border: '1px solid #F0E8E0',
-                                                                borderRadius: '40px',
-                                                                bgcolor: '#FAFAFA',
-                                                                color: '#8A8A8A',
-                                                                '&:hover': {
-                                                                    bgcolor: alpha('#FF6B35', 0.05),
-                                                                    color: '#FF6B35'
-                                                                }
-                                                            }}
-                                                        >
-                                                            <CloseIcon />
-                                                        </IconButton>
-                                                    </Tooltip>
-                                                )}
-                                            </Stack>
-                                        </Grid>
-                                    </Grid>
-                                </Paper>
-
-                                {/* CTA Buttons */}
-                                <Stack direction={{ xs: 'column', sm: 'row' }} spacing={2.5} justifyContent="center">
-                                    <Button
-                                        variant="contained"
-                                        onClick={handleEventsClick}
-                                        endIcon={<RocketLaunchIcon />}
-                                        sx={{
-                                            background: 'linear-gradient(135deg, #FF6B35 0%, #FFB347 100%)',
-                                            borderRadius: '40px',
-                                            padding: '12px 32px',
-                                            fontSize: 15,
-                                            fontWeight: 600,
-                                            textTransform: 'none',
-                                            boxShadow: '0 8px 20px rgba(255,107,53,0.25)',
-                                            '&:hover': {
-                                                transform: 'translateY(-2px)',
-                                                boxShadow: '0 12px 28px rgba(255,107,53,0.35)',
-                                            },
-                                            transition: 'all 0.3s'
-                                        }}
-                                    >
-                                        Browse All Events
-                                    </Button>
-                                </Stack>
-                            </Box>
+                                </Grid>
+                            </Grid>
                         </Fade>
                     </Container>
                 </Box>
 
-                {/* How It Works Section */}
-                <Box id="how-it-works" sx={{
-                    py: { xs: 8, md: 10 },
-                    mt: -5,
-                    position: 'relative',
-                    borderTop: '1px solid rgba(0,0,0,0.05)',
-                    borderBottom: '1px solid rgba(0,0,0,0.05)',
-                    background: 'transparent'
-                }}>
-                    <Container maxWidth="lg">
-                        <Box sx={{ textAlign: 'center', mb: 6 }}>
-                            <Typography variant="h3" sx={{
-                                fontSize: { xs: 28, md: 38 },
-                                fontWeight: 700,
-                                color: '#2C2C2C',
-                                mb: 2
-                            }}>
-                                How It Works
-                            </Typography>
-                            <Box sx={{
-                                width: 60,
-                                height: 3,
-                                background: 'linear-gradient(90deg, #FF6B35, #FFB347)',
-                                borderRadius: 2,
-                                mx: 'auto'
-                            }} />
-                        </Box>
-
-                        <Grid container spacing={4}>
-                            {[
-                                {
-                                    icon: <ExploreIcon sx={{ fontSize: 40 }} />,
-                                    title: 'Explore',
-                                    desc: 'Browse through 14+ event categories and discover amazing cultural experiences at museums across Armenia.',
-                                    color: '#FF6B35',
-                                    gradient: 'linear-gradient(135deg, #FF6B35 0%, #FF8C42 100%)'
-                                },
-                                {
-                                    icon: <AutoAwesomeIcon sx={{ fontSize: 40 }} />,
-                                    title: 'Discover',
-                                    desc: 'Find the perfect events that match your interests, schedule, and budget with our smart search filters.',
-                                    color: '#FFB347',
-                                    gradient: 'linear-gradient(135deg, #FFB347 0%, #FF9F4A 100%)'
-                                },
-                                {
-                                    icon: <RocketLaunchIcon sx={{ fontSize: 40 }} />,
-                                    title: 'Experience',
-                                    desc: 'Connect with museums, book your spot, and enjoy unforgettable cultural experiences!',
-                                    color: '#FF8C42',
-                                    gradient: 'linear-gradient(135deg, #FF8C42 0%, #FFA559 100%)'
-                                }
-                            ].map((step, idx) => (
-                                <Grid item xs={12} md={4} key={idx}>
-                                    <Zoom in timeout={500 + idx * 200}>
-                                        <Box sx={{
-                                            textAlign: 'center',
-                                            p: 4,
-                                            borderRadius: '32px',
-                                            background: alpha(step.color, 0.04),
-                                            backdropFilter: 'blur(10px)',
-                                            border: `1px solid ${alpha(step.color, 0.15)}`,
-                                            transition: 'all 0.4s cubic-bezier(0.2, 0.9, 0.4, 1.1)',
-                                            boxShadow: '0 8px 20px rgba(0,0,0,0.02)',
-                                            height: '100%',
-                                            display: 'flex',
-                                            flexDirection: 'column',
-                                            '&:hover': {
-                                                transform: 'translateY(-10px)',
-                                                background: alpha(step.color, 0.08),
-                                                borderColor: alpha(step.color, 0.4),
-                                                boxShadow: `0 20px 35px ${alpha(step.color, 0.15)}`,
-                                            }
-                                        }}>
-                                            <Box sx={{
-                                                width: 80,
-                                                height: 80,
-                                                borderRadius: '28px',
-                                                background: step.gradient,
-                                                display: 'flex',
-                                                alignItems: 'center',
-                                                justifyContent: 'center',
-                                                mx: 'auto',
-                                                mb: 3,
-                                                boxShadow: `0 10px 20px ${alpha(step.color, 0.25)}`,
-                                                transition: 'transform 0.3s',
-                                                '&:hover': {
-                                                    transform: 'scale(1.05)'
-                                                }
-                                            }}>
-                                                <Box sx={{ color: '#FFFFFF', fontSize: 40, display: 'flex' }}>
-                                                    {step.icon}
-                                                </Box>
-                                            </Box>
-                                            <Typography variant="h5" sx={{
-                                                color: step.color,
-                                                fontWeight: 700,
-                                                mb: 1.5,
-                                                letterSpacing: '-0.3px'
-                                            }}>
-                                                {step.title}
-                                            </Typography>
-                                            <Typography sx={{
-                                                color: '#5A5A5A',
-                                                lineHeight: 1.6,
-                                                fontSize: '0.95rem',
-                                                textAlign: 'justify'
-                                            }}>
-                                                {step.desc}
-                                            </Typography>
-                                        </Box>
-                                    </Zoom>
-                                </Grid>
-                            ))}
-                        </Grid>
-                    </Container>
-                </Box>
-
                 {/* Footer */}
-                <Box sx={{
-                    py: 5,
-                    textAlign: 'center',
-                    background: '#FFFFFF',
-                    borderTop: '1px solid #F0E8E0'
-                }}>
+                <Box sx={{ py: 5, textAlign: 'center', background: '#FFFFFF', borderTop: `1px solid ${colors.border}` }}>
                     <Container maxWidth="lg">
-                        <Typography variant="body2" sx={{ color: '#8A8A8A' }}>
-                            © 2026 Festivy. All rights reserved.
-                        </Typography>
+                        <Typography variant="body2" sx={{ color: colors.textLight }}>© 2026 Museum Events. All rights reserved.</Typography>
                     </Container>
                 </Box>
             </Box>
 
             {/* Modals */}
             <Modal open={loginModalOpen} onClose={handleCloseLoginModal} sx={{ display: 'flex', alignItems: 'center', justifyContent: 'center', backdropFilter: 'blur(8px)' }}>
-                <Box sx={{ width: '90%', maxWidth: 470, maxHeight: '90vh', bgcolor: '#FFFFFF', borderRadius: '24px', border: '1px solid #F0E8E0', position: 'relative', overflow: 'hidden', boxShadow: '0 24px 48px rgba(0,0,0,0.15)' }}>
-                    <IconButton onClick={handleCloseLoginModal} sx={{ position: 'absolute', top: 16, right: 16, zIndex: 10, backgroundColor: alpha('#000000', 0.5), color: '#FFFFFF', '&:hover': { backgroundColor: alpha('#000000', 0.7) } }}>
-                        <CloseIcon />
-                    </IconButton>
+                <Box sx={{ width: '90%', maxWidth: 470, maxHeight: '90vh', bgcolor: '#FFFFFF', borderRadius: '24px', border: `1px solid ${colors.border}`, position: 'relative', overflow: 'hidden', boxShadow: '0 24px 48px rgba(0,0,0,0.15)' }}>
+                    <IconButton onClick={handleCloseLoginModal} sx={{ position: 'absolute', top: 16, right: 16, zIndex: 10, backgroundColor: alpha('#000', 0.5), color: '#FFF', '&:hover': { backgroundColor: alpha('#000', 0.7) } }}><CloseIcon /></IconButton>
                     <LoginPage isModal={true} onClose={handleCloseLoginModal} onSwitchToSignup={handleSwitchToSignup} />
                 </Box>
             </Modal>
 
             <Modal open={signupModalOpen} onClose={handleCloseSignupModal} sx={{ display: 'flex', alignItems: 'center', justifyContent: 'center', backdropFilter: 'blur(8px)' }}>
-                <Box sx={{ width: '90%', maxWidth: 470, maxHeight: '90vh', bgcolor: '#FFFFFF', borderRadius: '24px', border: '1px solid #F0E8E0', position: 'relative', overflow: 'hidden', boxShadow: '0 24px 48px rgba(0,0,0,0.15)' }}>
-                    <IconButton onClick={handleCloseSignupModal} sx={{ position: 'absolute', top: 16, right: 16, zIndex: 10, backgroundColor: alpha('#000000', 0.5), color: '#FFFFFF', '&:hover': { backgroundColor: alpha('#000000', 0.7) } }}>
-                        <CloseIcon />
-                    </IconButton>
+                <Box sx={{ width: '90%', maxWidth: 470, maxHeight: '90vh', bgcolor: '#FFFFFF', borderRadius: '24px', border: `1px solid ${colors.border}`, position: 'relative', overflow: 'hidden', boxShadow: '0 24px 48px rgba(0,0,0,0.15)' }}>
+                    <IconButton onClick={handleCloseSignupModal} sx={{ position: 'absolute', top: 16, right: 16, zIndex: 10, backgroundColor: alpha('#000', 0.5), color: '#FFF', '&:hover': { backgroundColor: alpha('#000', 0.7) } }}><CloseIcon /></IconButton>
                     <SignUpPage isModal={true} onClose={handleCloseSignupModal} onSwitchToLogin={handleSwitchToLogin} onSuccess={handleSignupSuccess} />
                 </Box>
             </Modal>
 
             <Modal open={verifyModalOpen} onClose={handleCloseVerifyModal} sx={{ display: 'flex', alignItems: 'center', justifyContent: 'center', backdropFilter: 'blur(8px)' }}>
-                <Box sx={{ width: '90%', maxWidth: 470, bgcolor: '#FFFFFF', borderRadius: '24px', border: '1px solid #F0E8E0', position: 'relative', overflow: 'hidden', boxShadow: '0 24px 48px rgba(0,0,0,0.15)' }}>
-                    <IconButton onClick={handleCloseVerifyModal} sx={{ position: 'absolute', top: 16, right: 16, zIndex: 10, backgroundColor: alpha('#000000', 0.5), color: '#FFFFFF', '&:hover': { backgroundColor: alpha('#000000', 0.7) } }}>
-                        <CloseIcon />
-                    </IconButton>
+                <Box sx={{ width: '90%', maxWidth: 470, bgcolor: '#FFFFFF', borderRadius: '24px', border: `1px solid ${colors.border}`, position: 'relative', overflow: 'hidden', boxShadow: '0 24px 48px rgba(0,0,0,0.15)' }}>
+                    <IconButton onClick={handleCloseVerifyModal} sx={{ position: 'absolute', top: 16, right: 16, zIndex: 10, backgroundColor: alpha('#000', 0.5), color: '#FFF', '&:hover': { backgroundColor: alpha('#000', 0.7) } }}><CloseIcon /></IconButton>
                     <VerifyCodePage isModal={true} onClose={handleCloseVerifyModal} email={verifyEmail} />
                 </Box>
             </Modal>
 
             {/* Snackbar */}
             <Snackbar open={snackbar.open} autoHideDuration={6000} onClose={handleCloseSnackbar} anchorOrigin={{ vertical: 'bottom', horizontal: 'center' }}>
-                <Alert onClose={handleCloseSnackbar} severity={snackbar.severity} sx={{
-                    bgcolor: '#FFFFFF',
-                    color: '#1A1A1A',
-                    borderRadius: '16px',
-                    boxShadow: '0 4px 12px rgba(0,0,0,0.1)',
-                    borderLeft: `4px solid ${snackbar.severity === 'success' ? '#4CAF50' : '#FF6B35'}`
-                }}>
-                    {snackbar.message}
-                </Alert>
+                <Alert onClose={handleCloseSnackbar} severity={snackbar.severity} sx={{ bgcolor: '#FFFDF7', color: colors.text, borderRadius: '16px', boxShadow: '0 4px 12px rgba(0,0,0,0.1)', borderLeft: `4px solid ${snackbar.severity === 'success' ? colors.success : colors.primary}` }}>{snackbar.message}</Alert>
             </Snackbar>
         </Box>
     );
