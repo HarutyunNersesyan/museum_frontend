@@ -26,12 +26,11 @@ import {
     Grow,
     Paper,
     CircularProgress,
-    Backdrop,
     InputAdornment,
-    Card,
-    CardContent,
     Stack,
-    Tooltip
+    Tooltip,
+    Collapse,
+    Slider
 } from '@mui/material';
 import {
     LocationOn as LocationIcon,
@@ -66,10 +65,28 @@ import { useAuth } from '../context/AuthContext';
 import eventAPI from '../services/eventAPI';
 import { alpha, styled } from '@mui/material/styles';
 
+// Warm brown color palette
+const colors = {
+    primary: '#C4A484',
+    primaryDark: '#A0522D',
+    primaryLight: '#D2B48C',
+    secondary: '#8B7355',
+    background: '#FFF8F0',
+    surface: '#FFFDF7',
+    text: '#4A3728',
+    textLight: '#7A5C4A',
+    accent: '#DEB887',
+    border: '#E8D5B7',
+    success: '#6B8E23',
+    warning: '#CD853F',
+    error: '#BC544B',
+    gradient: 'linear-gradient(135deg, #C4A484 0%, #D2B48C 50%, #DEB887 100%)'
+};
+
 const scrollbarStyles = {
     '*::-webkit-scrollbar': { width: '10px', height: '10px' },
-    '*::-webkit-scrollbar-track': { background: '#F5F0E8', borderRadius: '10px' },
-    '*::-webkit-scrollbar-thumb': { background: '#FF6B35', borderRadius: '10px', '&:hover': { background: '#E55A2B' } },
+    '*::-webkit-scrollbar-track': { background: '#E8D5B7', borderRadius: '10px' },
+    '*::-webkit-scrollbar-thumb': { background: '#C4A484', borderRadius: '10px', '&:hover': { background: '#A0522D' } },
 };
 
 const EventImage = styled('img')({
@@ -95,16 +112,16 @@ const DetailIcon = styled(Box)(({ theme }) => ({
     display: 'flex',
     alignItems: 'center',
     justifyContent: 'center',
-    backgroundColor: alpha('#FF6B35', 0.12),
+    backgroundColor: alpha('#C4A484', 0.12),
     borderRadius: '12px',
-    color: '#FF6B35'
+    color: '#C4A484'
 }));
 
 const DetailText = styled(Box)(({ theme }) => ({
     flex: 1,
     '& .label': {
         fontSize: '0.7rem',
-        color: '#8A8A8A',
+        color: '#8A7A6A',
         fontWeight: 600,
         textTransform: 'uppercase',
         letterSpacing: '0.5px',
@@ -112,12 +129,12 @@ const DetailText = styled(Box)(({ theme }) => ({
     },
     '& .value': {
         fontSize: '0.95rem',
-        color: '#2C2C2C',
+        color: '#4A3728',
         fontWeight: 700
     }
 }));
 
-// Event Categories (from backend EventCategory enum)
+// Event Categories
 const EVENT_CATEGORIES = [
     { value: 'ART', label: '🎨 Art' },
     { value: 'HISTORY', label: '📜 History' },
@@ -135,7 +152,7 @@ const EVENT_CATEGORIES = [
     { value: 'OPEN_AIR', label: '🌳 Open Air' }
 ];
 
-// Locations (from backend Location enum)
+// Locations
 const ARMENIAN_LOCATIONS = [
     { value: 'YEREVAN', label: 'Yerevan' },
     { value: 'GYUMRI', label: 'Gyumri' },
@@ -169,12 +186,46 @@ const ARMENIAN_LOCATIONS = [
     { value: 'JERMUK', label: 'Jermuk' }
 ];
 
+// Helper function to format event date
 const formatEventDate = (eventDate) => {
     if (!eventDate) return null;
+
     try {
-        const date = dayjs(eventDate);
-        return date.isValid() ? date.format('MMMM D, YYYY, HH:mm') : null;
-    } catch { return null; }
+        let date;
+
+        if (dayjs.isDayjs(eventDate)) {
+            date = eventDate;
+        }
+        else if (typeof eventDate === 'string') {
+            date = dayjs(eventDate);
+        }
+        else if (Array.isArray(eventDate) && eventDate.length >= 3) {
+            const [year, month, day, hour = 0, minute = 0] = eventDate;
+            date = dayjs(new Date(year, month - 1, day, hour, minute));
+        }
+        else if (eventDate instanceof Date) {
+            date = dayjs(eventDate);
+        }
+        else if (typeof eventDate === 'object' && eventDate !== null) {
+            if (eventDate.date) {
+                date = dayjs(eventDate.date);
+            } else {
+                date = dayjs(eventDate);
+            }
+        }
+        else {
+            date = dayjs(eventDate);
+        }
+
+        if (date && date.isValid()) {
+            return date.format('MMMM D, YYYY, HH:mm');
+        }
+
+        return null;
+    } catch (error) {
+        console.error('Error formatting date:', error);
+        return null;
+    }
 };
 
 const formatPriceAMD = (price) => {
@@ -206,7 +257,11 @@ const EventsPage = () => {
     const [selectedCategory, setSelectedCategory] = useState('');
     const [selectedLocation, setSelectedLocation] = useState('');
     const [showFilters, setShowFilters] = useState(false);
-    const [searchLoading, setSearchLoading] = useState(false);
+
+    // Price filter states
+    const [minTicketPrice, setMinTicketPrice] = useState('');
+    const [maxTicketPrice, setMaxTicketPrice] = useState('');
+    const [ticketPriceRange, setTicketPriceRange] = useState([0, 1000000]);
 
     useEffect(() => {
         const savedParams = sessionStorage.getItem('eventsSearchParams');
@@ -215,6 +270,11 @@ const EventsPage = () => {
             if (params.query) setSearchQuery(params.query);
             if (params.category) setSelectedCategory(params.category);
             if (params.location) setSelectedLocation(params.location);
+            if (params.minTicketPrice) setMinTicketPrice(params.minTicketPrice);
+            if (params.maxTicketPrice) setMaxTicketPrice(params.maxTicketPrice);
+            if (params.minTicketPrice && params.maxTicketPrice) {
+                setTicketPriceRange([parseInt(params.minTicketPrice), parseInt(params.maxTicketPrice)]);
+            }
             sessionStorage.removeItem('eventsSearchParams');
         }
 
@@ -222,15 +282,22 @@ const EventsPage = () => {
         const queryFromUrl = urlParams.get('query');
         const categoryFromUrl = urlParams.get('category');
         const locationFromUrl = urlParams.get('location');
+        const minPriceFromUrl = urlParams.get('minTicketPrice');
+        const maxPriceFromUrl = urlParams.get('maxTicketPrice');
 
         if (queryFromUrl) setSearchQuery(queryFromUrl);
         if (categoryFromUrl) setSelectedCategory(categoryFromUrl);
         if (locationFromUrl) setSelectedLocation(locationFromUrl);
+        if (minPriceFromUrl) setMinTicketPrice(minPriceFromUrl);
+        if (maxPriceFromUrl) setMaxTicketPrice(maxPriceFromUrl);
+        if (minPriceFromUrl && maxPriceFromUrl) {
+            setTicketPriceRange([parseInt(minPriceFromUrl), parseInt(maxPriceFromUrl)]);
+        }
     }, []);
 
     useEffect(() => {
         loadEvents();
-    }, [page, sortBy, sortDirection, searchQuery, selectedCategory, selectedLocation]);
+    }, [page, sortBy, sortDirection, searchQuery, selectedCategory, selectedLocation, minTicketPrice, maxTicketPrice]);
 
     const loadEvents = async () => {
         setLoading(true);
@@ -251,6 +318,17 @@ const EventsPage = () => {
 
             if (selectedLocation) {
                 filteredEvents = filteredEvents.filter(event => event.location === selectedLocation);
+            }
+
+            if (minTicketPrice && !isNaN(parseInt(minTicketPrice))) {
+                filteredEvents = filteredEvents.filter(event =>
+                    event.ticketPrice >= parseInt(minTicketPrice)
+                );
+            }
+            if (maxTicketPrice && !isNaN(parseInt(maxTicketPrice))) {
+                filteredEvents = filteredEvents.filter(event =>
+                    event.ticketPrice <= parseInt(maxTicketPrice)
+                );
             }
 
             setEvents(filteredEvents);
@@ -279,8 +357,17 @@ const EventsPage = () => {
         setSearchQuery('');
         setSelectedCategory('');
         setSelectedLocation('');
+        setMinTicketPrice('');
+        setMaxTicketPrice('');
+        setTicketPriceRange([0, 1000000]);
         setPage(0);
         setTimeout(() => loadEvents(), 100);
+    };
+
+    const handlePriceRangeChange = (event, newValue) => {
+        setTicketPriceRange(newValue);
+        setMinTicketPrice(newValue[0].toString());
+        setMaxTicketPrice(newValue[1].toString());
     };
 
     const handleSortChange = (e) => { setSortBy(e.target.value); setPage(0); };
@@ -332,13 +419,13 @@ const EventsPage = () => {
     };
 
     const userInitial = user?.userName ? user.userName.charAt(0).toUpperCase() : '';
-    const activeFiltersCount = [searchQuery, selectedCategory, selectedLocation].filter(Boolean).length;
+    const activeFiltersCount = [searchQuery, selectedCategory, selectedLocation, minTicketPrice].filter(Boolean).length;
 
     return (
         <LocalizationProvider dateAdapter={AdapterDayjs}>
             <Box sx={{
                 minHeight: '100vh',
-                background: 'linear-gradient(135deg, #FFF9F0 0%, #F5F0E8 100%)',
+                background: 'linear-gradient(135deg, #FFF8F0 0%, #F5EDE3 100%)',
                 fontFamily: 'Inter, sans-serif',
                 position: 'relative'
             }}>
@@ -349,9 +436,9 @@ const EventsPage = () => {
                     position: 'sticky',
                     top: 0,
                     zIndex: 100,
-                    backgroundColor: alpha('#FFFFFF', 0.95),
+                    backgroundColor: alpha('#FFFDF7', 0.95),
                     backdropFilter: 'blur(10px)',
-                    borderBottom: '1px solid rgba(0,0,0,0.08)',
+                    borderBottom: '1px solid #E8D5B7',
                     boxShadow: '0 2px 20px rgba(0,0,0,0.03)'
                 }}>
                     <Container maxWidth="xl">
@@ -366,7 +453,7 @@ const EventsPage = () => {
                                     width: 38,
                                     height: 38,
                                     borderRadius: '12px',
-                                    background: 'linear-gradient(135deg, #FF6B35 0%, #FFB347 100%)',
+                                    background: colors.gradient,
                                     display: 'flex',
                                     alignItems: 'center',
                                     justifyContent: 'center'
@@ -375,7 +462,7 @@ const EventsPage = () => {
                                 </Box>
                                 <Typography variant="h6" sx={{
                                     fontWeight: 800,
-                                    background: 'linear-gradient(135deg, #FF6B35 0%, #FFB347 100%)',
+                                    background: colors.gradient,
                                     WebkitBackgroundClip: 'text',
                                     WebkitTextFillColor: 'transparent'
                                 }}>
@@ -384,29 +471,29 @@ const EventsPage = () => {
                             </Box>
 
                             <Box sx={{ display: { xs: 'none', md: 'flex' }, gap: 3 }}>
-                                <Button startIcon={<InfoIcon />} onClick={handleAboutClick} sx={{ fontWeight: 500, color: '#4A4A4A', '&:hover': { color: '#FF6B35' } }}>About Us</Button>
-                                <Button startIcon={<HowToRegIcon />} onClick={handleHowItWorks} sx={{ fontWeight: 500, color: '#4A4A4A', '&:hover': { color: '#FF6B35' } }}>How It Works</Button>
-                                <Button startIcon={<CelebrationIcon />} sx={{ fontWeight: 500, color: '#FF6B35', borderBottom: '2px solid #FF6B35', borderRadius: 0 }}>Events</Button>
+                                <Button startIcon={<InfoIcon />} onClick={handleAboutClick} sx={{ fontWeight: 500, color: colors.textLight, '&:hover': { color: colors.primary } }}>About Us</Button>
+                                <Button startIcon={<HowToRegIcon />} onClick={handleHowItWorks} sx={{ fontWeight: 500, color: colors.textLight, '&:hover': { color: colors.primary } }}>How It Works</Button>
+                                <Button startIcon={<CelebrationIcon />} sx={{ fontWeight: 500, color: colors.primary, borderBottom: `2px solid ${colors.primary}`, borderRadius: 0 }}>Events</Button>
                             </Box>
 
                             <Box sx={{ display: 'flex', alignItems: 'center', gap: 2 }}>
                                 {user ? (
                                     <>
-                                        <Chip label={`Welcome, ${user.userName}`} size="small" sx={{ display: { xs: 'none', sm: 'flex' }, bgcolor: alpha('#FF6B35', 0.1), color: '#FF6B35' }} />
-                                        <IconButton onClick={handleMenuOpen} sx={{ background: 'linear-gradient(135deg, #FF6B35 0%, #FFB347 100%)', width: 38, height: 38 }}>
+                                        <Chip label={`Welcome, ${user.userName}`} size="small" sx={{ display: { xs: 'none', sm: 'flex' }, bgcolor: alpha(colors.primary, 0.1), color: colors.primary }} />
+                                        <IconButton onClick={handleMenuOpen} sx={{ background: colors.gradient, width: 38, height: 38 }}>
                                             <Avatar sx={{ width: 38, height: 38, bgcolor: 'transparent', color: 'white' }}>{userInitial || <AccountCircleIcon />}</Avatar>
                                         </IconButton>
-                                        <Menu anchorEl={anchorEl} open={Boolean(anchorEl)} onClose={handleMenuClose} PaperProps={{ sx: { bgcolor: '#FFFFFF', borderRadius: '16px', minWidth: 200 } }}>
-                                            <MenuItem onClick={handleProfile}><PersonIcon sx={{ mr: 2, color: '#FF6B35' }} />Profile</MenuItem>
-                                            {isAdmin && <MenuItem onClick={handleAdminPanel}><AdminIcon sx={{ mr: 2, color: '#FF9800' }} />Admin Panel</MenuItem>}
+                                        <Menu anchorEl={anchorEl} open={Boolean(anchorEl)} onClose={handleMenuClose} PaperProps={{ sx: { bgcolor: '#FFFDF7', borderRadius: '16px', minWidth: 200 } }}>
+                                            <MenuItem onClick={handleProfile}><PersonIcon sx={{ mr: 2, color: colors.primary }} />Profile</MenuItem>
+                                            {isAdmin && <MenuItem onClick={handleAdminPanel}><AdminIcon sx={{ mr: 2, color: colors.primaryDark }} />Admin Panel</MenuItem>}
                                             <Divider />
-                                            <MenuItem onClick={handleLogout}><LogoutIcon sx={{ mr: 2, color: '#FF6B35' }} />Logout</MenuItem>
+                                            <MenuItem onClick={handleLogout}><LogoutIcon sx={{ mr: 2, color: colors.error }} />Logout</MenuItem>
                                         </Menu>
                                     </>
                                 ) : (
                                     <>
-                                        <Button onClick={() => navigate('/login')} sx={{ fontWeight: 500, color: '#4A4A4A' }}>Sign In</Button>
-                                        <Button variant="contained" onClick={() => navigate('/signup')} sx={{ fontWeight: 600, borderRadius: '12px', background: 'linear-gradient(135deg, #FF6B35 0%, #FFB347 100%)' }}>Sign Up</Button>
+                                        <Button onClick={() => navigate('/login')} sx={{ fontWeight: 500, color: colors.textLight }}>Sign In</Button>
+                                        <Button variant="contained" onClick={() => navigate('/signup')} sx={{ fontWeight: 600, borderRadius: '12px', background: colors.gradient, '&:hover': { transform: 'translateY(-2px)' } }}>Sign Up</Button>
                                     </>
                                 )}
                             </Box>
@@ -417,23 +504,14 @@ const EventsPage = () => {
                 {/* Main Content */}
                 <Box sx={{ py: 4, px: { xs: 2, sm: 3, md: 4, lg: 6 } }}>
 
-                    {/* Hero Section */}
-                    <Fade in={true}>
-                        <Box sx={{ textAlign: 'center', mb: 4 }}>
-                            <Typography variant="h1" sx={{ fontSize: { xs: '32px', md: '48px' }, fontWeight: 800, background: 'linear-gradient(135deg, #FF6B35 0%, #FFB347 50%, #FF6B35 100%)', WebkitBackgroundClip: 'text', WebkitTextFillColor: 'transparent', mb: 1 }}>
-                                Discover Amazing Events
-                            </Typography>
-                            <Typography variant="h6" sx={{ color: '#8A99A8' }}>Explore exhibitions and cultural events at museums across Armenia</Typography>
-                        </Box>
-                    </Fade>
-
                     {/* Search and Filters */}
                     <Paper elevation={0} sx={{
-                        background: alpha('#FFFFFF', 0.95),
+                        background: alpha('#FFFDF7', 0.95),
                         borderRadius: '20px',
                         p: 2.5,
                         mb: 3,
-                        border: '1px solid rgba(255,107,53,0.15)'
+                        border: `1px solid ${alpha(colors.primary, 0.2)}`,
+                        boxShadow: '0 4px 12px rgba(0,0,0,0.04)'
                     }}>
                         <Grid container spacing={2} alignItems="center">
                             <Grid item xs={12} md={4}>
@@ -444,19 +522,32 @@ const EventsPage = () => {
                                     onChange={(e) => setSearchQuery(e.target.value)}
                                     onKeyPress={(e) => e.key === 'Enter' && handleSearch()}
                                     InputProps={{
-                                        startAdornment: <InputAdornment position="start"><SearchIcon sx={{ color: '#FF6B35' }} /></InputAdornment>,
-                                        sx: { borderRadius: '40px', bgcolor: '#FAFAFA' }
+                                        startAdornment: <InputAdornment position="start"><SearchIcon sx={{ color: colors.primary }} /></InputAdornment>,
+                                        sx: {
+                                            borderRadius: '40px',
+                                            bgcolor: '#FAFAFA',
+                                            '& .MuiOutlinedInput-root': {
+                                                '& fieldset': { borderColor: colors.border },
+                                                '&:hover fieldset': { borderColor: colors.primary },
+                                                '&.Mui-focused fieldset': { borderColor: colors.primary }
+                                            }
+                                        }
                                     }}
                                 />
                             </Grid>
                             <Grid item xs={12} md={3}>
                                 <FormControl fullWidth>
-                                    <InputLabel>Category</InputLabel>
+                                    <InputLabel sx={{ color: colors.textLight }}>Category</InputLabel>
                                     <Select
                                         value={selectedCategory}
                                         onChange={(e) => setSelectedCategory(e.target.value)}
                                         label="Category"
-                                        sx={{ borderRadius: '40px', bgcolor: '#FAFAFA' }}
+                                        sx={{
+                                            borderRadius: '40px',
+                                            bgcolor: '#FAFAFA',
+                                            '& .MuiOutlinedInput-notchedOutline': { borderColor: colors.border },
+                                            '&:hover .MuiOutlinedInput-notchedOutline': { borderColor: colors.primary }
+                                        }}
                                         renderValue={(selected) => {
                                             const category = EVENT_CATEGORIES.find(c => c.value === selected);
                                             return category ? category.label : selected;
@@ -471,12 +562,17 @@ const EventsPage = () => {
                             </Grid>
                             <Grid item xs={12} md={3}>
                                 <FormControl fullWidth>
-                                    <InputLabel>Location</InputLabel>
+                                    <InputLabel sx={{ color: colors.textLight }}>Location</InputLabel>
                                     <Select
                                         value={selectedLocation}
                                         onChange={(e) => setSelectedLocation(e.target.value)}
                                         label="Location"
-                                        sx={{ borderRadius: '40px', bgcolor: '#FAFAFA' }}
+                                        sx={{
+                                            borderRadius: '40px',
+                                            bgcolor: '#FAFAFA',
+                                            '& .MuiOutlinedInput-notchedOutline': { borderColor: colors.border },
+                                            '&:hover .MuiOutlinedInput-notchedOutline': { borderColor: colors.primary }
+                                        }}
                                         renderValue={(selected) => {
                                             const location = ARMENIAN_LOCATIONS.find(l => l.value === selected);
                                             return location ? location.label : selected;
@@ -491,11 +587,11 @@ const EventsPage = () => {
                             </Grid>
                             <Grid item xs={12} md={2}>
                                 <Stack direction="row" spacing={1}>
-                                    <Button fullWidth variant="contained" onClick={handleSearch} sx={{ borderRadius: '40px', background: 'linear-gradient(135deg, #FF6B35 0%, #FFB347 100%)', height: '56px' }}>
+                                    <Button fullWidth variant="contained" onClick={handleSearch} sx={{ borderRadius: '40px', background: colors.gradient, height: '56px', textTransform: 'none', fontWeight: 600 }}>
                                         Search
                                     </Button>
                                     <Tooltip title="Filters">
-                                        <IconButton onClick={() => setShowFilters(!showFilters)} sx={{ height: '56px', width: '56px', border: '1px solid #F0E8E0', borderRadius: '40px', bgcolor: '#FAFAFA' }}>
+                                        <IconButton onClick={() => setShowFilters(!showFilters)} sx={{ height: '56px', width: '56px', border: `1px solid ${colors.border}`, borderRadius: '40px', bgcolor: '#FAFAFA', color: showFilters ? colors.primary : colors.textLight }}>
                                             <FilterIcon />
                                         </IconButton>
                                     </Tooltip>
@@ -503,35 +599,133 @@ const EventsPage = () => {
                             </Grid>
                         </Grid>
 
-                        {showFilters && (
-                            <Box sx={{ mt: 3, pt: 3, borderTop: '1px solid #F0E8E0' }}>
-                                <Box sx={{ display: 'flex', gap: 2, alignItems: 'center', flexWrap: 'wrap' }}>
+                        <Collapse in={showFilters}>
+                            <Box sx={{ mt: 3, pt: 3, borderTop: `1px solid ${colors.border}` }}>
+                                {/* Ticket Price Filter Section */}
+                                <Typography variant="subtitle1" sx={{ fontWeight: 600, mb: 2, color: colors.text }}>
+                                    💰 Ticket Price Range (AMD)
+                                </Typography>
+
+                                <Box sx={{ px: 2, mb: 3 }}>
+                                    <Box sx={{
+                                        display: 'flex',
+                                        justifyContent: 'space-between',
+                                        alignItems: 'center',
+                                        mb: 2,
+                                        p: 1.5,
+                                        background: alpha(colors.primary, 0.05),
+                                        borderRadius: '12px'
+                                    }}>
+                                        <Box sx={{ textAlign: 'center', flex: 1 }}>
+                                            <Typography variant="caption" sx={{ color: colors.textLight }}>Min Price</Typography>
+                                            <Typography variant="h6" sx={{ fontWeight: 700, color: colors.primary }}>{ticketPriceRange[0].toLocaleString()} ֏</Typography>
+                                        </Box>
+                                        <Box sx={{ width: 30, height: 2, background: colors.gradient }} />
+                                        <Box sx={{ textAlign: 'center', flex: 1 }}>
+                                            <Typography variant="caption" sx={{ color: colors.textLight }}>Max Price</Typography>
+                                            <Typography variant="h6" sx={{ fontWeight: 700, color: colors.primary }}>{ticketPriceRange[1].toLocaleString()} ֏</Typography>
+                                        </Box>
+                                    </Box>
+
+                                    <Slider
+                                        value={ticketPriceRange}
+                                        onChange={handlePriceRangeChange}
+                                        valueLabelDisplay="on"
+                                        valueLabelFormat={(value) => `${value.toLocaleString()} ֏`}
+                                        min={0}
+                                        max={1000000}
+                                        step={10000}
+                                        sx={{
+                                            color: colors.primary,
+                                            height: 8,
+                                            '& .MuiSlider-track': {
+                                                background: colors.gradient,
+                                                border: 'none',
+                                            },
+                                            '& .MuiSlider-thumb': {
+                                                width: 20,
+                                                height: 20,
+                                                backgroundColor: '#FFFFFF',
+                                                border: `2px solid ${colors.primary}`,
+                                            },
+                                            '& .MuiSlider-valueLabel': {
+                                                backgroundColor: colors.primary,
+                                                borderRadius: '12px',
+                                                padding: '4px 12px',
+                                                fontSize: '0.75rem',
+                                                fontWeight: 600,
+                                            }
+                                        }}
+                                    />
+
+                                    {/* Quick price buttons */}
+                                    <Box sx={{ display: 'flex', gap: 1, mt: 3, flexWrap: 'wrap' }}>
+                                        {[
+                                            { label: 'Under 10k', min: 0, max: 10000 },
+                                            { label: '10k - 50k', min: 10000, max: 50000 },
+                                            { label: '50k - 100k', min: 50000, max: 100000 },
+                                            { label: '100k - 300k', min: 100000, max: 300000 },
+                                            { label: '300k+', min: 300000, max: 1000000 }
+                                        ].map((preset) => (
+                                            <Button
+                                                key={preset.label}
+                                                size="small"
+                                                variant="outlined"
+                                                onClick={() => {
+                                                    setTicketPriceRange([preset.min, preset.max]);
+                                                    setMinTicketPrice(preset.min.toString());
+                                                    setMaxTicketPrice(preset.max.toString());
+                                                }}
+                                                sx={{
+                                                    borderRadius: '20px',
+                                                    textTransform: 'none',
+                                                    fontSize: '0.7rem',
+                                                    borderColor: alpha(colors.primary, 0.3),
+                                                    color: colors.textLight,
+                                                    '&:hover': {
+                                                        borderColor: colors.primary,
+                                                        backgroundColor: alpha(colors.primary, 0.05),
+                                                        color: colors.primary
+                                                    }
+                                                }}
+                                            >
+                                                {preset.label}
+                                            </Button>
+                                        ))}
+                                    </Box>
+                                </Box>
+
+                                {/* Sorting Controls */}
+                                <Box sx={{ display: 'flex', gap: 2, alignItems: 'center', flexWrap: 'wrap', mt: 2 }}>
                                     <FormControl size="small" sx={{ minWidth: 150 }}>
-                                        <InputLabel>Sort By</InputLabel>
-                                        <Select value={sortBy} onChange={handleSortChange} label="Sort By">
+                                        <InputLabel sx={{ color: colors.textLight }}>Sort By</InputLabel>
+                                        <Select value={sortBy} onChange={handleSortChange} label="Sort By" sx={{ '& .MuiOutlinedInput-notchedOutline': { borderColor: colors.border } }}>
                                             <MenuItem value="eventDate">Event Date</MenuItem>
                                             <MenuItem value="guidePrice">Guide Price</MenuItem>
                                             <MenuItem value="ticketPrice">Ticket Price</MenuItem>
                                             <MenuItem value="name">Name</MenuItem>
                                         </Select>
                                     </FormControl>
-                                    <Button onClick={handleSortDirectionToggle} variant="outlined" size="small" sx={{ borderRadius: '20px' }}>
+                                    <Button onClick={handleSortDirectionToggle} variant="outlined" size="small" sx={{ borderRadius: '20px', borderColor: colors.border, color: colors.text, '&:hover': { borderColor: colors.primary, color: colors.primary } }}>
                                         {sortDirection === 'asc' ? '↑ Ascending' : '↓ Descending'}
                                     </Button>
                                 </Box>
+
                                 {activeFiltersCount > 0 && (
                                     <Box sx={{ display: 'flex', justifyContent: 'flex-end', mt: 2 }}>
-                                        <Button startIcon={<ClearIcon />} onClick={handleClearFilters} sx={{ color: '#FF6B35' }}>Clear All ({activeFiltersCount})</Button>
+                                        <Button startIcon={<ClearIcon />} onClick={handleClearFilters} sx={{ color: colors.primary }}>
+                                            Clear All ({activeFiltersCount})
+                                        </Button>
                                     </Box>
                                 )}
                             </Box>
-                        )}
+                        </Collapse>
                     </Paper>
 
                     {/* Results Count */}
                     {!loading && events.length > 0 && (
                         <Box sx={{ mb: 3 }}>
-                            <Typography sx={{ color: '#8A99A8' }}>Found <strong style={{ color: '#FF6B35' }}>{totalElements}</strong> events</Typography>
+                            <Typography sx={{ color: colors.textLight }}>Found <strong style={{ color: colors.primary }}>{totalElements}</strong> events</Typography>
                         </Box>
                     )}
 
@@ -541,22 +735,22 @@ const EventsPage = () => {
                             {[1, 2, 3].map(i => (
                                 <Box key={i}>
                                     <Grid container>
-                                        <Grid item xs={12} md={5}><Skeleton variant="rectangular" height={280} sx={{ borderRadius: '16px' }} /></Grid>
+                                        <Grid item xs={12} md={5}><Skeleton variant="rectangular" height={280} sx={{ borderRadius: '16px', bgcolor: '#E8D5B7' }} /></Grid>
                                         <Grid item xs={12} md={7}>
-                                            <Skeleton height={40} width="60%" />
-                                            <Skeleton height={20} width="90%" />
-                                            <Skeleton height={20} width="80%" />
-                                            <Skeleton height={20} width="50%" />
+                                            <Skeleton height={40} width="60%" sx={{ bgcolor: '#E8D5B7' }} />
+                                            <Skeleton height={20} width="90%" sx={{ bgcolor: '#E8D5B7' }} />
+                                            <Skeleton height={20} width="80%" sx={{ bgcolor: '#E8D5B7' }} />
+                                            <Skeleton height={20} width="50%" sx={{ bgcolor: '#E8D5B7' }} />
                                         </Grid>
                                     </Grid>
-                                    <Divider sx={{ my: 4 }} />
+                                    <Divider sx={{ my: 4, borderColor: colors.border }} />
                                 </Box>
                             ))}
                         </Box>
                     ) : events.length === 0 ? (
                         <Box sx={{ textAlign: 'center', py: 8 }}>
-                            <Typography variant="h6" sx={{ color: '#8A99A8' }}>No events found</Typography>
-                            <Button onClick={handleClearFilters} sx={{ mt: 2, color: '#FF6B35' }}>Clear filters</Button>
+                            <Typography variant="h6" sx={{ color: colors.textLight }}>No events found</Typography>
+                            <Button onClick={handleClearFilters} sx={{ mt: 2, color: colors.primary }}>Clear filters</Button>
                         </Box>
                     ) : (
                         <Box sx={{ display: 'flex', flexDirection: 'column', gap: 0 }}>
@@ -569,7 +763,7 @@ const EventsPage = () => {
                                     <Grow in={true} style={{ transitionDelay: `${index * 50}ms` }} key={event.id}>
                                         <Box sx={{
                                             py: 3,
-                                            borderBottom: index < events.length - 1 ? '1px solid #E8ECF0' : 'none'
+                                            borderBottom: index < events.length - 1 ? `1px solid ${colors.border}` : 'none'
                                         }}>
                                             <Grid container spacing={3}>
                                                 {/* Image Carousel */}
@@ -583,7 +777,7 @@ const EventsPage = () => {
                                                         alignItems: 'center',
                                                         justifyContent: 'center',
                                                         overflow: 'hidden',
-                                                        border: '1px solid #F0E8E0',
+                                                        border: `1px solid ${colors.border}`,
                                                         boxShadow: '0 4px 12px rgba(0,0,0,0.04)'
                                                     }}>
                                                         {images.length > 0 ? (
@@ -603,8 +797,8 @@ const EventsPage = () => {
                                                             </>
                                                         ) : (
                                                             <Box sx={{ textAlign: 'center' }}>
-                                                                <ImageIcon sx={{ fontSize: 60, color: alpha('#FF6B35', 0.3) }} />
-                                                                <Typography variant="body2" sx={{ color: '#8A99A8', mt: 1 }}>No images</Typography>
+                                                                <ImageIcon sx={{ fontSize: 60, color: alpha(colors.primary, 0.3) }} />
+                                                                <Typography variant="body2" sx={{ color: colors.textLight, mt: 1 }}>No images</Typography>
                                                             </Box>
                                                         )}
                                                     </Box>
@@ -612,16 +806,17 @@ const EventsPage = () => {
 
                                                 {/* Event Details */}
                                                 <Grid item xs={12} md={7}>
-                                                    <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', mb: 2, flexWrap: 'wrap', gap: 1 }}>
-                                                        <Typography variant="h5" sx={{ fontWeight: 700, color: '#1A2733' }}>{event.name}</Typography>
-                                                        {eventDate && dayjs(event.eventDate).isAfter(dayjs()) ? (
-                                                            <Chip label="Upcoming" size="small" sx={{ bgcolor: alpha('#4CAF50', 0.15), color: '#2E7D32', fontWeight: 600 }} />
-                                                        ) : (
-                                                            <Chip label="Past" size="small" sx={{ bgcolor: alpha('#9E9E9E', 0.15), color: '#757575', fontWeight: 600 }} />
-                                                        )}
-                                                    </Box>
+                                                    <Typography variant="h5" sx={{ fontWeight: 700, color: colors.text, mb: 2 }}>
+                                                        {event.name}
+                                                    </Typography>
 
-                                                    <Typography variant="body2" sx={{ color: '#5A6874', mb: 3, lineHeight: 1.6 }}>
+                                                    {/* Description with justify alignment */}
+                                                    <Typography variant="body2" sx={{
+                                                        color: colors.textLight,
+                                                        mb: 3,
+                                                        lineHeight: 1.6,
+                                                        textAlign: 'justify'
+                                                    }}>
                                                         {event.description}
                                                     </Typography>
 
@@ -632,7 +827,7 @@ const EventsPage = () => {
                                                                 <DetailIcon><PriceIcon sx={{ fontSize: 20 }} /></DetailIcon>
                                                                 <DetailText>
                                                                     <div className="label">Guide Price</div>
-                                                                    <div className="value" style={{ color: '#FF6B35' }}>{formatPriceAMD(event.guidePrice)}</div>
+                                                                    <div className="value" style={{ color: colors.primary }}>{formatPriceAMD(event.guidePrice)}</div>
                                                                 </DetailText>
                                                             </DetailItem>
                                                         </Grid>
@@ -641,7 +836,7 @@ const EventsPage = () => {
                                                                 <DetailIcon><TicketIcon sx={{ fontSize: 20 }} /></DetailIcon>
                                                                 <DetailText>
                                                                     <div className="label">Ticket Price</div>
-                                                                    <div className="value" style={{ color: '#4CAF50' }}>{formatPriceAMD(event.ticketPrice)}</div>
+                                                                    <div className="value" style={{ color: colors.success }}>{formatPriceAMD(event.ticketPrice)}</div>
                                                                 </DetailText>
                                                             </DetailItem>
                                                         </Grid>
@@ -711,13 +906,13 @@ const EventsPage = () => {
 
                                                     {/* Contact Information */}
                                                     {(event.contactEmail || event.phoneNumber) && (
-                                                        <Box sx={{ mt: 2, p: 2, bgcolor: alpha('#FF6B35', 0.04), borderRadius: '16px', border: `1px solid ${alpha('#FF6B35', 0.15)}` }}>
-                                                            <Typography variant="subtitle2" sx={{ fontWeight: 700, color: '#2C2C2C', mb: 1.5, display: 'flex', alignItems: 'center', gap: 1 }}>
+                                                        <Box sx={{ mt: 2, p: 2, bgcolor: alpha(colors.primary, 0.04), borderRadius: '16px', border: `1px solid ${alpha(colors.primary, 0.15)}` }}>
+                                                            <Typography variant="subtitle2" sx={{ fontWeight: 700, color: colors.text, mb: 1.5, display: 'flex', alignItems: 'center', gap: 1 }}>
                                                                 📞 Contact Information
                                                             </Typography>
                                                             {event.contactEmail && (
                                                                 <DetailItem sx={{ mb: 1 }}>
-                                                                    <DetailIcon sx={{ width: '28px', height: '28px', backgroundColor: alpha('#FF6B35', 0.08) }}>
+                                                                    <DetailIcon sx={{ width: '28px', height: '28px', backgroundColor: alpha(colors.primary, 0.08) }}>
                                                                         <EmailIcon sx={{ fontSize: 16 }} />
                                                                     </DetailIcon>
                                                                     <DetailText>
@@ -727,7 +922,7 @@ const EventsPage = () => {
                                                             )}
                                                             {event.phoneNumber && (
                                                                 <DetailItem>
-                                                                    <DetailIcon sx={{ width: '28px', height: '28px', backgroundColor: alpha('#FF6B35', 0.08) }}>
+                                                                    <DetailIcon sx={{ width: '28px', height: '28px', backgroundColor: alpha(colors.primary, 0.08) }}>
                                                                         <PhoneIcon sx={{ fontSize: 16 }} />
                                                                     </DetailIcon>
                                                                     <DetailText>
@@ -753,14 +948,17 @@ const EventsPage = () => {
                                 count={totalPages}
                                 page={page + 1}
                                 onChange={(e, newPage) => setPage(newPage - 1)}
-                                sx={{ '& .Mui-selected': { bgcolor: '#FF6B35 !important', color: 'white' } }}
+                                sx={{
+                                    '& .MuiPaginationItem-root': { color: colors.text, borderColor: colors.border },
+                                    '& .Mui-selected': { bgcolor: colors.primary, color: 'white', '&:hover': { bgcolor: colors.primaryDark } }
+                                }}
                             />
                         </Box>
                     )}
                 </Box>
 
                 <Snackbar open={snackbar.open} autoHideDuration={4000} onClose={() => setSnackbar({ ...snackbar, open: false })}>
-                    <Alert severity={snackbar.severity} sx={{ borderRadius: '12px' }}>{snackbar.message}</Alert>
+                    <Alert severity={snackbar.severity} sx={{ borderRadius: '12px', bgcolor: '#FFFDF7', color: colors.text }}>{snackbar.message}</Alert>
                 </Snackbar>
             </Box>
         </LocalizationProvider>
