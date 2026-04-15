@@ -1,5 +1,4 @@
-// src/pages/HomePage.js - Complete updated file
-
+// src/pages/HomePage.js
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import {
@@ -29,7 +28,8 @@ import {
     Select,
     FormControl,
     InputLabel,
-    GlobalStyles
+    GlobalStyles,
+    CircularProgress
 } from '@mui/material';
 import CloseIcon from '@mui/icons-material/Close';
 import AccountCircleIcon from '@mui/icons-material/AccountCircle';
@@ -38,41 +38,19 @@ import PersonIcon from '@mui/icons-material/Person';
 import CelebrationIcon from '@mui/icons-material/Celebration';
 import AdminPanelSettingsIcon from '@mui/icons-material/AdminPanelSettings';
 import ExploreIcon from '@mui/icons-material/Explore';
-import EmailIcon from '@mui/icons-material/Email';
 import RocketLaunchIcon from '@mui/icons-material/RocketLaunch';
-import StarIcon from '@mui/icons-material/Star';
 import AutoAwesomeIcon from '@mui/icons-material/AutoAwesome';
-import CakeIcon from '@mui/icons-material/Cake';
-import EmojiEventsIcon from '@mui/icons-material/EmojiEvents';
-import BrushIcon from '@mui/icons-material/Brush';
-import CameraAltIcon from '@mui/icons-material/CameraAlt';
-import LocationOnIcon from '@mui/icons-material/LocationOn';
-import ArrowForwardIcon from '@mui/icons-material/ArrowForward';
 import InfoIcon from '@mui/icons-material/Info';
 import HowToRegIcon from '@mui/icons-material/HowToReg';
 import SearchIcon from '@mui/icons-material/Search';
-import WhatshotIcon from '@mui/icons-material/Whatshot';
-import BookmarkIcon from '@mui/icons-material/Bookmark';
-// Category-specific icons (same as ServicesPage)
-import PartyIcon from '@mui/icons-material/EmojiEvents';
-import BirthdayIcon from '@mui/icons-material/Cake';
-import DecorationIcon from '@mui/icons-material/Brush';
-import PhotographyIcon from '@mui/icons-material/CameraAlt';
-import WeddingIcon from '@mui/icons-material/Favorite';
-import CorporateIcon from '@mui/icons-material/Business';
-import EngagementIcon from '@mui/icons-material/Diamond';
-import AnniversaryIcon from '@mui/icons-material/Star';
-import GraduationIcon from '@mui/icons-material/School';
-import FlowersIcon from '@mui/icons-material/LocalFlorist';
-import LightingIcon from '@mui/icons-material/Highlight';
-import StageIcon from '@mui/icons-material/TheaterComedy';
-import RentalsIcon from '@mui/icons-material/Inventory';
+import LocationOnIcon from '@mui/icons-material/LocationOn';
+import CategoryIcon from '@mui/icons-material/Category';
 import { alpha, keyframes } from '@mui/material/styles';
 import LoginPage from './LoginPage';
 import SignUpPage from './SignUpPage';
 import VerifyCodePage from './VerifyCodePage';
 import { useAuth } from '../context/AuthContext';
-import serviceAPI from '../services/serviceAPI';
+import eventAPI from '../services/eventAPI';
 
 // Custom animations
 const float = keyframes`
@@ -122,35 +100,25 @@ const scrollbarStyles = {
     },
 };
 
-// EXACT SAME CATEGORIES as ServicesPage.js
-const CATEGORIES = [
-    { value: 'PARTY', label: 'Party / Celebration', icon: <PartyIcon />, color: '#FF6B35' },
-    { value: 'BIRTHDAY', label: 'Birthday Party', icon: <BirthdayIcon />, color: '#FFB347' },
-    { value: 'DECORATION', label: 'Decoration', icon: <DecorationIcon />, color: '#FFA559' },
-    { value: 'PHOTOGRAPHY', label: 'Photography', icon: <PhotographyIcon />, color: '#FF6B35' },
-    { value: 'WEDDING', label: 'Wedding', icon: <WeddingIcon />, color: '#FF6B35' },
-    { value: 'CORPORATE', label: 'Corporate Event', icon: <CorporateIcon />, color: '#FF8C42' },
-    { value: 'ENGAGEMENT', label: 'Engagement', icon: <EngagementIcon />, color: '#FFB347' },
-    { value: 'ANNIVERSARY', label: 'Anniversary', icon: <AnniversaryIcon />, color: '#FF9F4A' },
-    { value: 'GRADUATION_CEREMONY', label: 'Graduation Party', icon: <GraduationIcon />, color: '#FF8C42' },
-    { value: 'FLOWERS', label: 'Floral Design', icon: <FlowersIcon />, color: '#FFA559' },
-    { value: 'LIGHTING', label: 'Lighting', icon: <LightingIcon />, color: '#FFB347' },
-    { value: 'STAGE_SETUP', label: 'Stage Setup', icon: <StageIcon />, color: '#FF6B35' },
-    { value: 'RENTALS', label: 'Equipment Rental', icon: <RentalsIcon />, color: '#FF9F4A' }
+// Event Categories (from backend EventCategory enum)
+const EVENT_CATEGORIES = [
+    { value: 'ART', label: 'Art' },
+    { value: 'HISTORY', label: 'History' },
+    { value: 'SCIENCE', label: 'Science' },
+    { value: 'NATURAL_HISTORY', label: 'Natural History' },
+    { value: 'TECHNOLOGY', label: 'Technology' },
+    { value: 'MILITARY', label: 'Military' },
+    { value: 'ARCHAEOLOGY', label: 'Archaeology' },
+    { value: 'CULTURAL', label: 'Cultural' },
+    { value: 'MARITIME', label: 'Maritime' },
+    { value: 'SPACE', label: 'Space' },
+    { value: 'TRANSPORT', label: 'Transport' },
+    { value: 'RELIGIOUS', label: 'Religious' },
+    { value: 'ETHNOGRAPHIC', label: 'Ethnographic' },
+    { value: 'OPEN_AIR', label: 'Open Air' }
 ];
 
-// Helper function to get category icon (same as ServicesPage)
-const getCategoryIcon = (categoryValue) => {
-    const category = CATEGORIES.find(c => c.value === categoryValue);
-    return category?.icon || <CelebrationIcon />;
-};
-
-// Helper function to get category display name (same as ServicesPage)
-const getCategoryDisplayName = (categoryValue) => {
-    const category = CATEGORIES.find(c => c.value === categoryValue);
-    return category?.label || categoryValue;
-};
-
+// Locations (from backend Location enum)
 const ARMENIAN_LOCATIONS = [
     { value: 'YEREVAN', label: 'Yerevan' },
     { value: 'GYUMRI', label: 'Gyumri' },
@@ -184,33 +152,32 @@ const ARMENIAN_LOCATIONS = [
     { value: 'JERMUK', label: 'Jermuk' }
 ];
 
-// Random positions for scattered categories
 const getRandomPosition = (index) => {
     const positions = [
-        { top: '12%', left: '5%', size: 90, anim: float, delay: 0, duration: 7 },
-        { top: '18%', right: '3%', size: 75, anim: floatReverse, delay: 0.5, duration: 8 },
-        { top: '35%', left: '8%', size: 65, anim: float, delay: 1, duration: 6 },
-        { top: '28%', right: '10%', size: 85, anim: floatReverse, delay: 1.5, duration: 9 },
-        { top: '50%', left: '15%', size: 70, anim: float, delay: 0.8, duration: 7.5 },
-        { top: '45%', right: '5%', size: 80, anim: floatReverse, delay: 2, duration: 8.5 },
-        { top: '65%', left: '3%', size: 60, anim: float, delay: 1.2, duration: 6.5 },
-        { top: '60%', right: '8%', size: 95, anim: floatReverse, delay: 0.3, duration: 7.8 },
-        { top: '78%', left: '12%', size: 70, anim: float, delay: 1.8, duration: 8.2 },
-        { top: '20%', left: '25%', size: 55, anim: floatReverse, delay: 2.2, duration: 5.5 },
-        { top: '40%', left: '35%', size: 45, anim: float, delay: 0.6, duration: 6.8 },
-        { top: '55%', left: '45%', size: 50, anim: floatReverse, delay: 1.4, duration: 7.2 },
-        { top: '70%', left: '55%', size: 40, anim: float, delay: 2.5, duration: 5.8 },
-        { top: '15%', right: '20%', size: 60, anim: floatReverse, delay: 0.9, duration: 8.8 },
-        { top: '30%', right: '30%', size: 50, anim: float, delay: 1.7, duration: 6.3 },
-        { top: '48%', right: '40%', size: 45, anim: floatReverse, delay: 2.1, duration: 7.6 },
-        { top: '62%', left: '28%', size: 55, anim: float, delay: 0.4, duration: 9.2 },
-        { top: '80%', right: '20%', size: 65, anim: floatReverse, delay: 1.1, duration: 6.9 },
-        { top: '85%', left: '35%', size: 50, anim: float, delay: 2.3, duration: 7.4 },
-        { top: '10%', left: '45%', size: 48, anim: floatReverse, delay: 0.7, duration: 8.1 },
-        { top: '90%', right: '45%', size: 42, anim: float, delay: 1.9, duration: 5.9 },
-        { top: '5%', right: '50%', size: 38, anim: floatReverse, delay: 2.4, duration: 6.4 },
-        { top: '72%', left: '65%', size: 48, anim: float, delay: 0.2, duration: 7.7 },
-        { top: '42%', left: '60%', size: 52, anim: floatReverse, delay: 1.6, duration: 8.3 },
+        { top: '12%', left: '5%', size: 90, anim: float, delay: 0, duration: 7, color: '#FF6B35' },
+        { top: '18%', right: '3%', size: 75, anim: floatReverse, delay: 0.5, duration: 8, color: '#FFB347' },
+        { top: '35%', left: '8%', size: 65, anim: float, delay: 1, duration: 6, color: '#FF8C42' },
+        { top: '28%', right: '10%', size: 85, anim: floatReverse, delay: 1.5, duration: 9, color: '#FF9F4A' },
+        { top: '50%', left: '15%', size: 70, anim: float, delay: 0.8, duration: 7.5, color: '#FF6B35' },
+        { top: '45%', right: '5%', size: 80, anim: floatReverse, delay: 2, duration: 8.5, color: '#FFB347' },
+        { top: '65%', left: '3%', size: 60, anim: float, delay: 1.2, duration: 6.5, color: '#FF8C42' },
+        { top: '60%', right: '8%', size: 95, anim: floatReverse, delay: 0.3, duration: 7.8, color: '#FF9F4A' },
+        { top: '78%', left: '12%', size: 70, anim: float, delay: 1.8, duration: 8.2, color: '#FF6B35' },
+        { top: '20%', left: '25%', size: 55, anim: floatReverse, delay: 2.2, duration: 5.5, color: '#FFB347' },
+        { top: '40%', left: '35%', size: 45, anim: float, delay: 0.6, duration: 6.8, color: '#FF8C42' },
+        { top: '55%', left: '45%', size: 50, anim: floatReverse, delay: 1.4, duration: 7.2, color: '#FF9F4A' },
+        { top: '70%', left: '55%', size: 40, anim: float, delay: 2.5, duration: 5.8, color: '#FF6B35' },
+        { top: '15%', right: '20%', size: 60, anim: floatReverse, delay: 0.9, duration: 8.8, color: '#FFB347' },
+        { top: '30%', right: '30%', size: 50, anim: float, delay: 1.7, duration: 6.3, color: '#FF8C42' },
+        { top: '48%', right: '40%', size: 45, anim: floatReverse, delay: 2.1, duration: 7.6, color: '#FF9F4A' },
+        { top: '62%', left: '28%', size: 55, anim: float, delay: 0.4, duration: 9.2, color: '#FF6B35' },
+        { top: '80%', right: '20%', size: 65, anim: floatReverse, delay: 1.1, duration: 6.9, color: '#FFB347' },
+        { top: '85%', left: '35%', size: 50, anim: float, delay: 2.3, duration: 7.4, color: '#FF8C42' },
+        { top: '10%', left: '45%', size: 48, anim: floatReverse, delay: 0.7, duration: 8.1, color: '#FF9F4A' },
+        { top: '90%', right: '45%', size: 42, anim: float, delay: 1.9, duration: 5.9, color: '#FF6B35' },
+        { top: '5%', right: '50%', size: 38, anim: floatReverse, delay: 2.4, duration: 6.4, color: '#FFB347' },
+        { top: '72%', left: '65%', size: 48, anim: float, delay: 0.2, duration: 7.7, color: '#FF8C42' },
+        { top: '42%', left: '60%', size: 52, anim: floatReverse, delay: 1.6, duration: 8.3, color: '#FF9F4A' },
     ];
     return positions[index % positions.length];
 };
@@ -233,7 +200,7 @@ function HomePage() {
     const [anchorEl, setAnchorEl] = useState(null);
     const [backgroundPosition, setBackgroundPosition] = useState({ x: 0, y: 0 });
     const [hoveredCategory, setHoveredCategory] = useState(null);
-    const [favoritesCount, setFavoritesCount] = useState(0);
+    const [searchLoading, setSearchLoading] = useState(false);
 
     // Search states
     const [searchQuery, setSearchQuery] = useState('');
@@ -249,22 +216,6 @@ function HomePage() {
         window.addEventListener('mousemove', handleMouseMove);
         return () => window.removeEventListener('mousemove', handleMouseMove);
     }, []);
-
-    // Load favorites count when user is logged in
-    useEffect(() => {
-        if (user) {
-            loadFavoritesCount();
-        }
-    }, [user]);
-
-    const loadFavoritesCount = async () => {
-        try {
-            const response = await serviceAPI.getFavorites(0, 100);
-            setFavoritesCount(response.data.totalElements || 0);
-        } catch (error) {
-            console.error('Error loading favorites count:', error);
-        }
-    };
 
     const handleMenuOpen = (event) => setAnchorEl(event.currentTarget);
     const handleMenuClose = () => setAnchorEl(null);
@@ -286,42 +237,52 @@ function HomePage() {
         navigate('/admin/dashboard');
     };
 
-    const handleServicesClick = (categoryId = null, sortByPopular = false) => {
+    const handleEventsClick = () => {
         if (!user) {
-            setSnackbar({ open: true, message: 'Please sign in to browse services', severity: 'warning' });
+            setSnackbar({ open: true, message: 'Please sign in to browse events', severity: 'warning' });
             handleOpenLoginModal();
             return;
         }
-
-        if (sortByPopular) {
-            navigate('/services?tab=popular');
-        } else if (categoryId) {
-            navigate(`/services?category=${categoryId}`);
-        } else {
-            navigate('/services');
-        }
+        navigate('/events');
     };
 
-    const handleSearch = () => {
+    const handleSearch = async () => {
         if (!user) {
-            setSnackbar({ open: true, message: 'Please sign in to search services', severity: 'warning' });
+            setSnackbar({ open: true, message: 'Please sign in to search events', severity: 'warning' });
             handleOpenLoginModal();
             return;
         }
 
-        const searchParams = {};
-        if (searchQuery.trim()) searchParams.query = searchQuery.trim();
-        if (selectedCategory) searchParams.category = selectedCategory;
-        if (selectedLocation) searchParams.location = selectedLocation;
+        setSearchLoading(true);
 
-        sessionStorage.setItem('servicesSearchParams', JSON.stringify(searchParams));
+        try {
+            // Build search params object
+            const searchParams = {};
+            if (searchQuery.trim()) searchParams.query = searchQuery.trim();
+            if (selectedCategory) searchParams.category = selectedCategory;
+            if (selectedLocation) searchParams.location = selectedLocation;
 
-        const urlParams = new URLSearchParams();
-        if (searchQuery.trim()) urlParams.append('query', searchQuery.trim());
-        if (selectedCategory) urlParams.append('category', selectedCategory);
-        if (selectedLocation) urlParams.append('location', selectedLocation);
+            // Save to session storage for EventsPage to use
+            sessionStorage.setItem('eventsSearchParams', JSON.stringify(searchParams));
 
-        navigate(`/services?${urlParams.toString()}`);
+            // Build URL with query parameters
+            const urlParams = new URLSearchParams();
+            if (searchQuery.trim()) urlParams.append('query', searchQuery.trim());
+            if (selectedCategory) urlParams.append('category', selectedCategory);
+            if (selectedLocation) urlParams.append('location', selectedLocation);
+
+            // Navigate to events page with search params
+            navigate(`/events?${urlParams.toString()}`);
+        } catch (error) {
+            console.error('Search error:', error);
+            setSnackbar({
+                open: true,
+                message: 'Failed to perform search',
+                severity: 'error'
+            });
+        } finally {
+            setSearchLoading(false);
+        }
     };
 
     const handleClearSearch = () => {
@@ -361,10 +322,10 @@ function HomePage() {
 
     const userInitial = user?.userName ? user.userName.charAt(0).toUpperCase() : '';
 
-    // Create scattered category elements using the exact same categories as ServicesPage
+    // Create scattered category elements
     const scatteredCategories = [];
     for (let i = 0; i < 24; i++) {
-        const category = CATEGORIES[i % CATEGORIES.length];
+        const category = EVENT_CATEGORIES[i % EVENT_CATEGORIES.length];
         const pos = getRandomPosition(i);
         scatteredCategories.push(
             <Box
@@ -386,7 +347,14 @@ function HomePage() {
                 }}
                 onMouseEnter={() => setHoveredCategory(category.value)}
                 onMouseLeave={() => setHoveredCategory(null)}
-                onClick={() => handleServicesClick(category.value, false)}
+                onClick={() => {
+                    if (user) {
+                        setSelectedCategory(category.value);
+                        setTimeout(() => handleSearch(), 100);
+                    } else {
+                        handleOpenLoginModal();
+                    }
+                }}
             >
                 <Tooltip title={category.label} placement="top" arrow>
                     <Box sx={{
@@ -399,29 +367,22 @@ function HomePage() {
                             width: pos.size,
                             height: pos.size,
                             borderRadius: '50%',
-                            background: `linear-gradient(135deg, ${category.color}20, ${category.color}05)`,
+                            background: `linear-gradient(135deg, ${pos.color}20, ${pos.color}05)`,
                             display: 'flex',
                             alignItems: 'center',
                             justifyContent: 'center',
-                            border: `2px solid ${alpha(category.color, hoveredCategory === category.value ? 0.8 : 0.3)}`,
+                            border: `2px solid ${alpha(pos.color, hoveredCategory === category.value ? 0.8 : 0.3)}`,
                             backdropFilter: 'blur(8px)',
                             transition: 'all 0.3s',
-                            boxShadow: hoveredCategory === category.value ? `0 0 30px ${alpha(category.color, 0.4)}` : 'none'
+                            boxShadow: hoveredCategory === category.value ? `0 0 30px ${alpha(pos.color, 0.4)}` : 'none'
                         }}>
-                            <Box sx={{
-                                color: category.color,
-                                fontSize: pos.size * 0.4,
-                                display: 'flex',
-                                transition: 'all 0.3s'
-                            }}>
-                                {category.icon}
-                            </Box>
+                            <CategoryIcon sx={{ color: pos.color, fontSize: pos.size * 0.4 }} />
                         </Box>
                         {hoveredCategory === category.value && (
                             <Typography sx={{
                                 fontSize: '12px',
                                 fontWeight: 600,
-                                color: category.color,
+                                color: pos.color,
                                 bgcolor: alpha('#FFFFFF', 0.9),
                                 px: 1.5,
                                 py: 0.5,
@@ -446,7 +407,6 @@ function HomePage() {
             overflowX: 'hidden',
             fontFamily: 'Inter, sans-serif'
         }}>
-            {/* Global Scrollbar Styles */}
             <GlobalStyles styles={scrollbarStyles} />
 
             {/* Animated Background */}
@@ -464,7 +424,7 @@ function HomePage() {
                 transition: 'background 0.3s ease-out'
             }} />
 
-            {/* Scattered Categories - Background layer */}
+            {/* Floating decorative circles */}
             <Box sx={{
                 position: 'fixed',
                 top: 0,
@@ -475,7 +435,7 @@ function HomePage() {
                 pointerEvents: 'none',
                 overflow: 'hidden'
             }}>
-                {CATEGORIES.map((cat, idx) => (
+                {[...Array(12)].map((_, idx) => (
                     <Box
                         key={`bg-circle-${idx}`}
                         sx={{
@@ -485,7 +445,7 @@ function HomePage() {
                             width: `${150 + (idx * 20)}px`,
                             height: `${150 + (idx * 20)}px`,
                             borderRadius: '50%',
-                            background: `radial-gradient(circle, ${alpha(cat.color, 0.06)} 0%, transparent 70%)`,
+                            background: `radial-gradient(circle, ${alpha(['#FF6B35', '#FFB347', '#FF8C42', '#FF9F4A'][idx % 4], 0.06)} 0%, transparent 70%)`,
                             animation: `${pulse} ${8 + idx}s ease-in-out infinite`,
                             pointerEvents: 'none'
                         }}
@@ -578,16 +538,15 @@ function HomePage() {
                             <Button
                                 startIcon={<CelebrationIcon />}
                                 sx={{ fontWeight: 500, color: '#4A4A4A', '&:hover': { color: '#FF6B35' } }}
-                                onClick={() => handleServicesClick()}
+                                onClick={handleEventsClick}
                             >
-                                Services
+                                Events
                             </Button>
                         </Box>
 
                         <Box sx={{ display: 'flex', alignItems: 'center', gap: 2 }}>
                             {user ? (
                                 <>
-                                    {/* Welcome Chip */}
                                     <Chip
                                         label={`Welcome, ${user.userName}`}
                                         size="small"
@@ -599,45 +558,6 @@ function HomePage() {
                                         }}
                                     />
 
-                                    {/* Saved Button with Bookmark Icon */}
-                                    <Tooltip title="Saved Services">
-                                        <IconButton
-                                            onClick={() => navigate('/favorites')}
-                                            sx={{
-                                                position: 'relative',
-                                                bgcolor: alpha('#FF6B35', 0.1),
-                                                '&:hover': {
-                                                    bgcolor: alpha('#FF6B35', 0.2),
-                                                    transform: 'scale(1.05)'
-                                                }
-                                            }}
-                                        >
-                                            <BookmarkIcon sx={{ color: '#FF6B35' }} />
-                                            {favoritesCount > 0 && (
-                                                <Box
-                                                    sx={{
-                                                        position: 'absolute',
-                                                        top: -5,
-                                                        right: -5,
-                                                        bgcolor: '#FF5722',
-                                                        color: 'white',
-                                                        borderRadius: '50%',
-                                                        width: 20,
-                                                        height: 20,
-                                                        display: 'flex',
-                                                        alignItems: 'center',
-                                                        justifyContent: 'center',
-                                                        fontSize: '11px',
-                                                        fontWeight: 'bold'
-                                                    }}
-                                                >
-                                                    {favoritesCount > 99 ? '99+' : favoritesCount}
-                                                </Box>
-                                            )}
-                                        </IconButton>
-                                    </Tooltip>
-
-                                    {/* Profile Icon */}
                                     <IconButton
                                         onClick={handleMenuOpen}
                                         sx={{
@@ -717,7 +637,6 @@ function HomePage() {
                                 animation: `${slideIn} 0.8s ease-out`,
                                 textAlign: 'center'
                             }}>
-                                {/* Main Title */}
                                 <Typography
                                     variant="h1"
                                     sx={{
@@ -738,11 +657,10 @@ function HomePage() {
                                         WebkitBackgroundClip: 'text',
                                         color: 'transparent'
                                     }}>
-                                        Holiday Services
+                                        Events
                                     </Box>
                                 </Typography>
 
-                                {/* Decorative line */}
                                 <Box sx={{
                                     width: 60,
                                     height: 3,
@@ -752,7 +670,6 @@ function HomePage() {
                                     mx: 'auto'
                                 }} />
 
-                                {/* Dynamic, interesting call-to-action text */}
                                 <Typography
                                     sx={{
                                         fontSize: { xs: 18, md: 22, lg: 24 },
@@ -765,18 +682,18 @@ function HomePage() {
                                         textAlign: 'center'
                                     }}
                                 >
-                                    Your next celebration is just a click away.
+                                    Your next cultural experience is just a click away.
                                     <Box component="span" sx={{ display: 'inline-block', ml: 1, animation: `${pulse} 2s infinite` }}>
                                         🎉
                                     </Box>
                                 </Typography>
 
-                                {/* Search Bar - WITH SAME CATEGORY STYLING AS SERVICESPAGE */}
+                                {/* Search Bar */}
                                 <Paper elevation={0} sx={{
-                                    maxWidth: 900,
+                                    maxWidth: 1000,
                                     mx: 'auto',
                                     mb: 4,
-                                    p: 2,
+                                    p: 2.5,
                                     borderRadius: '60px',
                                     background: alpha('#FFFFFF', 0.95),
                                     backdropFilter: 'blur(10px)',
@@ -787,7 +704,7 @@ function HomePage() {
                                         <Grid item xs={12} md={4}>
                                             <TextField
                                                 fullWidth
-                                                placeholder="Search services..."
+                                                placeholder="Search events by name or description..."
                                                 value={searchQuery}
                                                 onChange={(e) => setSearchQuery(e.target.value)}
                                                 onKeyPress={(e) => e.key === 'Enter' && handleSearch()}
@@ -825,19 +742,17 @@ function HomePage() {
                                                         }
                                                     }}
                                                     renderValue={(selected) => {
-                                                        const category = CATEGORIES.find(c => c.value === selected);
-                                                        return category ? (
-                                                            <Box sx={{ display: 'flex', alignItems: 'center', gap: 1.5 }}>
-                                                                {React.cloneElement(category.icon, { sx: { fontSize: 20, color: '#FF6B35' } })}
-                                                                <span>{category.label}</span>
-                                                            </Box>
-                                                        ) : selected;
+                                                        const category = EVENT_CATEGORIES.find(c => c.value === selected);
+                                                        return category ? category.label : selected;
                                                     }}
                                                 >
-                                                    {CATEGORIES.map((cat) => (
+                                                    <MenuItem value="">
+                                                        <em>All Categories</em>
+                                                    </MenuItem>
+                                                    {EVENT_CATEGORIES.map((cat) => (
                                                         <MenuItem key={cat.value} value={cat.value}>
                                                             <Box sx={{ display: 'flex', alignItems: 'center', gap: 1.5 }}>
-                                                                {React.cloneElement(cat.icon, { sx: { fontSize: 20, color: '#FF6B35' } })}
+                                                                <CategoryIcon sx={{ fontSize: 20, color: '#FF6B35' }} />
                                                                 <span>{cat.label}</span>
                                                             </Box>
                                                         </MenuItem>
@@ -859,7 +774,14 @@ function HomePage() {
                                                             borderColor: '#E8E0D8'
                                                         }
                                                     }}
+                                                    renderValue={(selected) => {
+                                                        const location = ARMENIAN_LOCATIONS.find(l => l.value === selected);
+                                                        return location ? location.label : selected;
+                                                    }}
                                                 >
+                                                    <MenuItem value="">
+                                                        <em>All Locations</em>
+                                                    </MenuItem>
                                                     {ARMENIAN_LOCATIONS.map((location) => (
                                                         <MenuItem key={location.value} value={location.value}>
                                                             <Box sx={{ display: 'flex', alignItems: 'center', gap: 1.5 }}>
@@ -877,6 +799,7 @@ function HomePage() {
                                                     fullWidth
                                                     variant="contained"
                                                     onClick={handleSearch}
+                                                    disabled={searchLoading}
                                                     sx={{
                                                         background: 'linear-gradient(135deg, #FF6B35 0%, #FFB347 100%)',
                                                         height: '56px',
@@ -891,7 +814,7 @@ function HomePage() {
                                                         }
                                                     }}
                                                 >
-                                                    Search
+                                                    {searchLoading ? <CircularProgress size={24} sx={{ color: 'white' }} /> : 'Search'}
                                                 </Button>
                                                 {(searchQuery || selectedCategory || selectedLocation) && (
                                                     <Tooltip title="Clear filters">
@@ -923,7 +846,7 @@ function HomePage() {
                                 <Stack direction={{ xs: 'column', sm: 'row' }} spacing={2.5} justifyContent="center">
                                     <Button
                                         variant="contained"
-                                        onClick={() => handleServicesClick()}
+                                        onClick={handleEventsClick}
                                         endIcon={<RocketLaunchIcon />}
                                         sx={{
                                             background: 'linear-gradient(135deg, #FF6B35 0%, #FFB347 100%)',
@@ -940,55 +863,15 @@ function HomePage() {
                                             transition: 'all 0.3s'
                                         }}
                                     >
-                                        Browse All Services
-                                    </Button>
-                                    <Button
-                                        variant="contained"
-                                        onClick={() => handleServicesClick(null, true)}
-                                        endIcon={<WhatshotIcon />}
-                                        sx={{
-                                            background: 'linear-gradient(135deg, #FF6B35 0%, #FFB347 100%)',
-                                            borderRadius: '40px',
-                                            padding: '12px 32px',
-                                            fontSize: 15,
-                                            fontWeight: 600,
-                                            textTransform: 'none',
-                                            boxShadow: '0 8px 20px rgba(255,107,53,0.25)',
-                                            '&:hover': {
-                                                transform: 'translateY(-2px)',
-                                                boxShadow: '0 12px 28px rgba(255,107,53,0.35)',
-                                            },
-                                            transition: 'all 0.3s'
-                                        }}
-                                    >
-                                        View Popular Services
+                                        Browse All Events
                                     </Button>
                                 </Stack>
                             </Box>
                         </Fade>
                     </Container>
-
-                    {/* Decorative floating elements */}
-                    {!isMobile && (
-                        <Box sx={{
-                            position: 'absolute',
-                            right: '5%',
-                            top: '50%',
-                            transform: 'translateY(-50%)',
-                            opacity: 0.6
-                        }}>
-                            <Box sx={{
-                                width: 120,
-                                height: 120,
-                                borderRadius: '50%',
-                                background: `radial-gradient(circle, ${alpha('#FF6B35', 0.15)} 0%, transparent 70%)`,
-                                animation: `${pulse} 4s ease-in-out infinite`
-                            }} />
-                        </Box>
-                    )}
                 </Box>
 
-                {/* How It Works Section - UPDATED with justify text and new content */}
+                {/* How It Works Section */}
                 <Box id="how-it-works" sx={{
                     py: { xs: 8, md: 10 },
                     mt: -5,
@@ -1021,21 +904,21 @@ function HomePage() {
                                 {
                                     icon: <ExploreIcon sx={{ fontSize: 40 }} />,
                                     title: 'Explore',
-                                    desc: 'Browse through 13+ curated service categories and discover the perfect vendors for your event.',
+                                    desc: 'Browse through 14+ event categories and discover amazing cultural experiences at museums across Armenia.',
                                     color: '#FF6B35',
                                     gradient: 'linear-gradient(135deg, #FF6B35 0%, #FF8C42 100%)'
                                 },
                                 {
-                                    icon: <BookmarkIcon sx={{ fontSize: 40 }} />,
-                                    title: 'Save',
-                                    desc: 'Bookmark your favorite services, compare prices and features side by side to make the best choice.',
+                                    icon: <AutoAwesomeIcon sx={{ fontSize: 40 }} />,
+                                    title: 'Discover',
+                                    desc: 'Find the perfect events that match your interests, schedule, and budget with our smart search filters.',
                                     color: '#FFB347',
                                     gradient: 'linear-gradient(135deg, #FFB347 0%, #FF9F4A 100%)'
                                 },
                                 {
                                     icon: <RocketLaunchIcon sx={{ fontSize: 40 }} />,
-                                    title: 'Celebrate',
-                                    desc: 'Connect with providers instantly, secure your booking, and enjoy a stress-free celebration!',
+                                    title: 'Experience',
+                                    desc: 'Connect with museums, book your spot, and enjoy unforgettable cultural experiences!',
                                     color: '#FF8C42',
                                     gradient: 'linear-gradient(135deg, #FF8C42 0%, #FFA559 100%)'
                                 }

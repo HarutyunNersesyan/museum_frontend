@@ -1,5 +1,4 @@
 // App.js
-
 import React from 'react';
 import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-dom';
 import { AuthProvider } from './context/AuthContext';
@@ -10,9 +9,7 @@ import ProfilePage from './pages/ProfilePage';
 import LoginPage from './pages/LoginPage';
 import SignUpPage from './pages/SignUpPage';
 import VerifyCodePage from './pages/VerifyCodePage';
-import ServicesPage from './pages/ServicesPage';
-import ServiceDetailPage from './pages/ServiceDetailPage';
-import FavoritesPage from './pages/FavoritesPage'; // ADD THIS IMPORT
+import EventsPage from './pages/EventsPage';
 import AdminLoginPage from './pages/AdminLoginPage';
 import AdminDashboardPage from './pages/AdminDashboardPage';
 import './App.css';
@@ -44,30 +41,12 @@ const AppContent = () => {
                 />
                 <Route path="/admin" element={<Navigate to="/admin/auth" replace />} />
 
-                {/* Service Pages - Require Authentication */}
+                {/* Events Pages - Require Authentication */}
                 <Route
-                    path="/services"
+                    path="/events"
                     element={
                         <ProtectedRoute>
-                            <ServicesPage />
-                        </ProtectedRoute>
-                    }
-                />
-                <Route
-                    path="/services/:id"
-                    element={
-                        <ProtectedRoute>
-                            <ServiceDetailPage />
-                        </ProtectedRoute>
-                    }
-                />
-
-                {/* Favorites Page - ADD THIS ROUTE */}
-                <Route
-                    path="/favorites"
-                    element={
-                        <ProtectedRoute>
-                            <FavoritesPage />
+                            <EventsPage />
                         </ProtectedRoute>
                     }
                 />

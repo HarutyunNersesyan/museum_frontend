@@ -27,9 +27,7 @@ import {
     CircularProgress,
     Tabs,
     Tab,
-    FormControlLabel,
     InputAdornment,
-    Tooltip,
     Backdrop,
     FormControl,
     InputLabel,
@@ -65,9 +63,8 @@ import {
     LocationOn as LocationIcon,
     Category as CategoryIcon,
     CalendarToday as CalendarIcon,
-    MonetizationOn as MoneyIcon,
-    LocalOffer as TicketIcon,
-    AttachMoney as PriceIcon
+    AttachMoney as PriceIcon,
+    LocalOffer as TicketIcon
 } from '@mui/icons-material';
 import { useAuth } from '../context/AuthContext';
 import { alpha, styled } from '@mui/material/styles';
@@ -156,30 +153,6 @@ const ServiceImage = styled('img')({
     objectFit: 'contain',
     borderRadius: '12px'
 });
-
-const InfoCard = styled(Box)(({ theme }) => ({
-    display: 'flex',
-    alignItems: 'center',
-    gap: '8px',
-    padding: '8px 12px',
-    backgroundColor: '#FFF8F0',
-    borderRadius: '12px',
-    border: '1px solid #D4A574',
-}));
-
-const InfoLabel = styled(Typography)(({ theme }) => ({
-    color: '#8B6914',
-    fontSize: '0.7rem',
-    fontWeight: 600,
-    textTransform: 'uppercase',
-    letterSpacing: '0.5px',
-}));
-
-const InfoValue = styled(Typography)(({ theme }) => ({
-    color: '#3D2A1A',
-    fontSize: '0.95rem',
-    fontWeight: 700
-}));
 
 const DetailItem = styled(Box)(({ theme }) => ({
     display: 'flex',
@@ -271,7 +244,6 @@ const eventTypes = [
     { value: 'MOBILE', label: '📱 Mobile' }
 ];
 
-// Helper function to parse date from backend
 const parseEventDate = (dateValue) => {
     if (!dateValue) return dayjs();
     if (dayjs.isDayjs(dateValue)) return dateValue;
@@ -321,11 +293,8 @@ const AdminDashboardPage = () => {
     const [imageFiles, setImageFiles] = useState([]);
     const [imagePreviews, setImagePreviews] = useState([]);
     const [existingImages, setExistingImages] = useState([]);
-    const fileInputRef = useRef(null);
-    const [phoneNumbersList, setPhoneNumbersList] = useState([]);
+    const [phoneNumber, setPhoneNumber] = useState('');
     const [contactEmail, setContactEmail] = useState('');
-    const [newPhoneNumber, setNewPhoneNumber] = useState('');
-    const [phoneError, setPhoneError] = useState('');
     const [museumsList, setMuseumsList] = useState([]);
 
     const [eventFormData, setEventFormData] = useState({
@@ -336,28 +305,6 @@ const AdminDashboardPage = () => {
     const [museumFormData, setMuseumFormData] = useState({ name: '' });
 
     const validateArmenianPhone = (phone) => /^[0-9]{8}$/.test(phone);
-
-    const handleAddPhoneNumber = () => {
-        if (!newPhoneNumber.trim()) {
-            setPhoneError('Please enter a phone number');
-            return;
-        }
-        if (!validateArmenianPhone(newPhoneNumber.trim())) {
-            setPhoneError('Phone number must be exactly 8 digits');
-            return;
-        }
-        if (phoneNumbersList.includes(newPhoneNumber.trim())) {
-            setPhoneError('This phone number already exists');
-            return;
-        }
-        setPhoneNumbersList([...phoneNumbersList, newPhoneNumber.trim()]);
-        setNewPhoneNumber('');
-        setPhoneError('');
-    };
-
-    const handleRemovePhoneNumber = (index) => {
-        setPhoneNumbersList(phoneNumbersList.filter((_, i) => i !== index));
-    };
 
     useEffect(() => {
         const token = localStorage.getItem('token');
@@ -443,9 +390,8 @@ const AdminDashboardPage = () => {
         setImageFiles([]);
         setImagePreviews([]);
         setExistingImages([]);
-        setPhoneNumbersList([]);
+        setPhoneNumber('');
         setContactEmail('');
-        setNewPhoneNumber('');
         setEventDialogOpen(true);
     };
 
@@ -466,7 +412,7 @@ const AdminDashboardPage = () => {
         setExistingImages(event.imageUrls || []);
         setImageFiles([]);
         setImagePreviews([]);
-        setPhoneNumbersList(event.phoneNumbers || []);
+        setPhoneNumber(event.phoneNumber || '');
         setContactEmail(event.contactEmail || '');
         setEventDialogOpen(true);
     };
@@ -477,9 +423,8 @@ const AdminDashboardPage = () => {
         setImageFiles([]);
         setImagePreviews([]);
         setExistingImages([]);
-        setPhoneNumbersList([]);
+        setPhoneNumber('');
         setContactEmail('');
-        setNewPhoneNumber('');
     };
 
     const handleOpenCreateMuseumDialog = () => {
@@ -533,6 +478,11 @@ const AdminDashboardPage = () => {
             return;
         }
 
+        if (phoneNumber && !validateArmenianPhone(phoneNumber)) {
+            setSnackbar({ open: true, message: 'Phone number must be exactly 8 digits', severity: 'warning' });
+            return;
+        }
+
         setLoading(true);
         try {
             let formattedDate;
@@ -559,7 +509,7 @@ const AdminDashboardPage = () => {
                 location: eventFormData.location,
                 duration: eventFormData.duration ? parseInt(eventFormData.duration) : null,
                 museumId: parseInt(eventFormData.museumId),
-                phoneNumbers: phoneNumbersList,
+                phoneNumber: phoneNumber || null,
                 contactEmail: contactEmail || null
             };
 
@@ -838,7 +788,7 @@ const AdminDashboardPage = () => {
                                                             </Box>
                                                             <Typography variant="body2" sx={{ color: '#5A3A2A', mb: 3, lineHeight: 1.6 }}>{event.description}</Typography>
 
-                                                            {/* Details with Icons - New Design */}
+                                                            {/* Details with Icons */}
                                                             <Box sx={{ mb: 3 }}>
                                                                 <Grid container spacing={2}>
                                                                     <Grid item xs={12} sm={6}>
@@ -923,8 +873,8 @@ const AdminDashboardPage = () => {
                                                                 </DetailItem>
                                                             )}
 
-                                                            {/* Contact Information */}
-                                                            {(event.contactEmail || event.phoneNumbers?.length > 0) && (
+                                                            {/* Contact Information - Single Phone Number */}
+                                                            {(event.contactEmail || event.phoneNumber) && (
                                                                 <Box sx={{ mt: 2, p: 2, bgcolor: '#FFF8F0', borderRadius: '12px', border: '1px solid #D4A574' }}>
                                                                     <Typography variant="subtitle2" sx={{ fontWeight: 700, color: '#3D2A1A', mb: 1.5 }}>📞 Contact Information</Typography>
                                                                     {event.contactEmail && (
@@ -937,13 +887,15 @@ const AdminDashboardPage = () => {
                                                                             </DetailText>
                                                                         </DetailItem>
                                                                     )}
-                                                                    {event.phoneNumbers?.length > 0 && (
-                                                                        <Box sx={{ display: 'flex', flexWrap: 'wrap', gap: 1, mt: 1 }}>
-                                                                            <PhoneIcon sx={{ fontSize: 16, color: '#FF9800', mt: 0.5 }} />
-                                                                            {event.phoneNumbers.map((phone, idx) => (
-                                                                                <Chip key={idx} label={phone} size="small" sx={{ bgcolor: alpha('#FF9800', 0.15), color: '#FF9800', fontWeight: 500 }} />
-                                                                            ))}
-                                                                        </Box>
+                                                                    {event.phoneNumber && (
+                                                                        <DetailItem>
+                                                                            <DetailIcon sx={{ width: '28px', height: '28px' }}>
+                                                                                <PhoneIcon sx={{ fontSize: 16 }} />
+                                                                            </DetailIcon>
+                                                                            <DetailText>
+                                                                                <div className="value" style={{ fontSize: '0.85rem' }}>{event.phoneNumber}</div>
+                                                                            </DetailText>
+                                                                        </DetailItem>
                                                                     )}
                                                                 </Box>
                                                             )}
@@ -1127,20 +1079,28 @@ const AdminDashboardPage = () => {
                                 </Grid>
                             </Grid>
 
+                            {/* Contact Information - Single Phone Number */}
                             <Box>
                                 <Typography variant="subtitle1" sx={{ fontWeight: 700, color: '#3D2A1A', mb: 2 }}>Contact Information</Typography>
-                                <FlatTextField fullWidth type="email" label="Contact Email" value={contactEmail} onChange={(e) => setContactEmail(e.target.value)} sx={{ mb: 2 }} />
-                                <Box sx={{ display: 'flex', gap: 1, mb: 2 }}>
-                                    <FlatTextField size="small" placeholder="Phone (8 digits)" value={newPhoneNumber} onChange={(e) => { setNewPhoneNumber(e.target.value); setPhoneError(''); }} error={!!phoneError} helperText={phoneError} sx={{ flex: 1 }} />
-                                    <GradientButton onClick={handleAddPhoneNumber} sx={{ minWidth: 80 }}>Add</GradientButton>
-                                </Box>
-                                <Box sx={{ display: 'flex', flexWrap: 'wrap', gap: 1 }}>
-                                    {phoneNumbersList.map((phone, idx) => (
-                                        <Chip key={idx} label={phone} onDelete={() => handleRemovePhoneNumber(idx)} sx={{ bgcolor: alpha('#FF9800', 0.15), color: '#FF9800' }} />
-                                    ))}
-                                </Box>
+                                <FlatTextField
+                                    fullWidth
+                                    type="email"
+                                    label="Contact Email"
+                                    value={contactEmail}
+                                    onChange={(e) => setContactEmail(e.target.value)}
+                                    sx={{ mb: 2 }}
+                                />
+                                <FlatTextField
+                                    fullWidth
+                                    label="Phone Number (8 digits)"
+                                    value={phoneNumber}
+                                    onChange={(e) => setPhoneNumber(e.target.value)}
+                                    placeholder="e.g., 12345678"
+                                    helperText="Enter exactly 8 digits"
+                                />
                             </Box>
 
+                            {/* Images Section */}
                             <Box>
                                 <Typography variant="subtitle1" sx={{ fontWeight: 700, color: '#3D2A1A', mb: 2 }}>Images</Typography>
                                 <OutlinedButton component="label" startIcon={<UploadIcon />} fullWidth sx={{ py: 1.5, backgroundColor: '#FFF8F0' }}>

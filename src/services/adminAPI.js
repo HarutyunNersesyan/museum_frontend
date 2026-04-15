@@ -1,8 +1,7 @@
 // src/services/adminAPI.js
-
 import axios from 'axios';
 
-const API_BASE_URL = 'http://localhost:8080/api/private/admin';
+const API_BASE_URL = process.env.REACT_APP_API_URL || 'http://localhost:8080/api/private/admin';
 
 const getAuthHeaders = () => {
     const token = localStorage.getItem('token');
@@ -15,304 +14,216 @@ const getAuthHeaders = () => {
 // ==================== MUSEUM API ====================
 export const adminMuseumAPI = {
     getAllMuseums: async (page = 0, size = 20) => {
-        try {
-            const response = await axios.get(
-                `${API_BASE_URL}/museums?page=${page}&size=${size}`,
-                { headers: getAuthHeaders() }
-            );
-            return response;
-        } catch (error) {
-            console.error('Get all museums error:', error);
-            throw error;
-        }
+        const response = await axios.get(
+            `${API_BASE_URL}/museums?page=${page}&size=${size}`,
+            { headers: getAuthHeaders() }
+        );
+        return response;
     },
 
     getMuseumById: async (id) => {
-        try {
-            const response = await axios.get(
-                `${API_BASE_URL}/museums/${id}`,
-                { headers: getAuthHeaders() }
-            );
-            return response;
-        } catch (error) {
-            console.error('Get museum by ID error:', error);
-            throw error;
-        }
+        const response = await axios.get(
+            `${API_BASE_URL}/museums/${id}`,
+            { headers: getAuthHeaders() }
+        );
+        return response;
     },
 
     createMuseum: async (museumData) => {
-        try {
-            const response = await axios.post(
-                `${API_BASE_URL}/museums`,
-                museumData,
-                { headers: getAuthHeaders() }
-            );
-            return response;
-        } catch (error) {
-            console.error('Create museum error:', error);
-            throw error;
-        }
+        const response = await axios.post(
+            `${API_BASE_URL}/museums`,
+            museumData,
+            { headers: getAuthHeaders() }
+        );
+        return response;
     },
 
     updateMuseum: async (id, museumData) => {
-        try {
-            const response = await axios.put(
-                `${API_BASE_URL}/museums/${id}`,
-                museumData,
-                { headers: getAuthHeaders() }
-            );
-            return response;
-        } catch (error) {
-            console.error('Update museum error:', error);
-            throw error;
-        }
+        const response = await axios.put(
+            `${API_BASE_URL}/museums/${id}`,
+            museumData,
+            { headers: getAuthHeaders() }
+        );
+        return response;
     },
 
     deleteMuseum: async (id) => {
-        try {
-            const response = await axios.delete(
-                `${API_BASE_URL}/museums/${id}`,
-                { headers: getAuthHeaders() }
-            );
-            return response;
-        } catch (error) {
-            console.error('Delete museum error:', error);
-            throw error;
-        }
+        const response = await axios.delete(
+            `${API_BASE_URL}/museums/${id}`,
+            { headers: getAuthHeaders() }
+        );
+        return response;
     }
 };
 
 // ==================== EVENT API ====================
 export const adminEventAPI = {
     getAllEvents: async (page = 0, size = 20) => {
-        try {
-            const response = await axios.get(
-                `${API_BASE_URL}/events?page=${page}&size=${size}`,
-                { headers: getAuthHeaders() }
-            );
-            return response;
-        } catch (error) {
-            console.error('Get all events error:', error);
-            throw error;
-        }
+        const response = await axios.get(
+            `${API_BASE_URL}/events?page=${page}&size=${size}`,
+            { headers: getAuthHeaders() }
+        );
+        return response;
     },
 
     getEventById: async (id) => {
-        try {
-            const response = await axios.get(
-                `${API_BASE_URL}/events/${id}`,
-                { headers: getAuthHeaders() }
-            );
-            return response;
-        } catch (error) {
-            console.error('Get event by ID error:', error);
-            throw error;
-        }
+        const response = await axios.get(
+            `${API_BASE_URL}/events/${id}`,
+            { headers: getAuthHeaders() }
+        );
+        return response;
     },
 
     getEventsByMuseumId: async (museumId, page = 0, size = 20) => {
-        try {
-            const response = await axios.get(
-                `${API_BASE_URL}/events/museum/${museumId}?page=${page}&size=${size}`,
-                { headers: getAuthHeaders() }
-            );
-            return response;
-        } catch (error) {
-            console.error('Get events by museum ID error:', error);
-            throw error;
-        }
+        const response = await axios.get(
+            `${API_BASE_URL}/events/museum/${museumId}?page=${page}&size=${size}`,
+            { headers: getAuthHeaders() }
+        );
+        return response;
     },
 
     createEvent: async (eventData) => {
-        try {
-            const response = await axios.post(
-                `${API_BASE_URL}/events`,
-                eventData,
-                { headers: getAuthHeaders() }
-            );
-            return response;
-        } catch (error) {
-            console.error('Create event error:', error);
-            throw error;
-        }
+        const response = await axios.post(
+            `${API_BASE_URL}/events`,
+            eventData,
+            { headers: getAuthHeaders() }
+        );
+        return response;
     },
 
     createEventWithImages: async (eventData, imageFiles = []) => {
-        try {
-            const formData = new FormData();
+        const formData = new FormData();
 
-            formData.append('name', eventData.name);
-            formData.append('description', eventData.description);
-            formData.append('eventCategory', eventData.eventCategory);
-            formData.append('eventType', eventData.eventType);
-            formData.append('eventDate', eventData.eventDate);
-            formData.append('guidePrice', eventData.guidePrice.toString());
-            formData.append('ticketPrice', eventData.ticketPrice.toString());
-            formData.append('location', eventData.location);
-            formData.append('museumId', eventData.museumId.toString());
+        // Basic fields
+        formData.append('name', eventData.name);
+        formData.append('description', eventData.description);
+        formData.append('eventCategory', eventData.eventCategory);
+        formData.append('eventType', eventData.eventType);
+        formData.append('eventDate', eventData.eventDate);
+        formData.append('guidePrice', eventData.guidePrice.toString());
+        formData.append('ticketPrice', eventData.ticketPrice.toString());
+        formData.append('location', eventData.location);
+        formData.append('museumId', eventData.museumId.toString());
 
-            if (eventData.duration) {
-                formData.append('duration', eventData.duration.toString());
-            }
-
-            if (eventData.phoneNumbers && eventData.phoneNumbers.length > 0) {
-                eventData.phoneNumbers.forEach(phone => {
-                    formData.append('phoneNumbers', phone);
-                });
-            }
-
-            if (eventData.contactEmail) {
-                formData.append('contactEmail', eventData.contactEmail);
-            }
-
-            if (imageFiles && imageFiles.length > 0) {
-                imageFiles.forEach(file => {
-                    formData.append('images', file);
-                });
-            }
-
-            const token = localStorage.getItem('token');
-            const response = await axios.post(
-                `${API_BASE_URL}/events/with-images`,
-                formData,
-                {
-                    headers: {
-                        'Authorization': `Bearer ${token}`
-                    }
-                }
-            );
-            return response;
-        } catch (error) {
-            console.error('Create event with images error:', error);
-            throw error;
+        // Optional fields
+        if (eventData.duration) {
+            formData.append('duration', eventData.duration.toString());
         }
-    },
 
-    updateEvent: async (id, eventData) => {
-        try {
-            const response = await axios.put(
-                `${API_BASE_URL}/events/${id}`,
-                eventData,
-                { headers: getAuthHeaders() }
-            );
-            return response;
-        } catch (error) {
-            console.error('Update event error:', error);
-            throw error;
+        // Single phone number (not a list)
+        if (eventData.phoneNumber) {
+            formData.append('phoneNumber', eventData.phoneNumber);
         }
-    },
 
-    updateEventWithImages: async (id, eventData, imageFiles = [], existingImageUrls = []) => {
-        try {
-            const formData = new FormData();
-
-            formData.append('name', eventData.name);
-            formData.append('description', eventData.description);
-            formData.append('eventCategory', eventData.eventCategory);
-            formData.append('eventType', eventData.eventType);
-            formData.append('eventDate', eventData.eventDate);
-            formData.append('guidePrice', eventData.guidePrice.toString());
-            formData.append('ticketPrice', eventData.ticketPrice.toString());
-            formData.append('location', eventData.location);
-            formData.append('museumId', eventData.museumId.toString());
-
-            if (eventData.duration) {
-                formData.append('duration', eventData.duration.toString());
-            }
-
-            if (eventData.phoneNumbers && eventData.phoneNumbers.length > 0) {
-                eventData.phoneNumbers.forEach(phone => {
-                    formData.append('phoneNumbers', phone);
-                });
-            }
-
-            if (eventData.contactEmail) {
-                formData.append('contactEmail', eventData.contactEmail);
-            }
-
-            if (existingImageUrls && existingImageUrls.length > 0) {
-                existingImageUrls.forEach(url => {
-                    formData.append('existingImageUrls', url);
-                });
-            }
-
-            if (imageFiles && imageFiles.length > 0) {
-                imageFiles.forEach(file => {
-                    formData.append('images', file);
-                });
-            }
-
-            const token = localStorage.getItem('token');
-            const response = await axios.put(
-                `${API_BASE_URL}/events/${id}/with-images`,
-                formData,
-                {
-                    headers: {
-                        'Authorization': `Bearer ${token}`
-                    }
-                }
-            );
-            return response;
-        } catch (error) {
-            console.error('Update event with images error:', error);
-            throw error;
+        if (eventData.contactEmail) {
+            formData.append('contactEmail', eventData.contactEmail);
         }
-    },
 
-    uploadEventImages: async (eventId, imageFiles) => {
-        try {
-            const formData = new FormData();
+        // Images
+        if (imageFiles && imageFiles.length > 0) {
             imageFiles.forEach(file => {
                 formData.append('images', file);
             });
-
-            const token = localStorage.getItem('token');
-            const response = await axios.post(
-                `${API_BASE_URL}/events/${eventId}/images`,
-                formData,
-                {
-                    headers: {
-                        'Authorization': `Bearer ${token}`
-                    }
-                }
-            );
-            return response;
-        } catch (error) {
-            console.error('Upload event images error:', error);
-            throw error;
         }
+
+        const token = localStorage.getItem('token');
+        const response = await axios.post(
+            `${API_BASE_URL}/events/with-images`,
+            formData,
+            {
+                headers: {
+                    'Authorization': `Bearer ${token}`
+                }
+            }
+        );
+        return response;
+    },
+
+    updateEvent: async (id, eventData) => {
+        const response = await axios.put(
+            `${API_BASE_URL}/events/${id}`,
+            eventData,
+            { headers: getAuthHeaders() }
+        );
+        return response;
+    },
+
+    updateEventWithImages: async (id, eventData, imageFiles = [], existingImageUrls = []) => {
+        const formData = new FormData();
+
+        // Basic fields
+        formData.append('name', eventData.name);
+        formData.append('description', eventData.description);
+        formData.append('eventCategory', eventData.eventCategory);
+        formData.append('eventType', eventData.eventType);
+        formData.append('eventDate', eventData.eventDate);
+        formData.append('guidePrice', eventData.guidePrice.toString());
+        formData.append('ticketPrice', eventData.ticketPrice.toString());
+        formData.append('location', eventData.location);
+        formData.append('museumId', eventData.museumId.toString());
+
+        // Optional fields
+        if (eventData.duration) {
+            formData.append('duration', eventData.duration.toString());
+        }
+
+        // Single phone number
+        if (eventData.phoneNumber) {
+            formData.append('phoneNumber', eventData.phoneNumber);
+        }
+
+        if (eventData.contactEmail) {
+            formData.append('contactEmail', eventData.contactEmail);
+        }
+
+        // Existing images
+        if (existingImageUrls && existingImageUrls.length > 0) {
+            existingImageUrls.forEach(url => {
+                formData.append('existingImageUrls', url);
+            });
+        }
+
+        // New images
+        if (imageFiles && imageFiles.length > 0) {
+            imageFiles.forEach(file => {
+                formData.append('images', file);
+            });
+        }
+
+        const token = localStorage.getItem('token');
+        const response = await axios.put(
+            `${API_BASE_URL}/events/${id}/with-images`,
+            formData,
+            {
+                headers: {
+                    'Authorization': `Bearer ${token}`
+                }
+            }
+        );
+        return response;
     },
 
     deleteEvent: async (id) => {
-        try {
-            const response = await axios.delete(
-                `${API_BASE_URL}/events/${id}`,
-                { headers: getAuthHeaders() }
-            );
-            return response;
-        } catch (error) {
-            console.error('Delete event error:', error);
-            throw error;
-        }
+        const response = await axios.delete(
+            `${API_BASE_URL}/events/${id}`,
+            { headers: getAuthHeaders() }
+        );
+        return response;
     }
 };
 
 // ==================== STATS API ====================
 export const adminStatsAPI = {
     getDashboardStats: async () => {
-        try {
-            const response = await axios.get(
-                `${API_BASE_URL}/stats`,
-                { headers: getAuthHeaders() }
-            );
-            return response;
-        } catch (error) {
-            console.error('Get dashboard stats error:', error);
-            throw error;
-        }
+        const response = await axios.get(
+            `${API_BASE_URL}/stats`,
+            { headers: getAuthHeaders() }
+        );
+        return response;
     }
 };
 
+// Default export for backward compatibility
 const adminAPI = {
     getAllMuseums: adminMuseumAPI.getAllMuseums,
     getMuseumById: adminMuseumAPI.getMuseumById,
@@ -326,7 +237,6 @@ const adminAPI = {
     createEventWithImages: adminEventAPI.createEventWithImages,
     updateEvent: adminEventAPI.updateEvent,
     updateEventWithImages: adminEventAPI.updateEventWithImages,
-    uploadEventImages: adminEventAPI.uploadEventImages,
     deleteEvent: adminEventAPI.deleteEvent,
     getStats: adminStatsAPI.getDashboardStats
 };
