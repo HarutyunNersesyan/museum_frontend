@@ -46,10 +46,11 @@ import {
     Fade,
     Grow,
     GlobalStyles,
-    Pagination  // ADD THIS - was missing
+    Pagination
 } from '@mui/material';
 import { LocalizationProvider } from '@mui/x-date-pickers/LocalizationProvider';
 import { AdapterDayjs } from '@mui/x-date-pickers/AdapterDayjs';
+import { DateTimePicker } from '@mui/x-date-pickers/DateTimePicker';
 import dayjs from 'dayjs';
 import {
     Dashboard as DashboardIcon,
@@ -73,14 +74,14 @@ import {
     ChevronRight as ChevronRightIcon,
     Phone as PhoneIcon,
     Language as LanguageIcon,
-    Facebook as FacebookIcon,
-    Instagram as InstagramIcon,
-    YouTube as YouTubeIcon,
-    LinkedIn as LinkedInIcon
+    Museum as MuseumIcon,
+    Event as EventIcon,
+    AttachMoney as MoneyIcon,
+    CalendarMonth as CalendarIcon
 } from '@mui/icons-material';
 import { useAuth } from '../context/AuthContext';
 import { alpha, styled } from '@mui/material/styles';
-import adminAPI from '../services/adminAPI';
+import { adminMuseumAPI, adminEventAPI, adminStatsAPI } from '../services/adminAPI';
 import { isAdmin } from '../utils/jwtUtils';
 
 // Styled components for light design
@@ -124,7 +125,6 @@ const StatCard = styled(Paper)(({ theme }) => ({
     }
 }));
 
-// Flat TextField without borders
 const FlatTextField = styled(TextField)(({ theme }) => ({
     '& .MuiOutlinedInput-root': {
         backgroundColor: '#F5F7FA',
@@ -149,7 +149,6 @@ const FlatTextField = styled(TextField)(({ theme }) => ({
     }
 }));
 
-// Flat Select without borders
 const FlatSelect = styled(Select)(({ theme }) => ({
     backgroundColor: '#F5F7FA',
     borderRadius: '8px',
@@ -166,7 +165,6 @@ const FlatSelect = styled(Select)(({ theme }) => ({
     }
 }));
 
-// Styled image for consistent display
 const ServiceImage = styled('img')({
     maxWidth: '100%',
     maxHeight: '100%',
@@ -177,7 +175,6 @@ const ServiceImage = styled('img')({
     borderRadius: '12px'
 });
 
-// Styled Switch for orange color
 const OrangeSwitch = styled(Switch)(({ theme }) => ({
     '& .MuiSwitch-switchBase.Mui-checked': {
         color: '#FF9800',
@@ -193,12 +190,12 @@ const OrangeSwitch = styled(Switch)(({ theme }) => ({
     },
 }));
 
-// Armenian cities
+// Armenian cities (matching backend Location enum)
 const ARMENIAN_CITIES = [
     { value: 'YEREVAN', label: 'Yerevan', region: 'Central' },
     { value: 'GYUMRI', label: 'Gyumri', region: 'Shirak' },
     { value: 'VANADZOR', label: 'Vanadzor', region: 'Lori' },
-    { value: 'VAGHARSHAPAT', label: 'Vagharshapat', region: 'Armavir' },
+    { value: 'VAGHARSHAPAT', label: 'Vagharshapat (Ejmiatsin)', region: 'Armavir' },
     { value: 'ABOVYAN', label: 'Abovyan', region: 'Kotayk' },
     { value: 'KAPAN', label: 'Kapan', region: 'Syunik' },
     { value: 'HRAZDAN', label: 'Hrazdan', region: 'Kotayk' },
@@ -227,29 +224,27 @@ const ARMENIAN_CITIES = [
     { value: 'JERMUK', label: 'Jermuk', region: 'Vayots Dzor' }
 ];
 
-// Categories
-const categories = [
-    { value: 'PARTY', label: '🎉 Party / Celebration', icon: '🎉' },
-    { value: 'BIRTHDAY', label: '🎂 Birthday Party', icon: '🎂' },
-    { value: 'DECORATION', label: '🎨 Decoration', icon: '🎨' },
-    { value: 'PHOTOGRAPHY', label: '📸 Photography', icon: '📸' },
-    { value: 'WEDDING', label: '💒 Wedding', icon: '💒' },
-    { value: 'CORPORATE', label: '🏢 Corporate Event', icon: '🏢' },
-    { value: 'ENGAGEMENT', label: '💍 Engagement', icon: '💍' },
-    { value: 'ANNIVERSARY', label: '🎪 Anniversary', icon: '🎪' },
-    { value: 'GRADUATION_CEREMONY', label: '🎓 Graduation Party', icon: '🎓' },
-    { value: 'FLOWERS', label: '🌸 Floral Design', icon: '🌸' },
-    { value: 'LIGHTING', label: '💡 Lighting', icon: '💡' },
-    { value: 'STAGE_SETUP', label: '🎭 Stage Setup', icon: '🎭' },
-    { value: 'RENTALS', label: '🔧 Equipment Rental', icon: '🔧' }
+// Event Categories (matching backend EventCategory enum)
+const eventCategories = [
+    { value: 'ART', label: '🎨 Art' },
+    { value: 'HISTORY', label: '📜 History' },
+    { value: 'SCIENCE', label: '🔬 Science' },
+    { value: 'NATURAL_HISTORY', label: '🌿 Natural History' },
+    { value: 'TECHNOLOGY', label: '💻 Technology' },
+    { value: 'MILITARY', label: '⚔️ Military' },
+    { value: 'ARCHAEOLOGY', label: '🏺 Archaeology' },
+    { value: 'CULTURAL', label: '🎭 Cultural' },
+    { value: 'MARITIME', label: '⚓ Maritime' },
+    { value: 'SPACE', label: '🚀 Space' },
+    { value: 'TRANSPORT', label: '🚗 Transport' },
+    { value: 'RELIGIOUS', label: '⛪ Religious' },
+    { value: 'ETHNOGRAPHIC', label: '👥 Ethnographic' },
+    { value: 'OPEN_AIR', label: '🌳 Open Air' }
 ];
 
-// Social media platforms with real icons
-const socialPlatforms = [
-    { value: 'FACEBOOK', label: 'Facebook', icon: <FacebookIcon sx={{ color: '#1877F2' }} />, placeholder: 'https://facebook.com/yourpage' },
-    { value: 'INSTAGRAM', label: 'Instagram', icon: <InstagramIcon sx={{ color: '#E4405F' }} />, placeholder: 'https://instagram.com/yourprofile' },
-    { value: 'YOUTUBE', label: 'YouTube', icon: <YouTubeIcon sx={{ color: '#FF0000' }} />, placeholder: 'https://youtube.com/c/yourchannel' },
-    { value: 'LINKEDIN', label: 'LinkedIn', icon: <LinkedInIcon sx={{ color: '#0077B5' }} />, placeholder: 'https://linkedin.com/company/yourcompany' }
+// Event Types (matching backend EventType enum)
+const eventTypes = [
+    { value: 'MOBILE', label: '📱 Mobile' }
 ];
 
 const AdminDashboardPage = () => {
@@ -257,44 +252,72 @@ const AdminDashboardPage = () => {
     const { user, logout } = useAuth();
 
     const [loading, setLoading] = useState(false);
-    const [services, setServices] = useState([]);
+    const [activeTab, setActiveTab] = useState(0);
+
+    // Events state
+    const [events, setEvents] = useState([]);
+    const [eventsPage, setEventsPage] = useState(0);
+    const [eventsTotalPages, setEventsTotalPages] = useState(0);
+
+    // Museums state
+    const [museums, setMuseums] = useState([]);
+    const [museumsPage, setMuseumsPage] = useState(0);
+    const [museumsTotalPages, setMuseumsTotalPages] = useState(0);
+
+    // Stats state
     const [stats, setStats] = useState({
-        totalServices: 0,
-        availableServices: 0
+        totalMuseums: 0,
+        totalEvents: 0
     });
-    const [dialogOpen, setDialogOpen] = useState(false);
-    const [editingService, setEditingService] = useState(null);
+
+    // Dialog states
+    const [eventDialogOpen, setEventDialogOpen] = useState(false);
+    const [museumDialogOpen, setMuseumDialogOpen] = useState(false);
+    const [editingEvent, setEditingEvent] = useState(null);
+    const [editingMuseum, setEditingMuseum] = useState(null);
+
     const [snackbar, setSnackbar] = useState({
         open: false,
         message: '',
         severity: 'success'
     });
-    const [page, setPage] = useState(0);
-    const [totalPages, setTotalPages] = useState(0);
+
     const [anchorEl, setAnchorEl] = useState(null);
     const [userInitial, setUserInitial] = useState('');
     const [activeImageIndex, setActiveImageIndex] = useState({});
 
+    // Image upload states
     const [imageFiles, setImageFiles] = useState([]);
     const [imagePreviews, setImagePreviews] = useState([]);
     const [existingImages, setExistingImages] = useState([]);
     const fileInputRef = useRef(null);
 
-    // State variables for social networks, phone numbers, and contact email
-    const [socialNetworks, setSocialNetworks] = useState([]);
+    // Phone numbers and contact email states
     const [phoneNumbersList, setPhoneNumbersList] = useState([]);
     const [contactEmail, setContactEmail] = useState('');
     const [newPhoneNumber, setNewPhoneNumber] = useState('');
     const [phoneError, setPhoneError] = useState('');
 
-    const [formData, setFormData] = useState({
+    // Museums list for dropdown
+    const [museumsList, setMuseumsList] = useState([]);
+
+    // Event form data
+    const [eventFormData, setEventFormData] = useState({
         name: '',
         description: '',
-        price: '',
-        category: '',
+        eventCategory: '',
+        eventType: 'MOBILE',
+        eventDate: dayjs(),
+        guidePrice: '',
+        ticketPrice: '',
         location: '',
         duration: '',
-        tags: ''
+        museumId: ''
+    });
+
+    // Museum form data
+    const [museumFormData, setMuseumFormData] = useState({
+        name: ''
     });
 
     // Validate Armenian phone number (8 digits)
@@ -303,50 +326,27 @@ const AdminDashboardPage = () => {
         return phoneRegex.test(phone);
     };
 
-    // Add phone number
     const handleAddPhoneNumber = () => {
         if (!newPhoneNumber.trim()) {
             setPhoneError('Please enter a phone number');
             return;
         }
-
         if (!validateArmenianPhone(newPhoneNumber.trim())) {
             setPhoneError('Phone number must be exactly 8 digits (e.g., 99123456)');
             return;
         }
-
         if (phoneNumbersList.includes(newPhoneNumber.trim())) {
             setPhoneError('This phone number already exists');
             return;
         }
-
         setPhoneNumbersList([...phoneNumbersList, newPhoneNumber.trim()]);
         setNewPhoneNumber('');
         setPhoneError('');
     };
 
-    // Remove phone number
     const handleRemovePhoneNumber = (index) => {
         const newList = phoneNumbersList.filter((_, i) => i !== index);
         setPhoneNumbersList(newList);
-    };
-
-    // Add social network
-    const handleAddSocialNetwork = (platform) => {
-        setSocialNetworks([...socialNetworks, { platform, url: '' }]);
-    };
-
-    // Update social network URL
-    const handleUpdateSocialUrl = (index, url) => {
-        const updated = [...socialNetworks];
-        updated[index].url = url;
-        setSocialNetworks(updated);
-    };
-
-    // Remove social network
-    const handleRemoveSocialNetwork = (index) => {
-        const updated = socialNetworks.filter((_, i) => i !== index);
-        setSocialNetworks(updated);
     };
 
     useEffect(() => {
@@ -360,15 +360,17 @@ const AdminDashboardPage = () => {
             setUserInitial(user.userName.charAt(0).toUpperCase());
         }
 
-        loadData();
-    }, [user, page]);
+        loadAllData();
+    }, [user, eventsPage, museumsPage]);
 
-    const loadData = async () => {
+    const loadAllData = async () => {
         setLoading(true);
         try {
             await Promise.all([
-                loadServices(),
-                loadStats()
+                loadEvents(),
+                loadMuseums(),
+                loadStats(),
+                loadMuseumsForDropdown()
             ]);
         } catch (error) {
             console.error('Error loading data:', error);
@@ -377,89 +379,132 @@ const AdminDashboardPage = () => {
         }
     };
 
-    const loadServices = async () => {
+    const loadEvents = async () => {
         try {
-            const response = await adminAPI.getAllServices(page, 10);
-            setServices(response.data.content);
-            setTotalPages(response.data.totalPages);
+            const response = await adminEventAPI.getAllEvents(eventsPage, 10);
+            setEvents(response.data.content || []);
+            setEventsTotalPages(response.data.totalPages || 0);
         } catch (error) {
-            console.error('Error loading services:', error);
+            console.error('Error loading events:', error);
+        }
+    };
+
+    const loadMuseums = async () => {
+        try {
+            const response = await adminMuseumAPI.getAllMuseums(museumsPage, 10);
+            setMuseums(response.data.content || []);
+            setMuseumsTotalPages(response.data.totalPages || 0);
+        } catch (error) {
+            console.error('Error loading museums:', error);
         }
     };
 
     const loadStats = async () => {
         try {
-            const response = await adminAPI.getStats();
-            setStats(response.data);
+            const response = await adminStatsAPI.getDashboardStats();
+            const statsData = response.data;
+            setStats({
+                totalMuseums: statsData.totalMuseums || 0,
+                totalEvents: statsData.totalEvents || 0
+            });
         } catch (error) {
             console.error('Error loading stats:', error);
+            setStats({ totalMuseums: 0, totalEvents: 0 });
         }
     };
 
-    const handleOpenCreateDialog = () => {
-        setEditingService(null);
-        setFormData({
+    const loadMuseumsForDropdown = async () => {
+        try {
+            const response = await adminMuseumAPI.getAllMuseums(0, 100);
+            setMuseumsList(response.data.content || []);
+        } catch (error) {
+            console.error('Error loading museums for dropdown:', error);
+        }
+    };
+
+    // Event Dialog Handlers
+    const handleOpenCreateEventDialog = () => {
+        setEditingEvent(null);
+        setEventFormData({
             name: '',
             description: '',
-            price: '',
-            category: '',
+            eventCategory: '',
+            eventType: 'MOBILE',
+            eventDate: dayjs(),
+            guidePrice: '',
+            ticketPrice: '',
             location: '',
             duration: '',
-            tags: ''
+            museumId: ''
         });
         setImageFiles([]);
         setImagePreviews([]);
         setExistingImages([]);
-        setSocialNetworks([]);
         setPhoneNumbersList([]);
         setContactEmail('');
         setNewPhoneNumber('');
-        setDialogOpen(true);
+        setEventDialogOpen(true);
     };
 
-    const handleOpenEditDialog = (service) => {
-        setEditingService(service);
-
-        setFormData({
-            name: service.name,
-            description: service.description,
-            price: service.price,
-            category: service.category,
-            location: service.location,
-            duration: service.duration || '',
-            tags: service.tags || ''
+    const handleOpenEditEventDialog = (event) => {
+        setEditingEvent(event);
+        setEventFormData({
+            name: event.name,
+            description: event.description,
+            eventCategory: event.eventCategory,
+            eventType: event.eventType || 'MOBILE',
+            eventDate: dayjs(event.eventDate),
+            guidePrice: event.guidePrice?.toString() || '',
+            ticketPrice: event.ticketPrice?.toString() || '',
+            location: event.location,
+            duration: event.duration?.toString() || '',
+            museumId: event.museumId
         });
-
-        setExistingImages(service.imageUrls || []);
+        setExistingImages(event.imageUrls || []);
         setImageFiles([]);
         setImagePreviews([]);
-
-        setSocialNetworks(service.socialNetworks?.map(sn => ({
-            platform: sn.platform,
-            url: sn.url
-        })) || []);
-
-        setPhoneNumbersList(service.phoneNumbers || []);
-        setContactEmail(service.contactEmail || '');
-
-        setDialogOpen(true);
+        setPhoneNumbersList(event.phoneNumbers || []);
+        setContactEmail(event.contactEmail || '');
+        setEventDialogOpen(true);
     };
 
-    const handleCloseDialog = () => {
-        setDialogOpen(false);
-        setEditingService(null);
+    const handleCloseEventDialog = () => {
+        setEventDialogOpen(false);
+        setEditingEvent(null);
         setImageFiles([]);
         setImagePreviews([]);
         setExistingImages([]);
-        setSocialNetworks([]);
         setPhoneNumbersList([]);
         setContactEmail('');
         setNewPhoneNumber('');
     };
 
-    const handleInputChange = (e) => {
+    // Museum Dialog Handlers
+    const handleOpenCreateMuseumDialog = () => {
+        setEditingMuseum(null);
+        setMuseumFormData({ name: '' });
+        setMuseumDialogOpen(true);
+    };
+
+    const handleOpenEditMuseumDialog = (museum) => {
+        setEditingMuseum(museum);
+        setMuseumFormData({ name: museum.name });
+        setMuseumDialogOpen(true);
+    };
+
+    const handleCloseMuseumDialog = () => {
+        setMuseumDialogOpen(false);
+        setEditingMuseum(null);
+    };
+
+    const handleEventInputChange = (e) => {
         const { name, value } = e.target;
-        setFormData(prev => ({ ...prev, [name]: value }));
+        setEventFormData(prev => ({ ...prev, [name]: value }));
+    };
+
+    const handleMuseumInputChange = (e) => {
+        const { name, value } = e.target;
+        setMuseumFormData(prev => ({ ...prev, [name]: value }));
     };
 
     const handleImageSelect = (event) => {
@@ -491,8 +536,9 @@ const AdminDashboardPage = () => {
         setExistingImages(newExisting);
     };
 
-    const handleSubmit = async () => {
-        if (!formData.name || !formData.description || !formData.price || !formData.category || !formData.location) {
+    const handleSubmitEvent = async () => {
+        if (!eventFormData.name || !eventFormData.description || !eventFormData.eventCategory ||
+            !eventFormData.location || !eventFormData.guidePrice || !eventFormData.ticketPrice || !eventFormData.museumId) {
             setSnackbar({
                 open: true,
                 message: 'Please fill all required fields',
@@ -503,31 +549,42 @@ const AdminDashboardPage = () => {
 
         setLoading(true);
         try {
+            // Format date properly for backend
+            const formattedDate = eventFormData.eventDate
+                ? eventFormData.eventDate.format('YYYY-MM-DDTHH:mm:ss')
+                : dayjs().format('YYYY-MM-DDTHH:mm:ss');
+
             const submitData = {
-                name: formData.name,
-                description: formData.description,
-                price: parseFloat(formData.price),
-                category: formData.category,
-                location: formData.location,
-                duration: formData.duration ? parseInt(formData.duration) : null,
-                tags: formData.tags || '',
-                socialNetworks: socialNetworks.filter(sn => sn.url && sn.url.trim() !== ''),
+                name: eventFormData.name,
+                description: eventFormData.description,
+                eventCategory: eventFormData.eventCategory,
+                eventType: eventFormData.eventType,
+                eventDate: formattedDate,
+                guidePrice: parseInt(eventFormData.guidePrice),
+                ticketPrice: parseInt(eventFormData.ticketPrice),
+                location: eventFormData.location,
+                duration: eventFormData.duration ? parseInt(eventFormData.duration) : null,
+                museumId: parseInt(eventFormData.museumId),
                 phoneNumbers: phoneNumbersList,
                 contactEmail: contactEmail || null
             };
 
-            if (editingService) {
-                await adminAPI.updateService(editingService.id, submitData, imageFiles, existingImages);
-                setSnackbar({ open: true, message: 'Service updated successfully', severity: 'success' });
+            console.log('Submitting event data:', submitData);
+            console.log('Image files count:', imageFiles.length);
+
+            if (editingEvent) {
+                await adminEventAPI.updateEvent(editingEvent.id, submitData);
+                setSnackbar({ open: true, message: 'Event updated successfully', severity: 'success' });
             } else {
-                await adminAPI.createService(submitData, imageFiles);
-                setSnackbar({ open: true, message: 'Service created successfully', severity: 'success' });
+                await adminEventAPI.createEventWithImages(submitData, imageFiles);
+                setSnackbar({ open: true, message: 'Event created successfully', severity: 'success' });
             }
-            handleCloseDialog();
-            await loadServices();
+            handleCloseEventDialog();
+            await loadEvents();
             await loadStats();
         } catch (error) {
-            let errorMessage = 'Failed to save service';
+            console.error('Error saving event:', error);
+            let errorMessage = 'Failed to save event';
             if (error.response?.data) {
                 if (typeof error.response.data === 'string') {
                     errorMessage = error.response.data;
@@ -539,42 +596,69 @@ const AdminDashboardPage = () => {
             } else if (error.message) {
                 errorMessage = error.message;
             }
-
-            setSnackbar({
-                open: true,
-                message: errorMessage,
-                severity: 'error'
-            });
+            setSnackbar({ open: true, message: errorMessage, severity: 'error' });
         } finally {
             setLoading(false);
         }
     };
 
-    const handleDeleteService = async (serviceId) => {
-        if (window.confirm('Are you sure you want to delete this service?')) {
+    const handleSubmitMuseum = async () => {
+        if (!museumFormData.name) {
+            setSnackbar({ open: true, message: 'Please enter museum name', severity: 'warning' });
+            return;
+        }
+
+        setLoading(true);
+        try {
+            if (editingMuseum) {
+                await adminMuseumAPI.updateMuseum(editingMuseum.id, museumFormData);
+                setSnackbar({ open: true, message: 'Museum updated successfully', severity: 'success' });
+            } else {
+                await adminMuseumAPI.createMuseum(museumFormData);
+                setSnackbar({ open: true, message: 'Museum created successfully', severity: 'success' });
+            }
+            handleCloseMuseumDialog();
+            await loadMuseums();
+            await loadStats();
+            await loadMuseumsForDropdown();
+        } catch (error) {
+            let errorMessage = 'Failed to save museum';
+            if (error.response?.data) {
+                errorMessage = typeof error.response.data === 'string' ? error.response.data : error.response.data.message || errorMessage;
+            } else if (error.message) {
+                errorMessage = error.message;
+            }
+            setSnackbar({ open: true, message: errorMessage, severity: 'error' });
+        } finally {
+            setLoading(false);
+        }
+    };
+
+    const handleDeleteEvent = async (eventId) => {
+        if (window.confirm('Are you sure you want to delete this event?')) {
             try {
-                await adminAPI.deleteService(serviceId);
-                setSnackbar({ open: true, message: 'Service deleted successfully', severity: 'success' });
-                loadServices();
+                await adminEventAPI.deleteEvent(eventId);
+                setSnackbar({ open: true, message: 'Event deleted successfully', severity: 'success' });
+                loadEvents();
                 loadStats();
             } catch (error) {
-                setSnackbar({ open: true, message: 'Failed to delete service', severity: 'error' });
+                setSnackbar({ open: true, message: 'Failed to delete event', severity: 'error' });
             }
         }
     };
 
-    const handleToggleAvailability = async (serviceId, currentStatus) => {
-        try {
-            await adminAPI.toggleAvailability(serviceId);
-            setSnackbar({
-                open: true,
-                message: `Service ${currentStatus ? 'hidden' : 'visible'} successfully`,
-                severity: 'success'
-            });
-            loadServices();
-            loadStats();
-        } catch (error) {
-            setSnackbar({ open: true, message: 'Failed to update service status', severity: 'error' });
+    const handleDeleteMuseum = async (museumId) => {
+        if (window.confirm('Are you sure you want to delete this museum? This will also delete all associated events.')) {
+            try {
+                await adminMuseumAPI.deleteMuseum(museumId);
+                setSnackbar({ open: true, message: 'Museum deleted successfully', severity: 'success' });
+                loadMuseums();
+                loadEvents();
+                loadStats();
+                loadMuseumsForDropdown();
+            } catch (error) {
+                setSnackbar({ open: true, message: 'Failed to delete museum', severity: 'error' });
+            }
         }
     };
 
@@ -592,36 +676,22 @@ const AdminDashboardPage = () => {
         navigate('/');
     };
 
-    // Helper function to get category display name
     const getCategoryDisplayName = (categoryValue) => {
-        const category = categories.find(cat => cat.value === categoryValue);
+        const category = eventCategories.find(cat => cat.value === categoryValue);
         return category ? category.label : categoryValue;
     };
 
-    // Helper function to get social media icon
-    const getSocialIcon = (platform) => {
-        switch(platform?.toUpperCase()) {
-            case 'FACEBOOK': return <FacebookIcon sx={{ fontSize: 16 }} />;
-            case 'INSTAGRAM': return <InstagramIcon sx={{ fontSize: 16 }} />;
-            case 'YOUTUBE': return <YouTubeIcon sx={{ fontSize: 16 }} />;
-            case 'LINKEDIN': return <LinkedInIcon sx={{ fontSize: 16 }} />;
-            default: return <LanguageIcon sx={{ fontSize: 16 }} />;
-        }
-    };
-
-    // Handle next image
-    const handleNextImage = (serviceId, totalImages) => {
+    const handleNextImage = (eventId, totalImages) => {
         setActiveImageIndex(prev => ({
             ...prev,
-            [serviceId]: ((prev[serviceId] || 0) + 1) % totalImages
+            [eventId]: ((prev[eventId] || 0) + 1) % totalImages
         }));
     };
 
-    // Handle previous image
-    const handlePrevImage = (serviceId, totalImages) => {
+    const handlePrevImage = (eventId, totalImages) => {
         setActiveImageIndex(prev => ({
             ...prev,
-            [serviceId]: ((prev[serviceId] || 0) - 1 + totalImages) % totalImages
+            [eventId]: ((prev[eventId] || 0) - 1 + totalImages) % totalImages
         }));
     };
 
@@ -637,33 +707,12 @@ const AdminDashboardPage = () => {
         <LocalizationProvider dateAdapter={AdapterDayjs}>
             <GlobalStyles
                 styles={{
-                    '*::-webkit-scrollbar': {
-                        width: '10px',
-                        height: '10px',
-                    },
-                    '*::-webkit-scrollbar-track': {
-                        background: '#F5F5F5',
-                        borderRadius: '10px',
-                    },
-                    '*::-webkit-scrollbar-thumb': {
-                        background: '#FF9800',
-                        borderRadius: '10px',
-                        '&:hover': {
-                            background: '#FF5722',
-                        },
-                    },
-                    '*': {
-                        scrollbarWidth: 'thin',
-                        scrollbarColor: '#FF9800 #F5F5F5',
-                    },
+                    '*::-webkit-scrollbar': { width: '10px', height: '10px' },
+                    '*::-webkit-scrollbar-track': { background: '#F5F5F5', borderRadius: '10px' },
+                    '*::-webkit-scrollbar-thumb': { background: '#FF9800', borderRadius: '10px', '&:hover': { background: '#FF5722' } },
                 }}
             />
-            <Box sx={{
-                minHeight: '100vh',
-                background: '#FFFFFF',
-                color: '#1A2733',
-                position: 'relative'
-            }}>
+            <Box sx={{ minHeight: '100vh', background: '#FFFFFF', color: '#1A2733' }}>
                 {/* Header */}
                 <Box sx={{
                     position: 'sticky',
@@ -673,81 +722,30 @@ const AdminDashboardPage = () => {
                     borderBottom: '1px solid #E8ECF0',
                     px: { xs: 2, sm: 3, md: 4, lg: 6 }
                 }}>
-                    <Box sx={{
-                        display: 'flex',
-                        alignItems: 'center',
-                        justifyContent: 'space-between',
-                        py: 1.5,
-                        maxWidth: '100%',
-                        width: '100%',
-                        flexWrap: 'wrap',
-                        gap: 2
-                    }}>
+                    <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', py: 1.5, flexWrap: 'wrap', gap: 2 }}>
                         <Box sx={{ display: 'flex', alignItems: 'center', gap: 2 }}>
-                            <Box sx={{
-                                width: '45px',
-                                height: '45px',
-                                borderRadius: '12px',
-                                background: 'linear-gradient(135deg, #FF9800 0%, #FF5722 100%)',
-                                display: 'flex',
-                                alignItems: 'center',
-                                justifyContent: 'center'
-                            }}>
+                            <Box sx={{ width: '45px', height: '45px', borderRadius: '12px', background: 'linear-gradient(135deg, #FF9800 0%, #FF5722 100%)', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
                                 <AdminIcon sx={{ color: 'white', fontSize: 28 }} />
                             </Box>
                             <Box>
-                                <Typography variant="h6" sx={{ fontWeight: 700, color: '#1A2733' }}>
-                                    Admin Dashboard
-                                </Typography>
-                                <Typography variant="caption" sx={{ color: '#8A99A8' }}>
-                                    Manage your holiday services
-                                </Typography>
+                                <Typography variant="h6" sx={{ fontWeight: 700, color: '#1A2733' }}>Admin Dashboard</Typography>
+                                <Typography variant="caption" sx={{ color: '#8A99A8' }}>Manage museums and events</Typography>
                             </Box>
                         </Box>
-
-                        <Box sx={{ display: 'flex', alignItems: 'center', gap: 2 }}>
-                            <IconButton onClick={handleMenuOpen} sx={{
-                                background: 'linear-gradient(135deg, #FF9800 0%, #FF5722 100%)',
-                                width: '45px',
-                                height: '45px'
-                            }}>
-                                <Typography sx={{ fontWeight: 600, color: 'white' }}>{userInitial}</Typography>
-                            </IconButton>
-                        </Box>
+                        <IconButton onClick={handleMenuOpen} sx={{ background: 'linear-gradient(135deg, #FF9800 0%, #FF5722 100%)', width: '45px', height: '45px' }}>
+                            <Typography sx={{ fontWeight: 600, color: 'white' }}>{userInitial}</Typography>
+                        </IconButton>
                     </Box>
                 </Box>
 
-                <Menu
-                    anchorEl={anchorEl}
-                    open={Boolean(anchorEl)}
-                    onClose={handleMenuClose}
-                    PaperProps={{
-                        sx: {
-                            bgcolor: '#FFFFFF',
-                            color: '#1A2733',
-                            border: 'none',
-                            minWidth: '200px',
-                            borderRadius: '12px',
-                            boxShadow: '0 4px 12px rgba(0, 0, 0, 0.08)'
-                        }
-                    }}
-                >
-                    <MenuItem onClick={() => navigate('/profile')}>
-                        <PersonIcon sx={{ mr: 2, color: '#FF9800' }} /> Profile
-                    </MenuItem>
+                <Menu anchorEl={anchorEl} open={Boolean(anchorEl)} onClose={handleMenuClose} PaperProps={{ sx: { bgcolor: '#FFFFFF', color: '#1A2733', minWidth: '200px', borderRadius: '12px' } }}>
+                    <MenuItem onClick={() => navigate('/profile')}><PersonIcon sx={{ mr: 2, color: '#FF9800' }} /> Profile</MenuItem>
                     <Divider sx={{ borderColor: '#E8ECF0' }} />
-                    <MenuItem onClick={handleLogout}>
-                        <LogoutIcon sx={{ mr: 2, color: '#f44336' }} /> Logout
-                    </MenuItem>
+                    <MenuItem onClick={handleLogout}><LogoutIcon sx={{ mr: 2, color: '#f44336' }} /> Logout</MenuItem>
                 </Menu>
 
                 {/* Main Content */}
-                <Box sx={{
-                    position: 'relative',
-                    zIndex: 1,
-                    py: { xs: 2, sm: 3, md: 4 },
-                    px: { xs: 2, sm: 3, md: 4, lg: 6 }
-                }}>
+                <Box sx={{ py: { xs: 2, sm: 3, md: 4 }, px: { xs: 2, sm: 3, md: 4, lg: 6 } }}>
                     {/* Stats Cards */}
                     <Box sx={{ width: '100%', mb: 4 }}>
                         <Grid container spacing={{ xs: 2, sm: 3 }} sx={{ width: '100%', m: 0 }}>
@@ -755,15 +753,13 @@ const AdminDashboardPage = () => {
                                 <StatCard>
                                     <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', flexWrap: 'wrap', gap: 2 }}>
                                         <Box>
-                                            <Typography variant="body2" sx={{ color: '#8A99A8', mb: 1 }}>
-                                                Total Services
-                                            </Typography>
+                                            <Typography variant="body2" sx={{ color: '#8A99A8', mb: 1 }}>Total Museums</Typography>
                                             <Typography variant="h3" sx={{ fontWeight: 700, color: '#FF9800', fontSize: { xs: '2rem', sm: '2.5rem', md: '3rem' } }}>
-                                                {stats.totalServices}
+                                                {stats.totalMuseums}
                                             </Typography>
                                         </Box>
                                         <Avatar sx={{ bgcolor: alpha('#FF9800', 0.1), width: { xs: 48, sm: 56 }, height: { xs: 48, sm: 56 } }}>
-                                            <CelebrationIcon sx={{ fontSize: { xs: 28, sm: 32 }, color: '#FF9800' }} />
+                                            <MuseumIcon sx={{ fontSize: { xs: 28, sm: 32 }, color: '#FF9800' }} />
                                         </Avatar>
                                     </Box>
                                 </StatCard>
@@ -772,15 +768,13 @@ const AdminDashboardPage = () => {
                                 <StatCard>
                                     <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', flexWrap: 'wrap', gap: 2 }}>
                                         <Box>
-                                            <Typography variant="body2" sx={{ color: '#8A99A8', mb: 1 }}>
-                                                Available Services
-                                            </Typography>
+                                            <Typography variant="body2" sx={{ color: '#8A99A8', mb: 1 }}>Total Events</Typography>
                                             <Typography variant="h3" sx={{ fontWeight: 700, color: '#4CAF50', fontSize: { xs: '2rem', sm: '2.5rem', md: '3rem' } }}>
-                                                {stats.availableServices}
+                                                {stats.totalEvents}
                                             </Typography>
                                         </Box>
                                         <Avatar sx={{ bgcolor: alpha('#4CAF50', 0.1), width: { xs: 48, sm: 56 }, height: { xs: 48, sm: 56 } }}>
-                                            <VisibilityIcon sx={{ fontSize: { xs: 28, sm: 32 }, color: '#4CAF50' }} />
+                                            <EventIcon sx={{ fontSize: { xs: 28, sm: 32 }, color: '#4CAF50' }} />
                                         </Avatar>
                                     </Box>
                                 </StatCard>
@@ -788,737 +782,392 @@ const AdminDashboardPage = () => {
                         </Grid>
                     </Box>
 
-                    {/* Services Section - FLAT DESIGN like FavoritesPage */}
-                    <Box sx={{ width: '100%' }}>
-                        <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 3, flexWrap: 'wrap', gap: 2 }}>
-                            <Typography variant="h6" sx={{ fontWeight: 600, color: '#1A2733' }}>
-                                All Services ({services.length})
-                            </Typography>
-                            <GradientButton startIcon={<AddIcon />} onClick={handleOpenCreateDialog} sx={{ py: { xs: 1, sm: 1.5 }, px: { xs: 2, sm: 3 } }}>
-                                Add New Service
-                            </GradientButton>
-                        </Box>
+                    {/* Tabs */}
+                    <Box sx={{ borderBottom: '1px solid #E8ECF0', mb: 3 }}>
+                        <Tabs value={activeTab} onChange={(e, v) => setActiveTab(v)} sx={{ '& .MuiTab-root': { textTransform: 'none', fontWeight: 600 }, '& .Mui-selected': { color: '#FF9800' }, '& .MuiTabs-indicator': { bgcolor: '#FF9800' } }}>
+                            <Tab label={`Events (${stats.totalEvents})`} />
+                            <Tab label={`Museums (${stats.totalMuseums})`} />
+                        </Tabs>
+                    </Box>
 
-                        {loading ? (
-                            <Box sx={{ display: 'flex', justifyContent: 'center', py: 8 }}>
-                                <CircularProgress sx={{ color: '#FF9800' }} />
+                    {/* Events Tab */}
+                    {activeTab === 0 && (
+                        <Box>
+                            <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 3, flexWrap: 'wrap', gap: 2 }}>
+                                <Typography variant="h6" sx={{ fontWeight: 600, color: '#1A2733' }}>All Events ({events.length})</Typography>
+                                <GradientButton startIcon={<AddIcon />} onClick={handleOpenCreateEventDialog}>Add New Event</GradientButton>
                             </Box>
-                        ) : services.length === 0 ? (
-                            <Box sx={{ textAlign: 'center', py: 8 }}>
-                                <Typography sx={{ color: '#8A99A8' }}>No services found</Typography>
-                                <Button onClick={handleOpenCreateDialog} sx={{ mt: 2, color: '#FF9800' }}>
-                                    Create your first service
-                                </Button>
-                            </Box>
-                        ) : (
-                            <Box sx={{ display: 'flex', flexDirection: 'column', gap: 0 }}>
-                                {services.map((service, index) => {
-                                    const images = service.imageUrls || [];
-                                    const currentIndex = activeImageIndex[service.id] || 0;
 
-                                    return (
-                                        <Grow in={true} style={{ transitionDelay: `${index * 50}ms` }} key={service.id}>
-                                            <Box>
-                                                <Box sx={{ width: '100%', py: 3 }}>
-                                                    <Grid container sx={{ width: '100%', m: 0 }}>
-                                                        {/* Left side - Information */}
-                                                        <Grid item xs={12} md={7}>
-                                                            <Box sx={{ pr: { md: 4 } }}>
-                                                                <Box sx={{ display: 'flex', alignItems: 'flex-start', justifyContent: 'space-between', mb: 2, flexWrap: 'wrap', gap: 2 }}>
-                                                                    <Typography variant="h5" sx={{ fontWeight: 700, color: '#1A2733', fontSize: { xs: '1.3rem', sm: '1.5rem', md: '1.8rem' } }}>
-                                                                        {service.name}
+                            {loading ? (
+                                <Box sx={{ display: 'flex', justifyContent: 'center', py: 8 }}><CircularProgress sx={{ color: '#FF9800' }} /></Box>
+                            ) : events.length === 0 ? (
+                                <Box sx={{ textAlign: 'center', py: 8 }}>
+                                    <Typography sx={{ color: '#8A99A8' }}>No events found</Typography>
+                                    <Button onClick={handleOpenCreateEventDialog} sx={{ mt: 2, color: '#FF9800' }}>Create your first event</Button>
+                                </Box>
+                            ) : (
+                                <Box sx={{ display: 'flex', flexDirection: 'column', gap: 0 }}>
+                                    {events.map((event, index) => {
+                                        const images = event.imageUrls || [];
+                                        const currentIndex = activeImageIndex[event.id] || 0;
+                                        const museum = museumsList.find(m => m.id === event.museumId);
+
+                                        return (
+                                            <Grow in={true} style={{ transitionDelay: `${index * 50}ms` }} key={event.id}>
+                                                <Box>
+                                                    <Box sx={{ width: '100%', py: 3 }}>
+                                                        <Grid container sx={{ width: '100%', m: 0 }}>
+                                                            <Grid item xs={12} md={7}>
+                                                                <Box sx={{ pr: { md: 4 } }}>
+                                                                    <Box sx={{ display: 'flex', alignItems: 'flex-start', justifyContent: 'space-between', mb: 2, flexWrap: 'wrap', gap: 2 }}>
+                                                                        <Typography variant="h5" sx={{ fontWeight: 700, color: '#1A2733', fontSize: { xs: '1.3rem', sm: '1.5rem', md: '1.8rem' } }}>
+                                                                            {event.name}
+                                                                        </Typography>
+                                                                        <Chip label="● Active" size="small" sx={{ bgcolor: alpha('#4CAF50', 0.1), color: '#4CAF50', fontWeight: 600 }} />
+                                                                    </Box>
+
+                                                                    <Typography variant="body1" sx={{ color: '#5A6874', mb: 3, lineHeight: 1.6 }}>
+                                                                        {event.description}
                                                                     </Typography>
-                                                                    <Chip
-                                                                        label={service.isAvailable ? '● Available' : '● Hidden'}
-                                                                        size="small"
-                                                                        sx={{
-                                                                            bgcolor: service.isAvailable ? alpha('#FF9800', 0.1) : alpha('#f44336', 0.1),
-                                                                            color: service.isAvailable ? '#FF9800' : '#f44336',
-                                                                            fontWeight: 600,
-                                                                            fontSize: '0.75rem'
-                                                                        }}
-                                                                    />
-                                                                </Box>
 
-                                                                <Typography variant="body1" sx={{ color: '#5A6874', mb: 3, lineHeight: 1.6, fontSize: { xs: '0.9rem', sm: '1rem' } }}>
-                                                                    {service.description}
-                                                                </Typography>
-
-                                                                <Grid container spacing={2} sx={{ mb: 3 }}>
-                                                                    <Grid item xs={6} sm={4}>
-                                                                        <Box>
-                                                                            <Typography variant="body2" sx={{ color: '#8A99A8', display: 'block', fontSize: '0.75rem', mb: 0.5 }}>
-                                                                                Price
-                                                                            </Typography>
-                                                                            <Typography variant="body1" sx={{ color: '#4CAF50', fontWeight: 600, fontSize: { xs: '0.9rem', sm: '1rem' } }}>
-                                                                                From {service.price?.toLocaleString()} ֏
-                                                                            </Typography>
-                                                                        </Box>
+                                                                    <Grid container spacing={2} sx={{ mb: 3 }}>
+                                                                        <Grid item xs={6} sm={4}>
+                                                                            <Typography variant="body2" sx={{ color: '#8A99A8', fontSize: '0.75rem', mb: 0.5 }}>Guide Price</Typography>
+                                                                            <Typography variant="body1" sx={{ color: '#FF9800', fontWeight: 600 }}>{event.guidePrice?.toLocaleString()} ֏</Typography>
+                                                                        </Grid>
+                                                                        <Grid item xs={6} sm={4}>
+                                                                            <Typography variant="body2" sx={{ color: '#8A99A8', fontSize: '0.75rem', mb: 0.5 }}>Ticket Price</Typography>
+                                                                            <Typography variant="body1" sx={{ color: '#4CAF50', fontWeight: 600 }}>{event.ticketPrice?.toLocaleString()} ֏</Typography>
+                                                                        </Grid>
+                                                                        <Grid item xs={6} sm={4}>
+                                                                            <Typography variant="body2" sx={{ color: '#8A99A8', fontSize: '0.75rem', mb: 0.5 }}>Category</Typography>
+                                                                            <Typography variant="body1" sx={{ color: '#1A2733' }}>{getCategoryDisplayName(event.eventCategory)}</Typography>
+                                                                        </Grid>
+                                                                        <Grid item xs={6} sm={4}>
+                                                                            <Typography variant="body2" sx={{ color: '#8A99A8', fontSize: '0.75rem', mb: 0.5 }}>Location</Typography>
+                                                                            <Typography variant="body1" sx={{ color: '#1A2733' }}>{event.location}</Typography>
+                                                                        </Grid>
+                                                                        <Grid item xs={6} sm={4}>
+                                                                            <Typography variant="body2" sx={{ color: '#8A99A8', fontSize: '0.75rem', mb: 0.5 }}>Museum</Typography>
+                                                                            <Typography variant="body1" sx={{ color: '#1A2733' }}>{museum?.name || event.museumName || '-'}</Typography>
+                                                                        </Grid>
+                                                                        <Grid item xs={6} sm={4}>
+                                                                            <Typography variant="body2" sx={{ color: '#8A99A8', fontSize: '0.75rem', mb: 0.5 }}>Event Date</Typography>
+                                                                            <Typography variant="body1" sx={{ color: '#1A2733' }}>{dayjs(event.eventDate).format('MMM D, YYYY HH:mm')}</Typography>
+                                                                        </Grid>
                                                                     </Grid>
-                                                                    <Grid item xs={6} sm={4}>
-                                                                        <Box>
-                                                                            <Typography variant="body2" sx={{ color: '#8A99A8', display: 'block', fontSize: '0.75rem', mb: 0.5 }}>
-                                                                                Category
-                                                                            </Typography>
-                                                                            <Typography variant="body1" sx={{ color: '#1A2733', fontSize: { xs: '0.85rem', sm: '0.9rem' } }}>
-                                                                                {getCategoryDisplayName(service.category)}
-                                                                            </Typography>
+
+                                                                    {event.duration && (
+                                                                        <Box sx={{ display: 'flex', alignItems: 'center', gap: 1.5, mb: 2 }}>
+                                                                            <AccessTimeIcon sx={{ fontSize: 20, color: '#8A99A8' }} />
+                                                                            <Typography variant="body1" sx={{ color: '#5A6874' }}>Duration: {event.duration} hours</Typography>
                                                                         </Box>
-                                                                    </Grid>
-                                                                    <Grid item xs={6} sm={4}>
-                                                                        <Box>
-                                                                            <Typography variant="body2" sx={{ color: '#8A99A8', display: 'block', fontSize: '0.75rem', mb: 0.5 }}>
-                                                                                Location
-                                                                            </Typography>
-                                                                            <Typography variant="body1" sx={{ color: '#1A2733', fontSize: { xs: '0.85rem', sm: '0.9rem' } }}>
-                                                                                {service.location}
-                                                                            </Typography>
-                                                                        </Box>
-                                                                    </Grid>
-                                                                </Grid>
+                                                                    )}
 
-                                                                {service.duration && service.duration > 0 && (
-                                                                    <Box sx={{ display: 'flex', alignItems: 'center', gap: 1.5, mb: 2 }}>
-                                                                        <AccessTimeIcon sx={{ fontSize: 20, color: '#8A99A8' }} />
-                                                                        <Typography variant="body1" sx={{ color: '#5A6874', fontSize: { xs: '0.85rem', sm: '0.9rem' } }}>
-                                                                            Duration: {service.duration} hours
-                                                                        </Typography>
-                                                                    </Box>
-                                                                )}
-
-                                                                {(service.contactEmail || (service.phoneNumbers && service.phoneNumbers.length > 0) || (service.socialNetworks && service.socialNetworks.length > 0)) && (
-                                                                    <Box sx={{ mt: 2, mb: 2 }}>
-                                                                        <Typography variant="subtitle2" sx={{ fontWeight: 600, color: '#1A2733', mb: 1.5, fontSize: { xs: '0.85rem', sm: '0.9rem' } }}>
-                                                                            📞 Contact Us
-                                                                        </Typography>
-
-                                                                        {service.contactEmail && (
-                                                                            <Box sx={{ display: 'flex', alignItems: 'center', gap: 1.5, mb: 1.5 }}>
-                                                                                <EmailIcon sx={{ fontSize: 18, color: '#8A99A8' }} />
-                                                                                <Typography variant="body2" sx={{ color: '#5A6874', fontSize: { xs: '0.8rem', sm: '0.85rem' } }}>
-                                                                                    {service.contactEmail}
-                                                                                </Typography>
-                                                                            </Box>
-                                                                        )}
-
-                                                                        {service.phoneNumbers && service.phoneNumbers.length > 0 && (
-                                                                            <Box sx={{ display: 'flex', alignItems: 'center', gap: 1.5, mb: 1.5, flexWrap: 'wrap' }}>
-                                                                                <PhoneIcon sx={{ fontSize: 18, color: '#8A99A8' }} />
-                                                                                <Box sx={{ display: 'flex', gap: 1, flexWrap: 'wrap' }}>
-                                                                                    {service.phoneNumbers.map((phone, idx) => (
-                                                                                        <Chip
-                                                                                            key={idx}
-                                                                                            label={phone}
-                                                                                            size="small"
-                                                                                            sx={{ bgcolor: alpha('#FF9800', 0.1), color: '#FF9800', fontSize: '0.7rem' }}
-                                                                                        />
-                                                                                    ))}
+                                                                    {(event.contactEmail || (event.phoneNumbers && event.phoneNumbers.length > 0)) && (
+                                                                        <Box sx={{ mt: 2, mb: 2 }}>
+                                                                            <Typography variant="subtitle2" sx={{ fontWeight: 600, color: '#1A2733', mb: 1.5 }}>📞 Contact Information</Typography>
+                                                                            {event.contactEmail && (
+                                                                                <Box sx={{ display: 'flex', alignItems: 'center', gap: 1.5, mb: 1.5 }}>
+                                                                                    <EmailIcon sx={{ fontSize: 18, color: '#8A99A8' }} />
+                                                                                    <Typography variant="body2" sx={{ color: '#5A6874' }}>{event.contactEmail}</Typography>
                                                                                 </Box>
-                                                                            </Box>
-                                                                        )}
-
-                                                                        {service.socialNetworks && service.socialNetworks.length > 0 && (
-                                                                            <Box sx={{ display: 'flex', alignItems: 'center', gap: 1.5, mb: 1.5, flexWrap: 'wrap' }}>
-                                                                                <LanguageIcon sx={{ fontSize: 18, color: '#8A99A8' }} />
-                                                                                <Box sx={{ display: 'flex', gap: 1, flexWrap: 'wrap' }}>
-                                                                                    {service.socialNetworks.map((social, idx) => (
-                                                                                        <Button
-                                                                                            key={idx}
-                                                                                            size="small"
-                                                                                            href={social.url}
-                                                                                            target="_blank"
-                                                                                            startIcon={getSocialIcon(social.platform)}
-                                                                                            sx={{
-                                                                                                textTransform: 'none',
-                                                                                                color: '#1A2733',
-                                                                                                fontSize: '0.7rem',
-                                                                                                '&:hover': { bgcolor: alpha('#FF9800', 0.1) }
-                                                                                            }}
-                                                                                        >
-                                                                                            {social.platform}
-                                                                                        </Button>
-                                                                                    ))}
+                                                                            )}
+                                                                            {event.phoneNumbers && event.phoneNumbers.length > 0 && (
+                                                                                <Box sx={{ display: 'flex', alignItems: 'center', gap: 1.5, mb: 1.5, flexWrap: 'wrap' }}>
+                                                                                    <PhoneIcon sx={{ fontSize: 18, color: '#8A99A8' }} />
+                                                                                    <Box sx={{ display: 'flex', gap: 1, flexWrap: 'wrap' }}>
+                                                                                        {event.phoneNumbers.map((phone, idx) => (
+                                                                                            <Chip key={idx} label={phone} size="small" sx={{ bgcolor: alpha('#FF9800', 0.1), color: '#FF9800' }} />
+                                                                                        ))}
+                                                                                    </Box>
                                                                                 </Box>
-                                                                            </Box>
-                                                                        )}
-                                                                    </Box>
-                                                                )}
+                                                                            )}
+                                                                        </Box>
+                                                                    )}
 
-                                                                <Divider sx={{ borderColor: '#E8ECF0', my: 2 }} />
+                                                                    <Divider sx={{ borderColor: '#E8ECF0', my: 2 }} />
 
-                                                                <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: 2 }}>
-                                                                    <FormControlLabel
-                                                                        control={
-                                                                            <OrangeSwitch
-                                                                                checked={service.isAvailable}
-                                                                                onChange={() => handleToggleAvailability(service.id, service.isAvailable)}
-                                                                                size="small"
-                                                                            />
-                                                                        }
-                                                                        label="Visible"
-                                                                        sx={{
-                                                                            mr: 0,
-                                                                            '& .MuiFormControlLabel-label': {
-                                                                                color: service.isAvailable ? '#FF9800' : '#8A99A8',
-                                                                                fontWeight: service.isAvailable ? 600 : 400,
-                                                                                fontSize: '0.85rem'
-                                                                            }
-                                                                        }}
-                                                                    />
-                                                                    <Box>
+                                                                    <Box sx={{ display: 'flex', justifyContent: 'flex-end', gap: 1 }}>
                                                                         <Tooltip title="Edit">
-                                                                            <IconButton
-                                                                                size="small"
-                                                                                onClick={() => handleOpenEditDialog(service)}
-                                                                                sx={{
-                                                                                    color: '#FF9800',
-                                                                                    '&:hover': { bgcolor: alpha('#FF9800', 0.1) }
-                                                                                }}
-                                                                            >
+                                                                            <IconButton size="small" onClick={() => handleOpenEditEventDialog(event)} sx={{ color: '#FF9800' }}>
                                                                                 <EditIcon fontSize="small" />
                                                                             </IconButton>
                                                                         </Tooltip>
                                                                         <Tooltip title="Delete">
-                                                                            <IconButton
-                                                                                size="small"
-                                                                                onClick={() => handleDeleteService(service.id)}
-                                                                                sx={{
-                                                                                    color: '#f44336',
-                                                                                    '&:hover': { bgcolor: alpha('#f44336', 0.1) }
-                                                                                }}
-                                                                            >
+                                                                            <IconButton size="small" onClick={() => handleDeleteEvent(event.id)} sx={{ color: '#f44336' }}>
                                                                                 <DeleteIcon fontSize="small" />
                                                                             </IconButton>
                                                                         </Tooltip>
                                                                     </Box>
                                                                 </Box>
-                                                            </Box>
-                                                        </Grid>
+                                                            </Grid>
 
-                                                        {/* Right side - Image Carousel */}
-                                                        <Grid item xs={12} md={5}>
-                                                            <Box sx={{
-                                                                height: '100%',
-                                                                minHeight: { xs: '250px', sm: '300px', md: '320px' },
-                                                                background: '#FFFFFF',
-                                                                display: 'flex',
-                                                                flexDirection: 'column',
-                                                                alignItems: 'center',
-                                                                justifyContent: 'center',
-                                                                position: 'relative',
-                                                                overflow: 'hidden'
-                                                            }}>
-                                                                {images.length > 0 ? (
-                                                                    <>
-                                                                        <Box sx={{
-                                                                            width: '100%',
-                                                                            height: '100%',
-                                                                            display: 'flex',
-                                                                            alignItems: 'center',
-                                                                            justifyContent: 'center',
-                                                                            backgroundColor: '#FFFFFF',
-                                                                            borderRadius: '12px',
-                                                                            overflow: 'hidden',
-                                                                            position: 'relative',
-                                                                            minHeight: { xs: '250px', sm: '300px', md: '320px' }
-                                                                        }}>
-                                                                            <ServiceImage
-                                                                                src={images[currentIndex]}
-                                                                                alt={`${service.name} - ${currentIndex + 1}`}
-                                                                            />
+                                                            <Grid item xs={12} md={5}>
+                                                                <Box sx={{ height: '100%', minHeight: { xs: '250px', sm: '300px', md: '320px' }, background: '#FFFFFF', display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', position: 'relative', overflow: 'hidden' }}>
+                                                                    {images.length > 0 ? (
+                                                                        <>
+                                                                            <Box sx={{ width: '100%', height: '100%', display: 'flex', alignItems: 'center', justifyContent: 'center', backgroundColor: '#FFFFFF', borderRadius: '12px', overflow: 'hidden', position: 'relative', minHeight: { xs: '250px', sm: '300px', md: '320px' } }}>
+                                                                                <ServiceImage src={images[currentIndex]} alt={`${event.name} - ${currentIndex + 1}`} />
+                                                                            </Box>
+                                                                            {images.length > 1 && (
+                                                                                <>
+                                                                                    <IconButton onClick={() => handlePrevImage(event.id, images.length)} size="small" sx={{ position: 'absolute', left: 8, top: '50%', transform: 'translateY(-50%)', backgroundColor: alpha('#000000', 0.5), color: 'white', '&:hover': { backgroundColor: alpha('#000000', 0.7) }, zIndex: 1 }}>
+                                                                                        <ChevronLeftIcon sx={{ fontSize: { xs: 18, sm: 20 } }} />
+                                                                                    </IconButton>
+                                                                                    <IconButton onClick={() => handleNextImage(event.id, images.length)} size="small" sx={{ position: 'absolute', right: 8, top: '50%', transform: 'translateY(-50%)', backgroundColor: alpha('#000000', 0.5), color: 'white', '&:hover': { backgroundColor: alpha('#000000', 0.7) }, zIndex: 1 }}>
+                                                                                        <ChevronRightIcon sx={{ fontSize: { xs: 18, sm: 20 } }} />
+                                                                                    </IconButton>
+                                                                                    <Box sx={{ position: 'absolute', bottom: 8, left: '50%', transform: 'translateX(-50%)', display: 'flex', gap: 0.5, zIndex: 1, backgroundColor: alpha('#000000', 0.5), padding: '3px 6px', borderRadius: '16px' }}>
+                                                                                        {images.map((_, idx) => (
+                                                                                            <Box key={idx} onClick={() => setActiveImageIndex(prev => ({ ...prev, [event.id]: idx }))} sx={{ width: { xs: 5, sm: 6 }, height: { xs: 5, sm: 6 }, borderRadius: '50%', backgroundColor: idx === currentIndex ? '#FF9800' : 'white', cursor: 'pointer' }} />
+                                                                                        ))}
+                                                                                    </Box>
+                                                                                    <Chip label={`${currentIndex + 1} / ${images.length}`} size="small" sx={{ position: 'absolute', top: 8, right: 8, bgcolor: alpha('#000000', 0.7), color: 'white', fontWeight: 500, fontSize: '0.65rem', height: 20, zIndex: 1 }} />
+                                                                                </>
+                                                                            )}
+                                                                        </>
+                                                                    ) : (
+                                                                        <Box sx={{ textAlign: 'center', p: { xs: 2, sm: 3 } }}>
+                                                                            <ImageIcon sx={{ fontSize: { xs: 50, sm: 80 }, color: alpha('#FF9800', 0.3), mb: 1 }} />
+                                                                            <Typography variant="body2" sx={{ color: '#8A99A8' }}>No images available</Typography>
                                                                         </Box>
-
-                                                                        {images.length > 1 && (
-                                                                            <>
-                                                                                <IconButton
-                                                                                    onClick={() => handlePrevImage(service.id, images.length)}
-                                                                                    size="small"
-                                                                                    sx={{
-                                                                                        position: 'absolute',
-                                                                                        left: 8,
-                                                                                        top: '50%',
-                                                                                        transform: 'translateY(-50%)',
-                                                                                        backgroundColor: alpha('#000000', 0.5),
-                                                                                        color: 'white',
-                                                                                        '&:hover': {
-                                                                                            backgroundColor: alpha('#000000', 0.7),
-                                                                                        },
-                                                                                        zIndex: 1,
-                                                                                        width: { xs: 28, sm: 32 },
-                                                                                        height: { xs: 28, sm: 32 }
-                                                                                    }}
-                                                                                >
-                                                                                    <ChevronLeftIcon sx={{ fontSize: { xs: 18, sm: 20 } }} />
-                                                                                </IconButton>
-                                                                                <IconButton
-                                                                                    onClick={() => handleNextImage(service.id, images.length)}
-                                                                                    size="small"
-                                                                                    sx={{
-                                                                                        position: 'absolute',
-                                                                                        right: 8,
-                                                                                        top: '50%',
-                                                                                        transform: 'translateY(-50%)',
-                                                                                        backgroundColor: alpha('#000000', 0.5),
-                                                                                        color: 'white',
-                                                                                        '&:hover': {
-                                                                                            backgroundColor: alpha('#000000', 0.7),
-                                                                                        },
-                                                                                        zIndex: 1,
-                                                                                        width: { xs: 28, sm: 32 },
-                                                                                        height: { xs: 28, sm: 32 }
-                                                                                    }}
-                                                                                >
-                                                                                    <ChevronRightIcon sx={{ fontSize: { xs: 18, sm: 20 } }} />
-                                                                                </IconButton>
-
-                                                                                <Box sx={{
-                                                                                    position: 'absolute',
-                                                                                    bottom: 8,
-                                                                                    left: '50%',
-                                                                                    transform: 'translateX(-50%)',
-                                                                                    display: 'flex',
-                                                                                    gap: 0.5,
-                                                                                    zIndex: 1,
-                                                                                    backgroundColor: alpha('#000000', 0.5),
-                                                                                    padding: '3px 6px',
-                                                                                    borderRadius: '16px'
-                                                                                }}>
-                                                                                    {images.map((_, idx) => (
-                                                                                        <Box
-                                                                                            key={idx}
-                                                                                            onClick={() => setActiveImageIndex(prev => ({ ...prev, [service.id]: idx }))}
-                                                                                            sx={{
-                                                                                                width: { xs: 5, sm: 6 },
-                                                                                                height: { xs: 5, sm: 6 },
-                                                                                                borderRadius: '50%',
-                                                                                                backgroundColor: idx === currentIndex ? '#FF9800' : 'white',
-                                                                                                cursor: 'pointer',
-                                                                                                transition: 'all 0.3s ease',
-                                                                                                '&:hover': {
-                                                                                                    transform: 'scale(1.2)'
-                                                                                                }
-                                                                                            }}
-                                                                                        />
-                                                                                    ))}
-                                                                                </Box>
-
-                                                                                <Chip
-                                                                                    label={`${currentIndex + 1} / ${images.length}`}
-                                                                                    size="small"
-                                                                                    sx={{
-                                                                                        position: 'absolute',
-                                                                                        top: 8,
-                                                                                        right: 8,
-                                                                                        bgcolor: alpha('#000000', 0.7),
-                                                                                        color: 'white',
-                                                                                        fontWeight: 500,
-                                                                                        fontSize: '0.65rem',
-                                                                                        height: 20,
-                                                                                        zIndex: 1
-                                                                                    }}
-                                                                                />
-                                                                            </>
-                                                                        )}
-                                                                    </>
-                                                                ) : (
-                                                                    <Box sx={{
-                                                                        textAlign: 'center',
-                                                                        p: { xs: 2, sm: 3 }
-                                                                    }}>
-                                                                        <ImageIcon sx={{ fontSize: { xs: 50, sm: 80 }, color: alpha('#FF9800', 0.3), mb: 1 }} />
-                                                                        <Typography variant="body2" sx={{ color: '#8A99A8', fontSize: { xs: '0.75rem', sm: '0.85rem' } }}>
-                                                                            No images available
-                                                                        </Typography>
-                                                                    </Box>
-                                                                )}
-                                                            </Box>
+                                                                    )}
+                                                                </Box>
+                                                            </Grid>
                                                         </Grid>
-                                                    </Grid>
+                                                    </Box>
+                                                    {index < events.length - 1 && <Divider sx={{ borderColor: '#E8ECF0' }} />}
                                                 </Box>
-                                                {index < services.length - 1 && <Divider sx={{ borderColor: '#E8ECF0' }} />}
-                                            </Box>
-                                        </Grow>
-                                    );
-                                })}
-                            </Box>
-                        )}
+                                            </Grow>
+                                        );
+                                    })}
+                                </Box>
+                            )}
 
-                        {/* Pagination */}
-                        {totalPages > 1 && (
-                            <Box sx={{ display: 'flex', justifyContent: 'center', mt: 4 }}>
-                                <Pagination
-                                    count={totalPages}
-                                    page={page + 1}
-                                    onChange={(e, newPage) => setPage(newPage - 1)}
-                                    sx={{
-                                        '& .MuiPaginationItem-root': { color: '#5A6874', borderRadius: '12px' },
-                                        '& .Mui-selected': { bgcolor: '#FF9800 !important', color: 'white', '&:hover': { bgcolor: '#FF9800' } }
-                                    }}
-                                />
+                            {eventsTotalPages > 1 && (
+                                <Box sx={{ display: 'flex', justifyContent: 'center', mt: 4 }}>
+                                    <Pagination count={eventsTotalPages} page={eventsPage + 1} onChange={(e, newPage) => setEventsPage(newPage - 1)} sx={{ '& .MuiPaginationItem-root': { color: '#5A6874', borderRadius: '12px' }, '& .Mui-selected': { bgcolor: '#FF9800 !important', color: 'white' } }} />
+                                </Box>
+                            )}
+                        </Box>
+                    )}
+
+                    {/* Museums Tab */}
+                    {activeTab === 1 && (
+                        <Box>
+                            <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 3, flexWrap: 'wrap', gap: 2 }}>
+                                <Typography variant="h6" sx={{ fontWeight: 600, color: '#1A2733' }}>All Museums ({museums.length})</Typography>
+                                <GradientButton startIcon={<AddIcon />} onClick={handleOpenCreateMuseumDialog}>Add New Museum</GradientButton>
                             </Box>
-                        )}
-                    </Box>
+
+                            {loading ? (
+                                <Box sx={{ display: 'flex', justifyContent: 'center', py: 8 }}><CircularProgress sx={{ color: '#FF9800' }} /></Box>
+                            ) : museums.length === 0 ? (
+                                <Box sx={{ textAlign: 'center', py: 8 }}>
+                                    <Typography sx={{ color: '#8A99A8' }}>No museums found</Typography>
+                                    <Button onClick={handleOpenCreateMuseumDialog} sx={{ mt: 2, color: '#FF9800' }}>Create your first museum</Button>
+                                </Box>
+                            ) : (
+                                <Grid container spacing={3}>
+                                    {museums.map((museum) => (
+                                        <Grid item xs={12} sm={6} md={4} key={museum.id}>
+                                            <Card sx={{ borderRadius: '16px', boxShadow: '0 2px 8px rgba(0,0,0,0.04)', '&:hover': { transform: 'translateY(-4px)', transition: 'all 0.3s ease' } }}>
+                                                <CardContent>
+                                                    <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', mb: 2 }}>
+                                                        <Avatar sx={{ bgcolor: alpha('#FF9800', 0.1), width: 48, height: 48 }}>
+                                                            <MuseumIcon sx={{ color: '#FF9800' }} />
+                                                        </Avatar>
+                                                        <Box>
+                                                            <Tooltip title="Edit">
+                                                                <IconButton size="small" onClick={() => handleOpenEditMuseumDialog(museum)} sx={{ color: '#FF9800' }}>
+                                                                    <EditIcon fontSize="small" />
+                                                                </IconButton>
+                                                            </Tooltip>
+                                                            <Tooltip title="Delete">
+                                                                <IconButton size="small" onClick={() => handleDeleteMuseum(museum.id)} sx={{ color: '#f44336' }}>
+                                                                    <DeleteIcon fontSize="small" />
+                                                                </IconButton>
+                                                            </Tooltip>
+                                                        </Box>
+                                                    </Box>
+                                                    <Typography variant="h6" sx={{ fontWeight: 700, color: '#1A2733', mb: 1 }}>{museum.name}</Typography>
+                                                    <Typography variant="body2" sx={{ color: '#8A99A8' }}>ID: {museum.id}</Typography>
+                                                </CardContent>
+                                            </Card>
+                                        </Grid>
+                                    ))}
+                                </Grid>
+                            )}
+
+                            {museumsTotalPages > 1 && (
+                                <Box sx={{ display: 'flex', justifyContent: 'center', mt: 4 }}>
+                                    <Pagination count={museumsTotalPages} page={museumsPage + 1} onChange={(e, newPage) => setMuseumsPage(newPage - 1)} sx={{ '& .MuiPaginationItem-root': { color: '#5A6874', borderRadius: '12px' }, '& .Mui-selected': { bgcolor: '#FF9800 !important', color: 'white' } }} />
+                                </Box>
+                            )}
+                        </Box>
+                    )}
                 </Box>
 
-                {/* Create/Edit Service Dialog */}
-                <Dialog
-                    open={dialogOpen}
-                    onClose={handleCloseDialog}
-                    maxWidth="lg"
-                    fullWidth
-                    PaperProps={{
-                        sx: {
-                            bgcolor: '#FFFFFF',
-                            borderRadius: '20px',
-                            border: 'none',
-                            boxShadow: '0 4px 12px rgba(0, 0, 0, 0.08)',
-                            width: '100%',
-                            maxWidth: '1144px',
-                            m: { xs: 2, sm: 3 }
-                        }
-                    }}
-                >
-                    <DialogTitle sx={{ borderBottom: 'none', pb: 2, pt: 3, px: 3, bgcolor: '#FFFFFF' }}>
+                {/* Event Dialog */}
+                <Dialog open={eventDialogOpen} onClose={handleCloseEventDialog} maxWidth="lg" fullWidth PaperProps={{ sx: { bgcolor: '#FFFFFF', borderRadius: '20px', border: 'none' } }}>
+                    <DialogTitle sx={{ borderBottom: 'none', pb: 2, pt: 3, px: 3 }}>
                         <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
-                            {editingService ? <EditIcon sx={{ color: '#FF9800' }} /> : <AddIcon sx={{ color: '#FF9800' }} />}
-                            <Typography variant="h5" sx={{ fontWeight: 600, color: '#1A2733', fontSize: { xs: '1.2rem', sm: '1.5rem' } }}>
-                                {editingService ? 'Edit Service' : 'Create New Service'}
-                            </Typography>
+                            {editingEvent ? <EditIcon sx={{ color: '#FF9800' }} /> : <AddIcon sx={{ color: '#FF9800' }} />}
+                            <Typography variant="h5" sx={{ fontWeight: 600, color: '#1A2733' }}>{editingEvent ? 'Edit Event' : 'Create New Event'}</Typography>
                         </Box>
-                        <IconButton onClick={handleCloseDialog} sx={{ position: 'absolute', right: 16, top: 16, color: '#8A99A8' }}>
-                            <CloseIcon />
-                        </IconButton>
+                        <IconButton onClick={handleCloseEventDialog} sx={{ position: 'absolute', right: 16, top: 16, color: '#8A99A8' }}><CloseIcon /></IconButton>
                     </DialogTitle>
                     <DialogContent sx={{ p: { xs: 2, sm: 3 } }}>
                         <Box sx={{ display: 'flex', flexDirection: 'column', gap: 3 }}>
-                            {/* Service Name */}
-                            <FlatTextField
-                                fullWidth
-                                label="Service Name"
-                                name="name"
-                                value={formData.name}
-                                onChange={handleInputChange}
-                                required
-                                variant="outlined"
-                                InputProps={{ style: { padding: '12px 14px' } }}
-                            />
+                            <FlatTextField fullWidth label="Event Name" name="name" value={eventFormData.name} onChange={handleEventInputChange} required variant="outlined" />
+                            <FlatTextField fullWidth multiline rows={4} label="Description" name="description" value={eventFormData.description} onChange={handleEventInputChange} required variant="outlined" />
 
-                            {/* Description */}
-                            <FlatTextField
-                                fullWidth
-                                multiline
-                                rows={4}
-                                label="Description"
-                                name="description"
-                                value={formData.description}
-                                onChange={handleInputChange}
-                                required
-                                variant="outlined"
-                            />
-
-                            {/* Price and Category */}
                             <Grid container spacing={2}>
                                 <Grid item xs={12} sm={6}>
-                                    <FlatTextField
-                                        fullWidth
-                                        type="number"
-                                        label="Price (AMD)"
-                                        name="price"
-                                        value={formData.price}
-                                        onChange={handleInputChange}
-                                        required
-                                        variant="outlined"
-                                        InputProps={{
-                                            startAdornment: <InputAdornment position="start">֏</InputAdornment>,
-                                            style: { padding: '12px 14px' }
+                                    <FormControl fullWidth required variant="outlined">
+                                        <InputLabel>Event Category</InputLabel>
+                                        <FlatSelect name="eventCategory" value={eventFormData.eventCategory} onChange={handleEventInputChange} label="Event Category">
+                                            <MenuItem value="">Select Category</MenuItem>
+                                            {eventCategories.map(cat => <MenuItem key={cat.value} value={cat.value}>{cat.label}</MenuItem>)}
+                                        </FlatSelect>
+                                    </FormControl>
+                                </Grid>
+                                <Grid item xs={12} sm={6}>
+                                    <FormControl fullWidth variant="outlined">
+                                        <InputLabel>Event Type</InputLabel>
+                                        <FlatSelect name="eventType" value={eventFormData.eventType} onChange={handleEventInputChange} label="Event Type">
+                                            {eventTypes.map(type => <MenuItem key={type.value} value={type.value}>{type.label}</MenuItem>)}
+                                        </FlatSelect>
+                                    </FormControl>
+                                </Grid>
+                            </Grid>
+
+                            <Grid container spacing={2}>
+                                <Grid item xs={12} sm={6}>
+                                    <FormControl fullWidth required variant="outlined">
+                                        <InputLabel>Museum</InputLabel>
+                                        <FlatSelect name="museumId" value={eventFormData.museumId} onChange={handleEventInputChange} label="Museum">
+                                            <MenuItem value="">Select Museum</MenuItem>
+                                            {museumsList.map(museum => <MenuItem key={museum.id} value={museum.id}>{museum.name}</MenuItem>)}
+                                        </FlatSelect>
+                                    </FormControl>
+                                </Grid>
+                                <Grid item xs={12} sm={6}>
+                                    <FormControl fullWidth required variant="outlined">
+                                        <InputLabel>City</InputLabel>
+                                        <FlatSelect name="location" value={eventFormData.location} onChange={handleEventInputChange} label="City">
+                                            <MenuItem value="">Select City</MenuItem>
+                                            {ARMENIAN_CITIES.map(city => <MenuItem key={city.value} value={city.value}>{city.label}</MenuItem>)}
+                                        </FlatSelect>
+                                    </FormControl>
+                                </Grid>
+                            </Grid>
+
+                            <Grid container spacing={2}>
+                                <Grid item xs={12} sm={6}>
+                                    <FlatTextField fullWidth type="number" label="Guide Price (AMD)" name="guidePrice" value={eventFormData.guidePrice} onChange={handleEventInputChange} required InputProps={{ startAdornment: <InputAdornment position="start">֏</InputAdornment> }} />
+                                </Grid>
+                                <Grid item xs={12} sm={6}>
+                                    <FlatTextField fullWidth type="number" label="Ticket Price (AMD)" name="ticketPrice" value={eventFormData.ticketPrice} onChange={handleEventInputChange} required InputProps={{ startAdornment: <InputAdornment position="start">֏</InputAdornment> }} />
+                                </Grid>
+                            </Grid>
+
+                            <Grid container spacing={2}>
+                                <Grid item xs={12} sm={6}>
+                                    <DateTimePicker
+                                        label="Event Date & Time"
+                                        value={eventFormData.eventDate}
+                                        onChange={(newValue) => setEventFormData(prev => ({ ...prev, eventDate: newValue }))}
+                                        slotProps={{
+                                            textField: {
+                                                fullWidth: true,
+                                                sx: { '& .MuiOutlinedInput-root': { backgroundColor: '#F5F7FA', borderRadius: '8px' } }
+                                            }
                                         }}
                                     />
                                 </Grid>
                                 <Grid item xs={12} sm={6}>
-                                    <FormControl fullWidth variant="outlined">
-                                        <InputLabel sx={{ color: '#8A99A8' }}>Category</InputLabel>
-                                        <FlatSelect
-                                            name="category"
-                                            value={formData.category}
-                                            onChange={handleInputChange}
-                                            label="Category"
-                                            required
-                                        >
-                                            <MenuItem value="">Select Category</MenuItem>
-                                            {categories.map((cat) => (
-                                                <MenuItem key={cat.value} value={cat.value}>{cat.label}</MenuItem>
-                                            ))}
-                                        </FlatSelect>
-                                    </FormControl>
+                                    <FlatTextField fullWidth type="number" label="Duration (hours)" name="duration" value={eventFormData.duration} onChange={handleEventInputChange} />
                                 </Grid>
                             </Grid>
 
-                            {/* Location and Duration */}
-                            <Grid container spacing={2}>
-                                <Grid item xs={12} sm={6}>
-                                    <FormControl fullWidth required variant="outlined">
-                                        <InputLabel sx={{ color: '#8A99A8' }}>City</InputLabel>
-                                        <FlatSelect
-                                            name="location"
-                                            value={formData.location}
-                                            onChange={handleInputChange}
-                                            label="City"
-                                        >
-                                            <MenuItem value="">Select City</MenuItem>
-                                            {ARMENIAN_CITIES.map((city) => (
-                                                <MenuItem key={city.value} value={city.value}>
-                                                    <Box sx={{ display: 'flex', alignItems: 'center', gap: 1, flexWrap: 'wrap' }}>
-                                                        <LocationIcon sx={{ fontSize: 16, color: '#FF9800' }} />
-                                                        <span>{city.label}</span>
-                                                        <Typography variant="caption" sx={{ color: '#8A99A8', display: { xs: 'none', sm: 'inline' } }}>
-                                                            ({city.region})
-                                                        </Typography>
-                                                    </Box>
-                                                </MenuItem>
-                                            ))}
-                                        </FlatSelect>
-                                    </FormControl>
-                                </Grid>
-                                <Grid item xs={12} sm={6}>
-                                    <FlatTextField
-                                        fullWidth
-                                        type="number"
-                                        label="Duration (hours)"
-                                        name="duration"
-                                        value={formData.duration}
-                                        onChange={handleInputChange}
-                                        variant="outlined"
-                                    />
-                                </Grid>
-                            </Grid>
-
-                            {/* Social Networks Section */}
-                            <Box sx={{ mt: 2 }}>
-                                <Typography variant="subtitle1" sx={{ fontWeight: 600, color: '#1A2733', mb: 2, fontSize: { xs: '0.9rem', sm: '1rem' } }}>
-                                    🌐 Social Networks (Optional)
-                                </Typography>
-                                <Grid container spacing={2}>
-                                    {socialPlatforms.map((platform) => {
-                                        const existing = socialNetworks.find(sn => sn.platform === platform.value);
-                                        const index = socialNetworks.findIndex(sn => sn.platform === platform.value);
-
-                                        return (
-                                            <Grid item xs={12} sm={6} key={platform.value}>
-                                                <Box sx={{ display: 'flex', gap: 1, alignItems: 'center' }}>
-                                                    {platform.icon}
-                                                    {existing ? (
-                                                        <FlatTextField
-                                                            fullWidth
-                                                            size="small"
-                                                            placeholder={platform.placeholder}
-                                                            value={existing.url}
-                                                            onChange={(e) => handleUpdateSocialUrl(index, e.target.value)}
-                                                            sx={{ flex: 1 }}
-                                                        />
-                                                    ) : (
-                                                        <OutlinedButton
-                                                            size="small"
-                                                            onClick={() => handleAddSocialNetwork(platform.value)}
-                                                            sx={{ flex: 1, justifyContent: 'flex-start', py: 1 }}
-                                                        >
-                                                            + Add {platform.label}
-                                                        </OutlinedButton>
-                                                    )}
-                                                    {existing && (
-                                                        <IconButton
-                                                            size="small"
-                                                            onClick={() => handleRemoveSocialNetwork(index)}
-                                                            sx={{ color: '#f44336' }}
-                                                        >
-                                                            <DeleteIcon fontSize="small" />
-                                                        </IconButton>
-                                                    )}
-                                                </Box>
-                                            </Grid>
-                                        );
-                                    })}
-                                </Grid>
+                            <Box>
+                                <Typography variant="subtitle1" sx={{ fontWeight: 600, color: '#1A2733', mb: 2 }}>📞 Contact Information (Optional)</Typography>
+                                <FlatTextField fullWidth type="email" label="Contact Email" value={contactEmail} onChange={(e) => setContactEmail(e.target.value)} size="small" sx={{ mb: 2 }} />
+                                <Box sx={{ display: 'flex', gap: 1, mb: 2, flexWrap: 'wrap' }}>
+                                    <FlatTextField size="small" placeholder="Enter 8-digit number (e.g., 99123456)" value={newPhoneNumber} onChange={(e) => { setNewPhoneNumber(e.target.value); setPhoneError(''); }} error={!!phoneError} helperText={phoneError} sx={{ flex: 1, minWidth: '180px' }} />
+                                    <GradientButton onClick={handleAddPhoneNumber} sx={{ minWidth: '80px', py: 1 }}>Add</GradientButton>
+                                </Box>
+                                {phoneNumbersList.length > 0 && (
+                                    <Box sx={{ display: 'flex', flexWrap: 'wrap', gap: 1 }}>
+                                        {phoneNumbersList.map((phone, idx) => <Chip key={idx} label={`📞 ${phone}`} onDelete={() => handleRemovePhoneNumber(idx)} sx={{ bgcolor: alpha('#FF9800', 0.1), color: '#FF9800' }} />)}
+                                    </Box>
+                                )}
                             </Box>
 
-                            {/* Contact Email and Phone Numbers - Side by side */}
-                            <Grid container spacing={2}>
-                                <Grid item xs={12} md={6}>
-                                    <Box>
-                                        <Typography variant="subtitle1" sx={{ fontWeight: 600, color: '#1A2733', mb: 2, fontSize: { xs: '0.9rem', sm: '1rem' } }}>
-                                            ✉️ Contact Email (Optional)
-                                        </Typography>
-                                        <FlatTextField
-                                            fullWidth
-                                            type="email"
-                                            placeholder="contact@example.com"
-                                            value={contactEmail}
-                                            onChange={(e) => setContactEmail(e.target.value)}
-                                            size="small"
-                                        />
+                            <Box>
+                                <Typography variant="subtitle1" sx={{ fontWeight: 600, color: '#1A2733', mb: 2 }}>🖼️ Event Images (Optional)</Typography>
+                                <OutlinedButton component="label" startIcon={<UploadIcon />} fullWidth sx={{ height: '56px', borderColor: '#E0E4E8', color: '#5A6874', backgroundColor: '#F5F7FA' }}>
+                                    Choose Images
+                                    <input type="file" multiple accept="image/*" onChange={handleImageSelect} style={{ display: 'none' }} ref={fileInputRef} />
+                                </OutlinedButton>
+                                {existingImages.length > 0 && (
+                                    <Box sx={{ mt: 2 }}>
+                                        <Typography variant="body2" sx={{ color: '#8A99A8', mb: 1 }}>Current Images:</Typography>
+                                        <ImageList cols={3} rowHeight={100}>
+                                            {existingImages.map((url, index) => (
+                                                <ImageListItem key={index} sx={{ position: 'relative', borderRadius: '8px', overflow: 'hidden' }}>
+                                                    <img src={url} alt={`Existing ${index}`} style={{ height: 100, objectFit: 'cover', width: '100%' }} />
+                                                    <IconButton size="small" onClick={() => handleRemoveExistingImage(index)} sx={{ position: 'absolute', top: 5, right: 5, bgcolor: alpha('#000000', 0.6) }}><DeleteOutlineIcon sx={{ fontSize: 16, color: 'white' }} /></IconButton>
+                                                </ImageListItem>
+                                            ))}
+                                        </ImageList>
                                     </Box>
-                                </Grid>
-
-                                <Grid item xs={12} md={6}>
-                                    <Box>
-                                        <Typography variant="subtitle1" sx={{ fontWeight: 600, color: '#1A2733', mb: 2, fontSize: { xs: '0.9rem', sm: '1rem' } }}>
-                                            📞 Phone Numbers (Optional - 8 digits)
-                                        </Typography>
-
-                                        <Box sx={{ display: 'flex', gap: 1, mb: 2, flexWrap: 'wrap' }}>
-                                            <FlatTextField
-                                                size="small"
-                                                placeholder="Enter 8-digit number (e.g., 99123456)"
-                                                value={newPhoneNumber}
-                                                onChange={(e) => {
-                                                    setNewPhoneNumber(e.target.value);
-                                                    setPhoneError('');
-                                                }}
-                                                error={!!phoneError}
-                                                helperText={phoneError}
-                                                sx={{ flex: 1, minWidth: '180px' }}
-                                            />
-                                            <GradientButton onClick={handleAddPhoneNumber} sx={{ minWidth: '80px', py: 1 }}>
-                                                Add
-                                            </GradientButton>
-                                        </Box>
-
-                                        {phoneNumbersList.length > 0 && (
-                                            <Box sx={{ display: 'flex', flexWrap: 'wrap', gap: 1 }}>
-                                                {phoneNumbersList.map((phone, idx) => (
-                                                    <Chip
-                                                        key={idx}
-                                                        label={`📞 ${phone}`}
-                                                        onDelete={() => handleRemovePhoneNumber(idx)}
-                                                        sx={{
-                                                            bgcolor: alpha('#FF9800', 0.1),
-                                                            color: '#FF9800',
-                                                            '&:hover': { bgcolor: alpha('#FF9800', 0.2) }
-                                                        }}
-                                                    />
-                                                ))}
-                                            </Box>
-                                        )}
+                                )}
+                                {imagePreviews.length > 0 && (
+                                    <Box sx={{ mt: 2 }}>
+                                        <Typography variant="body2" sx={{ color: '#8A99A8', mb: 1 }}>New Images:</Typography>
+                                        <ImageList cols={3} rowHeight={100}>
+                                            {imagePreviews.map((preview, index) => (
+                                                <ImageListItem key={index} sx={{ position: 'relative', borderRadius: '8px', overflow: 'hidden' }}>
+                                                    <img src={preview} alt={`Preview ${index}`} style={{ height: 100, objectFit: 'cover', width: '100%' }} />
+                                                    <IconButton size="small" onClick={() => handleRemoveNewImage(index)} sx={{ position: 'absolute', top: 5, right: 5, bgcolor: alpha('#000000', 0.6) }}><DeleteOutlineIcon sx={{ fontSize: 16, color: 'white' }} /></IconButton>
+                                                </ImageListItem>
+                                            ))}
+                                        </ImageList>
                                     </Box>
-                                </Grid>
-                            </Grid>
-
-                            {/* Tags and Upload Images */}
-                            <Grid container spacing={2}>
-                                <Grid item xs={12} md={6}>
-                                    <Box>
-                                        <Typography variant="subtitle1" sx={{ fontWeight: 600, color: '#1A2733', mb: 2, fontSize: { xs: '0.9rem', sm: '1rem' } }}>
-                                            🏷️ Tags (Optional)
-                                        </Typography>
-                                        <FlatTextField
-                                            fullWidth
-                                            label="Tags (comma separated)"
-                                            name="tags"
-                                            value={formData.tags}
-                                            onChange={handleInputChange}
-                                            placeholder="e.g., premium, outdoor, family-friendly"
-                                            variant="outlined"
-                                        />
-                                    </Box>
-                                </Grid>
-
-                                <Grid item xs={12} md={6}>
-                                    <Box>
-                                        <Typography variant="subtitle1" sx={{ fontWeight: 600, color: '#1A2733', mb: 2, fontSize: { xs: '0.9rem', sm: '1rem' } }}>
-                                            🖼️ Upload Images (Optional)
-                                        </Typography>
-                                        <OutlinedButton
-                                            component="label"
-                                            startIcon={<UploadIcon />}
-                                            fullWidth
-                                            sx={{
-                                                height: '56px',
-                                                borderColor: '#E0E4E8',
-                                                color: '#5A6874',
-                                                backgroundColor: '#F5F7FA',
-                                                '&:hover': { borderColor: '#FF9800', backgroundColor: '#EEF0F2' }
-                                            }}
-                                        >
-                                            Choose Images
-                                            <input type="file" multiple accept="image/*" onChange={handleImageSelect} style={{ display: 'none' }} ref={fileInputRef} />
-                                        </OutlinedButton>
-                                    </Box>
-                                </Grid>
-                            </Grid>
-
-                            {/* Image Previews Section */}
-                            {existingImages.length > 0 && (
-                                <Box>
-                                    <Typography variant="body2" sx={{ color: '#8A99A8', mb: 1 }}>Current Images:</Typography>
-                                    <ImageList cols={3} rowHeight={100} sx={{ mb: 2 }}>
-                                        {existingImages.map((url, index) => (
-                                            <ImageListItem key={index} sx={{ position: 'relative', borderRadius: '8px', overflow: 'hidden' }}>
-                                                <img src={url} alt={`Existing ${index}`} style={{ height: 100, objectFit: 'cover', width: '100%' }} />
-                                                <IconButton
-                                                    size="small"
-                                                    onClick={() => handleRemoveExistingImage(index)}
-                                                    sx={{
-                                                        position: 'absolute',
-                                                        top: 5,
-                                                        right: 5,
-                                                        bgcolor: alpha('#000000', 0.6),
-                                                        '&:hover': { bgcolor: '#f44336' }
-                                                    }}
-                                                >
-                                                    <DeleteOutlineIcon sx={{ fontSize: 16, color: 'white' }} />
-                                                </IconButton>
-                                            </ImageListItem>
-                                        ))}
-                                    </ImageList>
-                                </Box>
-                            )}
-
-                            {imagePreviews.length > 0 && (
-                                <Box>
-                                    <Typography variant="body2" sx={{ color: '#8A99A8', mb: 1 }}>New Images:</Typography>
-                                    <ImageList cols={3} rowHeight={100}>
-                                        {imagePreviews.map((preview, index) => (
-                                            <ImageListItem key={index} sx={{ position: 'relative', borderRadius: '8px', overflow: 'hidden' }}>
-                                                <img src={preview} alt={`Preview ${index}`} style={{ height: 100, objectFit: 'cover', width: '100%' }} />
-                                                <IconButton
-                                                    size="small"
-                                                    onClick={() => handleRemoveNewImage(index)}
-                                                    sx={{
-                                                        position: 'absolute',
-                                                        top: 5,
-                                                        right: 5,
-                                                        bgcolor: alpha('#000000', 0.6),
-                                                        '&:hover': { bgcolor: '#f44336' }
-                                                    }}
-                                                >
-                                                    <DeleteOutlineIcon sx={{ fontSize: 16, color: 'white' }} />
-                                                </IconButton>
-                                            </ImageListItem>
-                                        ))}
-                                    </ImageList>
-                                </Box>
-                            )}
+                                )}
+                            </Box>
                         </Box>
                     </DialogContent>
-                    <DialogActions sx={{ p: { xs: 2, sm: 3 }, borderTop: 'none', bgcolor: '#FFFFFF', flexWrap: 'wrap', gap: 1 }}>
-                        <OutlinedButton onClick={handleCloseDialog}>
-                            Cancel
-                        </OutlinedButton>
-                        <GradientButton onClick={handleSubmit} disabled={loading}>
-                            {loading ? <CircularProgress size={24} sx={{ color: 'white' }} /> : (editingService ? 'Update Service' : 'Create Service')}
-                        </GradientButton>
+                    <DialogActions sx={{ p: { xs: 2, sm: 3 }, borderTop: 'none', flexWrap: 'wrap', gap: 1 }}>
+                        <OutlinedButton onClick={handleCloseEventDialog}>Cancel</OutlinedButton>
+                        <GradientButton onClick={handleSubmitEvent} disabled={loading}>{loading ? <CircularProgress size={24} sx={{ color: 'white' }} /> : (editingEvent ? 'Update Event' : 'Create Event')}</GradientButton>
+                    </DialogActions>
+                </Dialog>
+
+                {/* Museum Dialog */}
+                <Dialog open={museumDialogOpen} onClose={handleCloseMuseumDialog} maxWidth="sm" fullWidth PaperProps={{ sx: { bgcolor: '#FFFFFF', borderRadius: '20px', border: 'none' } }}>
+                    <DialogTitle sx={{ borderBottom: 'none', pb: 2, pt: 3, px: 3 }}>
+                        <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
+                            {editingMuseum ? <EditIcon sx={{ color: '#FF9800' }} /> : <AddIcon sx={{ color: '#FF9800' }} />}
+                            <Typography variant="h5" sx={{ fontWeight: 600, color: '#1A2733' }}>{editingMuseum ? 'Edit Museum' : 'Create New Museum'}</Typography>
+                        </Box>
+                        <IconButton onClick={handleCloseMuseumDialog} sx={{ position: 'absolute', right: 16, top: 16, color: '#8A99A8' }}><CloseIcon /></IconButton>
+                    </DialogTitle>
+                    <DialogContent sx={{ p: { xs: 2, sm: 3 } }}>
+                        <FlatTextField fullWidth label="Museum Name" name="name" value={museumFormData.name} onChange={handleMuseumInputChange} required variant="outlined" sx={{ mt: 1 }} />
+                    </DialogContent>
+                    <DialogActions sx={{ p: { xs: 2, sm: 3 }, borderTop: 'none', gap: 1 }}>
+                        <OutlinedButton onClick={handleCloseMuseumDialog}>Cancel</OutlinedButton>
+                        <GradientButton onClick={handleSubmitMuseum} disabled={loading}>{loading ? <CircularProgress size={24} sx={{ color: 'white' }} /> : (editingMuseum ? 'Update Museum' : 'Create Museum')}</GradientButton>
                     </DialogActions>
                 </Dialog>
 
                 {/* Snackbar */}
                 <Snackbar open={snackbar.open} autoHideDuration={4000} onClose={() => setSnackbar({ ...snackbar, open: false })} anchorOrigin={{ vertical: 'bottom', horizontal: 'center' }}>
-                    <Alert severity={snackbar.severity} sx={{
-                        bgcolor: '#FFFFFF',
-                        color: '#1A2733',
-                        border: `1px solid ${snackbar.severity === 'success' ? '#4CAF50' : '#f44336'}`,
-                        borderRadius: '12px'
-                    }}>
-                        {snackbar.message}
-                    </Alert>
+                    <Alert severity={snackbar.severity} sx={{ bgcolor: '#FFFFFF', color: '#1A2733', border: `1px solid ${snackbar.severity === 'success' ? '#4CAF50' : '#f44336'}`, borderRadius: '12px' }}>{snackbar.message}</Alert>
                 </Snackbar>
             </Box>
         </LocalizationProvider>

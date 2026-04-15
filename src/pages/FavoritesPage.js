@@ -584,7 +584,8 @@ const FavoritesPage = () => {
                                                                             }
                                                                         }}
                                                                     >
-                                                                        <WhatshotIcon sx={{ color: '#FF6B35', fontSize: 28 }} />
+                                                                        {/* Changed from WhatshotIcon to BookmarkIcon to match navbar */}
+                                                                        <BookmarkIcon sx={{ color: '#FF6B35', fontSize: 28 }} />
                                                                     </IconButton>
                                                                 </Tooltip>
                                                             </Box>
