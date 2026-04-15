@@ -141,7 +141,6 @@ export const adminEventAPI = {
         try {
             const formData = new FormData();
 
-            // Add basic fields
             formData.append('name', eventData.name);
             formData.append('description', eventData.description);
             formData.append('eventCategory', eventData.eventCategory);
@@ -152,7 +151,6 @@ export const adminEventAPI = {
             formData.append('location', eventData.location);
             formData.append('museumId', eventData.museumId.toString());
 
-            // Add optional fields
             if (eventData.duration) {
                 formData.append('duration', eventData.duration.toString());
             }
@@ -167,17 +165,10 @@ export const adminEventAPI = {
                 formData.append('contactEmail', eventData.contactEmail);
             }
 
-            // Add image files
             if (imageFiles && imageFiles.length > 0) {
                 imageFiles.forEach(file => {
                     formData.append('images', file);
                 });
-            }
-
-            // Debug logging
-            console.log('Creating event with FormData:');
-            for (let pair of formData.entries()) {
-                console.log(pair[0] + ':', pair[1]);
             }
 
             const token = localStorage.getItem('token');
@@ -187,14 +178,12 @@ export const adminEventAPI = {
                 {
                     headers: {
                         'Authorization': `Bearer ${token}`
-                        // Do NOT set Content-Type - let browser set it with boundary
                     }
                 }
             );
             return response;
         } catch (error) {
             console.error('Create event with images error:', error);
-            console.error('Error response:', error.response?.data);
             throw error;
         }
     },
@@ -213,16 +202,59 @@ export const adminEventAPI = {
         }
     },
 
-    updateEventImages: async (eventId, imageUrls) => {
+    updateEventWithImages: async (id, eventData, imageFiles = [], existingImageUrls = []) => {
         try {
+            const formData = new FormData();
+
+            formData.append('name', eventData.name);
+            formData.append('description', eventData.description);
+            formData.append('eventCategory', eventData.eventCategory);
+            formData.append('eventType', eventData.eventType);
+            formData.append('eventDate', eventData.eventDate);
+            formData.append('guidePrice', eventData.guidePrice.toString());
+            formData.append('ticketPrice', eventData.ticketPrice.toString());
+            formData.append('location', eventData.location);
+            formData.append('museumId', eventData.museumId.toString());
+
+            if (eventData.duration) {
+                formData.append('duration', eventData.duration.toString());
+            }
+
+            if (eventData.phoneNumbers && eventData.phoneNumbers.length > 0) {
+                eventData.phoneNumbers.forEach(phone => {
+                    formData.append('phoneNumbers', phone);
+                });
+            }
+
+            if (eventData.contactEmail) {
+                formData.append('contactEmail', eventData.contactEmail);
+            }
+
+            if (existingImageUrls && existingImageUrls.length > 0) {
+                existingImageUrls.forEach(url => {
+                    formData.append('existingImageUrls', url);
+                });
+            }
+
+            if (imageFiles && imageFiles.length > 0) {
+                imageFiles.forEach(file => {
+                    formData.append('images', file);
+                });
+            }
+
+            const token = localStorage.getItem('token');
             const response = await axios.put(
-                `${API_BASE_URL}/events/${eventId}/images`,
-                { imageUrls },
-                { headers: getAuthHeaders() }
+                `${API_BASE_URL}/events/${id}/with-images`,
+                formData,
+                {
+                    headers: {
+                        'Authorization': `Bearer ${token}`
+                    }
+                }
             );
             return response;
         } catch (error) {
-            console.error('Update event images error:', error);
+            console.error('Update event with images error:', error);
             throw error;
         }
     },
@@ -281,31 +313,22 @@ export const adminStatsAPI = {
     }
 };
 
-// ==================== COMBINED EXPORT for backward compatibility ====================
 const adminAPI = {
-    // Museum endpoints
     getAllMuseums: adminMuseumAPI.getAllMuseums,
     getMuseumById: adminMuseumAPI.getMuseumById,
     createMuseum: adminMuseumAPI.createMuseum,
     updateMuseum: adminMuseumAPI.updateMuseum,
     deleteMuseum: adminMuseumAPI.deleteMuseum,
-
-    // Event endpoints
     getAllEvents: adminEventAPI.getAllEvents,
     getEventById: adminEventAPI.getEventById,
     getEventsByMuseumId: adminEventAPI.getEventsByMuseumId,
     createEvent: adminEventAPI.createEvent,
     createEventWithImages: adminEventAPI.createEventWithImages,
     updateEvent: adminEventAPI.updateEvent,
-    updateEventImages: adminEventAPI.updateEventImages,
+    updateEventWithImages: adminEventAPI.updateEventWithImages,
     uploadEventImages: adminEventAPI.uploadEventImages,
     deleteEvent: adminEventAPI.deleteEvent,
-
-    // Stats endpoints
     getStats: adminStatsAPI.getDashboardStats
 };
 
 export default adminAPI;
-
-// REMOVED the duplicate export line below
-// The exports are already defined above with 'export const'
