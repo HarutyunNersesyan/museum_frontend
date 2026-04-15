@@ -26,13 +26,13 @@ const scrollbarStyles = {
         width: '8px',
     },
     '*::-webkit-scrollbar-track': {
-        background: '#F5F0E8',
+        background: '#D7CCC8',
         borderRadius: '10px',
     },
     '*::-webkit-scrollbar-thumb': {
-        background: '#FF6B35',
+        background: '#A0522D',
         borderRadius: '10px',
-        '&:hover': { background: '#E55A2B' },
+        '&:hover': { background: '#8B4513' },
     },
 };
 
@@ -53,16 +53,14 @@ const VerifyCodePage = ({ isModal = false, onClose, email: propEmail }) => {
     const [resendLoading, setResendLoading] = useState(false);
     const [error, setError] = useState('');
     const [success, setSuccess] = useState('');
-    const [countdown, setCountdown] = useState(120); // 2 minutes (120 seconds)
-    const [resendAttempts, setResendAttempts] = useState(0); // Track resend attempts
+    const [countdown, setCountdown] = useState(120);
+    const [resendAttempts, setResendAttempts] = useState(0);
     const MAX_RESEND_ATTEMPTS = 3;
     const [isAutoResending, setIsAutoResending] = useState(false);
     const [backgroundPosition, setBackgroundPosition] = useState({ x: 0, y: 0 });
 
-    // Get email from props, location state or localStorage
     const email = propEmail || location.state?.email || localStorage.getItem('verificationEmail') || '';
 
-    // Mouse move effect for background
     useEffect(() => {
         const handleMouseMove = (e) => {
             const x = e.clientX / window.innerWidth;
@@ -73,7 +71,6 @@ const VerifyCodePage = ({ isModal = false, onClose, email: propEmail }) => {
         return () => window.removeEventListener('mousemove', handleMouseMove);
     }, []);
 
-    // Load saved resend attempts from localStorage
     useEffect(() => {
         if (email) {
             const savedAttempts = localStorage.getItem(`resendAttempts_${email}`);
@@ -81,7 +78,6 @@ const VerifyCodePage = ({ isModal = false, onClose, email: propEmail }) => {
                 setResendAttempts(parseInt(savedAttempts, 10));
             }
 
-            // Check if already exceeded max attempts
             const attempts = savedAttempts ? parseInt(savedAttempts, 10) : 0;
             if (attempts >= MAX_RESEND_ATTEMPTS) {
                 handleMaxAttemptsReached();
@@ -96,20 +92,17 @@ const VerifyCodePage = ({ isModal = false, onClose, email: propEmail }) => {
             localStorage.setItem('verificationEmail', email);
         }
 
-        // Auto send first verification code if specified
         if (location.state?.autoSend) {
             handleManualResendCode();
         }
     }, [email, location.state]);
 
-    // Auto resend when countdown reaches 0
     useEffect(() => {
         if (countdown === 0 && resendAttempts < MAX_RESEND_ATTEMPTS && !isAutoResending) {
             handleAutoResendCode();
         }
     }, [countdown]);
 
-    // Countdown timer
     useEffect(() => {
         if (countdown > 0) {
             const timer = setTimeout(() => {
@@ -122,11 +115,9 @@ const VerifyCodePage = ({ isModal = false, onClose, email: propEmail }) => {
     const handleMaxAttemptsReached = () => {
         setError('Maximum verification attempts reached. Redirecting to signup...');
 
-        // Clear stored data
         localStorage.removeItem('verificationEmail');
         localStorage.removeItem(`resendAttempts_${email}`);
 
-        // Auto redirect to signup after 2 seconds
         setTimeout(() => {
             if (isModal && onClose) {
                 onClose();
@@ -152,7 +143,6 @@ const VerifyCodePage = ({ isModal = false, onClose, email: propEmail }) => {
             setResendAttempts(newAttempts);
             localStorage.setItem(`resendAttempts_${email}`, newAttempts.toString());
 
-            // Make API call to resend code
             const response = await fetch('/api/public/user/resend-verification', {
                 method: 'POST',
                 headers: {
@@ -166,10 +156,9 @@ const VerifyCodePage = ({ isModal = false, onClose, email: propEmail }) => {
             }
 
             setSuccess(`New verification code sent automatically (Attempt ${newAttempts}/${MAX_RESEND_ATTEMPTS})`);
-            setCountdown(120); // Reset to 2 minutes
-            setPin(['', '', '', '', '', '']); // Clear PIN inputs
+            setCountdown(120);
+            setPin(['', '', '', '', '', '']);
 
-            // If this was the last attempt, show warning
             if (newAttempts === MAX_RESEND_ATTEMPTS) {
                 setError('This is your last attempt. After this, you will be redirected to signup.');
             }
@@ -187,7 +176,6 @@ const VerifyCodePage = ({ isModal = false, onClose, email: propEmail }) => {
             newPin[index] = value;
             setPin(newPin);
 
-            // Auto focus next input
             if (value && index < 5) {
                 const nextInput = document.getElementById(`pin-input-${index + 1}`);
                 if (nextInput) nextInput.focus();
@@ -217,7 +205,6 @@ const VerifyCodePage = ({ isModal = false, onClose, email: propEmail }) => {
         });
         setPin(newPin);
 
-        // Focus the last filled input
         const lastFilledIndex = Math.min(numbers.length - 1, 5);
         const lastInput = document.getElementById(`pin-input-${lastFilledIndex}`);
         if (lastInput) lastInput.focus();
@@ -241,11 +228,9 @@ const VerifyCodePage = ({ isModal = false, onClose, email: propEmail }) => {
             if (result.success) {
                 setSuccess('Email verified successfully! Redirecting to login...');
 
-                // Clear stored data
                 localStorage.removeItem('verificationEmail');
                 localStorage.removeItem(`resendAttempts_${email}`);
 
-                // Redirect to login after delay
                 setTimeout(() => {
                     if (isModal && onClose) {
                         onClose();
@@ -294,8 +279,8 @@ const VerifyCodePage = ({ isModal = false, onClose, email: propEmail }) => {
             }
 
             setSuccess(`Verification code resent manually (Attempt ${newAttempts}/${MAX_RESEND_ATTEMPTS})`);
-            setCountdown(120); // Reset to 2 minutes
-            setPin(['', '', '', '', '', '']); // Clear PIN inputs
+            setCountdown(120);
+            setPin(['', '', '', '', '', '']);
 
         } catch (err) {
             setError('Failed to resend code. Please try again.');
@@ -311,14 +296,13 @@ const VerifyCodePage = ({ isModal = false, onClose, email: propEmail }) => {
                 display: 'flex',
                 alignItems: 'center',
                 justifyContent: 'center',
-                background: 'linear-gradient(135deg, #FFF9F0 0%, #F5F0E8 100%)'
+                background: 'linear-gradient(135deg, #D7CCC8 0%, #BCAAA4 100%)'
             }}>
-                <CircularProgress sx={{ color: '#FF6B35' }} />
+                <CircularProgress sx={{ color: '#A0522D' }} />
             </Box>
         );
     }
 
-    // Content for modal or standalone page
     const content = (
         <>
             <GlobalStyles styles={scrollbarStyles} />
@@ -327,7 +311,7 @@ const VerifyCodePage = ({ isModal = false, onClose, email: propEmail }) => {
                 display: 'flex',
                 alignItems: 'center',
                 justifyContent: 'center',
-                background: 'linear-gradient(135deg, #FFF9F0 0%, #F5F0E8 100%)',
+                background: 'linear-gradient(135deg, #D7CCC8 0%, #BCAAA4 100%)',
                 fontFamily: "'Inter', sans-serif",
                 padding: '20px',
                 position: 'relative',
@@ -336,25 +320,23 @@ const VerifyCodePage = ({ isModal = false, onClose, email: propEmail }) => {
                     position: 'absolute',
                     width: '100%',
                     height: '100%',
-                    background: `radial-gradient(circle at ${backgroundPosition.x * 100}% ${backgroundPosition.y * 100}%, rgba(255,107,53,0.03) 0%, transparent 50%)`,
+                    background: `radial-gradient(circle at ${backgroundPosition.x * 100}% ${backgroundPosition.y * 100}%, rgba(160, 82, 45, 0.03) 0%, transparent 50%)`,
                     pointerEvents: 'none'
                 }
             }}>
-                {/* Backdrop for loading */}
                 <Backdrop
                     sx={{ color: '#fff', zIndex: (theme) => theme.zIndex.drawer + 1 }}
                     open={loading || isAutoResending}
                 >
-                    <CircularProgress sx={{ color: '#FF6B35' }} />
+                    <CircularProgress sx={{ color: '#A0522D' }} />
                 </Backdrop>
 
-                {/* VerifyEmail Block */}
                 <Box sx={{
                     width: '100%',
                     maxWidth: isModal ? '100%' : '520px',
                     margin: isModal ? 0 : '0 auto',
                     position: 'relative',
-                    background: isModal ? 'transparent' : 'linear-gradient(135deg, #FFF9F0 0%, #F5F0E8 100%)',
+                    background: isModal ? 'transparent' : 'linear-gradient(135deg, #D7CCC8 0%, #BCAAA4 100%)',
                     borderRadius: isModal ? 0 : '32px',
                     overflow: 'hidden',
                     fontFamily: 'Inter, sans-serif'
@@ -365,11 +347,10 @@ const VerifyCodePage = ({ isModal = false, onClose, email: propEmail }) => {
                             background: alpha('#FFFFFF', 0.95),
                             backdropFilter: 'blur(10px)',
                             boxShadow: isModal ? 'none' : '0 20px 40px rgba(0,0,0,0.08)',
-                            border: isModal ? 'none' : '1px solid rgba(255,107,53,0.15)',
+                            border: isModal ? 'none' : '1px solid rgba(160, 82, 45, 0.15)',
                             overflow: 'hidden',
                             padding: isModal ? '0' : { xs: '30px 20px', sm: '40px 30px', md: '50px 40px' }
                         }}>
-                            {/* Header with logo */}
                             <Box sx={{
                                 textAlign: 'center',
                                 mb: 3
@@ -384,7 +365,7 @@ const VerifyCodePage = ({ isModal = false, onClose, email: propEmail }) => {
                                         width: 42,
                                         height: 42,
                                         borderRadius: '12px',
-                                        background: 'linear-gradient(135deg, #FF6B35 0%, #FFB347 100%)',
+                                        background: 'linear-gradient(135deg, #A0522D 0%, #D4A373 100%)',
                                         display: 'flex',
                                         alignItems: 'center',
                                         justifyContent: 'center',
@@ -394,7 +375,7 @@ const VerifyCodePage = ({ isModal = false, onClose, email: propEmail }) => {
                                     </Box>
                                     <Typography variant="h5" sx={{
                                         fontWeight: 800,
-                                        background: 'linear-gradient(135deg, #FF6B35 0%, #FFB347 100%)',
+                                        background: 'linear-gradient(135deg, #A0522D 0%, #D4A373 100%)',
                                         WebkitBackgroundClip: 'text',
                                         WebkitTextFillColor: 'transparent',
                                         letterSpacing: '-0.5px'
@@ -405,25 +386,25 @@ const VerifyCodePage = ({ isModal = false, onClose, email: propEmail }) => {
                                 <Typography variant="h4" sx={{
                                     fontSize: { xs: '28px', sm: '32px' },
                                     fontWeight: 700,
-                                    color: '#2C2C2C',
+                                    color: '#3E2723',
                                     mb: 1
                                 }}>
                                     Verify Your Email
                                 </Typography>
                                 <Typography sx={{
-                                    color: '#6B6B6B',
+                                    color: '#6B4C3A',
                                     fontSize: '14px',
                                     mb: 2
                                 }}>
                                     Enter the 6-digit code sent to
                                 </Typography>
                                 <Typography sx={{
-                                    color: '#FF6B35',
+                                    color: '#A0522D',
                                     fontSize: '15px',
                                     fontWeight: 600,
                                     mb: 2,
                                     padding: '6px 16px',
-                                    background: alpha('#FF6B35', 0.05),
+                                    background: alpha('#A0522D', 0.05),
                                     borderRadius: '20px',
                                     display: 'inline-block'
                                 }}>
@@ -432,14 +413,13 @@ const VerifyCodePage = ({ isModal = false, onClose, email: propEmail }) => {
                                 <Box sx={{
                                     width: 50,
                                     height: 3,
-                                    background: 'linear-gradient(90deg, #FF6B35, #FFB347)',
+                                    background: 'linear-gradient(90deg, #A0522D, #D4A373)',
                                     borderRadius: 2,
                                     mx: 'auto',
                                     mt: 1
                                 }} />
                             </Box>
 
-                            {/* Attempts counter and auto-resend info */}
                             <Box sx={{
                                 display: 'flex',
                                 flexDirection: 'column',
@@ -448,20 +428,20 @@ const VerifyCodePage = ({ isModal = false, onClose, email: propEmail }) => {
                                 marginBottom: '24px'
                             }}>
                                 <Typography sx={{
-                                    color: '#6B6B6B',
+                                    color: '#6B4C3A',
                                     fontSize: '13px',
                                     padding: '4px 16px',
-                                    background: alpha('#FF6B35', 0.05),
+                                    background: alpha('#A0522D', 0.05),
                                     borderRadius: '20px',
-                                    border: '1px solid rgba(255,107,53,0.15)',
+                                    border: '1px solid rgba(160, 82, 45, 0.15)',
                                     fontWeight: 500
                                 }}>
-                                    Attempts: <span style={{ color: '#FF6B35', fontWeight: 700 }}>{resendAttempts}</span>/{MAX_RESEND_ATTEMPTS}
+                                    Attempts: <span style={{ color: '#A0522D', fontWeight: 700 }}>{resendAttempts}</span>/{MAX_RESEND_ATTEMPTS}
                                 </Typography>
 
                                 {resendAttempts < MAX_RESEND_ATTEMPTS && countdown > 0 && (
                                     <Typography sx={{
-                                        color: '#FF6B35',
+                                        color: '#A0522D',
                                         fontSize: '13px',
                                         fontStyle: 'italic',
                                         fontWeight: 500,
@@ -472,7 +452,6 @@ const VerifyCodePage = ({ isModal = false, onClose, email: propEmail }) => {
                                 )}
                             </Box>
 
-                            {/* Alerts */}
                             {error && (
                                 <Fade in={!!error}>
                                     <Alert
@@ -517,13 +496,11 @@ const VerifyCodePage = ({ isModal = false, onClose, email: propEmail }) => {
                                 </Fade>
                             )}
 
-                            {/* PIN Input Form */}
                             <Box component="form" onSubmit={handleSubmit} sx={{
                                 display: 'flex',
                                 flexDirection: 'column',
                                 gap: '24px'
                             }}>
-                                {/* PIN Inputs */}
                                 <Box sx={{
                                     display: 'flex',
                                     justifyContent: 'center',
@@ -548,7 +525,7 @@ const VerifyCodePage = ({ isModal = false, onClose, email: propEmail }) => {
                                                     fontSize: '24px',
                                                     fontWeight: 600,
                                                     padding: '12px',
-                                                    color: '#FF6B35'
+                                                    color: '#A0522D'
                                                 }
                                             }}
                                             sx={{
@@ -558,41 +535,40 @@ const VerifyCodePage = ({ isModal = false, onClose, email: propEmail }) => {
                                                     background: '#FAFAFA',
                                                     borderRadius: '12px',
                                                     '& fieldset': {
-                                                        borderColor: 'rgba(255,107,53,0.15)',
+                                                        borderColor: 'rgba(160, 82, 45, 0.15)',
                                                         borderWidth: '1px',
                                                     },
                                                     '&:hover fieldset': {
-                                                        borderColor: '#FFB347 !important',
+                                                        borderColor: '#D4A373 !important',
                                                     },
                                                     '&.Mui-focused fieldset': {
-                                                        borderColor: '#FF6B35 !important',
+                                                        borderColor: '#A0522D !important',
                                                         borderWidth: '2px',
                                                     },
                                                     '&.Mui-focused': {
-                                                        boxShadow: '0 0 10px rgba(255,107,53,0.15)',
+                                                        boxShadow: '0 0 10px rgba(160, 82, 45, 0.15)',
                                                     }
                                                 },
                                                 '& .MuiOutlinedInput-notchedOutline': {
-                                                    borderColor: 'rgba(255,107,53,0.15)',
+                                                    borderColor: 'rgba(160, 82, 45, 0.15)',
                                                 },
                                                 '&:hover .MuiOutlinedInput-notchedOutline': {
-                                                    borderColor: '#FFB347',
+                                                    borderColor: '#D4A373',
                                                 },
                                                 '& .Mui-focused .MuiOutlinedInput-notchedOutline': {
-                                                    borderColor: '#FF6B35',
+                                                    borderColor: '#A0522D',
                                                 }
                                             }}
                                         />
                                     ))}
                                 </Box>
 
-                                {/* Submit Button */}
                                 <Button
                                     type="submit"
                                     variant="contained"
                                     disabled={loading || pin.join('').length !== 6 || resendAttempts >= MAX_RESEND_ATTEMPTS}
                                     sx={{
-                                        background: 'linear-gradient(135deg, #FF6B35 0%, #FFB347 100%)',
+                                        background: 'linear-gradient(135deg, #A0522D 0%, #D4A373 100%)',
                                         color: '#FFFFFF',
                                         padding: '12px',
                                         borderRadius: '12px',
@@ -600,11 +576,11 @@ const VerifyCodePage = ({ isModal = false, onClose, email: propEmail }) => {
                                         fontWeight: 700,
                                         textTransform: 'none',
                                         height: '48px',
-                                        boxShadow: '0 4px 12px rgba(255,107,53,0.25)',
+                                        boxShadow: '0 4px 12px rgba(160, 82, 45, 0.25)',
                                         '&:hover': {
                                             transform: 'translateY(-2px)',
-                                            boxShadow: '0 6px 16px rgba(255,107,53,0.35)',
-                                            background: 'linear-gradient(135deg, #E55A2B 0%, #FFA040 100%)'
+                                            boxShadow: '0 6px 16px rgba(160, 82, 45, 0.35)',
+                                            background: 'linear-gradient(135deg, #8B4513 0%, #C49A6C 100%)'
                                         },
                                         '&:disabled': {
                                             background: '#E0E0E0',
@@ -622,7 +598,6 @@ const VerifyCodePage = ({ isModal = false, onClose, email: propEmail }) => {
                                     )}
                                 </Button>
 
-                                {/* Manual Resend Button */}
                                 <Box sx={{
                                     display: 'flex',
                                     flexDirection: 'column',
@@ -635,16 +610,16 @@ const VerifyCodePage = ({ isModal = false, onClose, email: propEmail }) => {
                                         disabled={resendLoading || resendAttempts >= MAX_RESEND_ATTEMPTS}
                                         startIcon={<Refresh />}
                                         sx={{
-                                            color: '#FF6B35',
+                                            color: '#A0522D',
                                             textTransform: 'none',
                                             fontSize: '14px',
                                             fontWeight: 600,
                                             padding: '6px 20px',
-                                            border: '1px solid rgba(255,107,53,0.3)',
+                                            border: '1px solid rgba(160, 82, 45, 0.3)',
                                             borderRadius: '40px',
                                             '&:hover': {
-                                                backgroundColor: alpha('#FF6B35', 0.05),
-                                                borderColor: '#FF6B35',
+                                                backgroundColor: alpha('#A0522D', 0.05),
+                                                borderColor: '#A0522D',
                                                 transform: 'translateY(-1px)'
                                             },
                                             '&:disabled': {
@@ -655,7 +630,7 @@ const VerifyCodePage = ({ isModal = false, onClose, email: propEmail }) => {
                                         }}
                                     >
                                         {resendLoading ? (
-                                            <CircularProgress size={16} sx={{ color: '#FF6B35' }} />
+                                            <CircularProgress size={16} sx={{ color: '#A0522D' }} />
                                         ) : resendAttempts >= MAX_RESEND_ATTEMPTS ? (
                                             'Max attempts reached'
                                         ) : (
@@ -665,22 +640,21 @@ const VerifyCodePage = ({ isModal = false, onClose, email: propEmail }) => {
                                 </Box>
                             </Box>
 
-                            {/* Info Message */}
                             <Box sx={{
                                 marginTop: '30px',
                                 padding: '16px',
-                                background: alpha('#FF6B35', 0.03),
+                                background: alpha('#A0522D', 0.03),
                                 borderRadius: '16px',
-                                border: '1px solid rgba(255,107,53,0.15)',
-                                borderLeft: '4px solid #FF6B35',
+                                border: '1px solid rgba(160, 82, 45, 0.15)',
+                                borderLeft: '4px solid #A0522D',
                             }}>
                                 <Typography sx={{
-                                    color: '#6B6B6B',
+                                    color: '#6B4C3A',
                                     fontSize: '13px',
                                     lineHeight: 1.6
                                 }}>
-                                    <strong style={{ color: '#FF6B35' }}>Auto-Resend Active:</strong> A new code will be automatically sent every 2 minutes.
-                                    You have <span style={{ color: '#FF6B35', fontWeight: 700 }}>{MAX_RESEND_ATTEMPTS - resendAttempts}</span> attempts remaining.
+                                    <strong style={{ color: '#A0522D' }}>Auto-Resend Active:</strong> A new code will be automatically sent every 2 minutes.
+                                    You have <span style={{ color: '#A0522D', fontWeight: 700 }}>{MAX_RESEND_ATTEMPTS - resendAttempts}</span> attempts remaining.
                                     {resendAttempts === MAX_RESEND_ATTEMPTS - 1 && ' This is your last attempt!'}
                                 </Typography>
                             </Box>

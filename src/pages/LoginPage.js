@@ -57,13 +57,13 @@ const scrollbarStyles = {
         width: '8px',
     },
     '*::-webkit-scrollbar-track': {
-        background: '#F5F0E8',
+        background: '#D7CCC8',
         borderRadius: '10px',
     },
     '*::-webkit-scrollbar-thumb': {
-        background: '#FF6B35',
+        background: '#A0522D',
         borderRadius: '10px',
-        '&:hover': { background: '#E55A2B' },
+        '&:hover': { background: '#8B4513' },
     },
 };
 
@@ -243,24 +243,22 @@ const LoginPage = ({ isModal = false, onClose, onSwitchToSignup }) => {
             maxWidth: '480px',
             margin: '0 auto',
             position: 'relative',
-            background: 'linear-gradient(135deg, #FFF9F0 0%, #F5F0E8 100%)',
+            background: 'linear-gradient(135deg, #D7CCC8 0%, #BCAAA4 100%)',
             borderRadius: '32px',
             overflow: 'hidden',
             fontFamily: 'Inter, sans-serif'
         }}>
             <GlobalStyles styles={scrollbarStyles} />
 
-            {/* Main Content */}
             <Box sx={{ position: 'relative', zIndex: 2 }}>
                 <Paper elevation={0} sx={{
                     borderRadius: '32px',
                     background: alpha('#FFFFFF', 0.95),
                     backdropFilter: 'blur(10px)',
                     boxShadow: '0 20px 40px rgba(0,0,0,0.08)',
-                    border: '1px solid rgba(255,107,53,0.15)',
+                    border: '1px solid rgba(160, 82, 45, 0.15)',
                     overflow: 'hidden'
                 }}>
-                    {/* Header with logo */}
                     <Box sx={{
                         textAlign: 'center',
                         pt: { xs: 4, sm: 5 },
@@ -276,7 +274,7 @@ const LoginPage = ({ isModal = false, onClose, onSwitchToSignup }) => {
                                 width: 42,
                                 height: 42,
                                 borderRadius: '12px',
-                                background: 'linear-gradient(135deg, #FF6B35 0%, #FFB347 100%)',
+                                background: 'linear-gradient(135deg, #A0522D 0%, #D4A373 100%)',
                                 display: 'flex',
                                 alignItems: 'center',
                                 justifyContent: 'center'
@@ -285,7 +283,7 @@ const LoginPage = ({ isModal = false, onClose, onSwitchToSignup }) => {
                             </Box>
                             <Typography variant="h5" sx={{
                                 fontWeight: 800,
-                                background: 'linear-gradient(135deg, #FF6B35 0%, #FFB347 100%)',
+                                background: 'linear-gradient(135deg, #A0522D 0%, #D4A373 100%)',
                                 WebkitBackgroundClip: 'text',
                                 WebkitTextFillColor: 'transparent',
                                 letterSpacing: '-0.5px'
@@ -296,13 +294,13 @@ const LoginPage = ({ isModal = false, onClose, onSwitchToSignup }) => {
                         <Typography variant="h4" sx={{
                             fontSize: { xs: '28px', sm: '32px' },
                             fontWeight: 700,
-                            color: '#2C2C2C',
+                            color: '#3E2723',
                             mb: 1
                         }}>
                             Welcome Back
                         </Typography>
                         <Typography sx={{
-                            color: '#6B6B6B',
+                            color: '#6B4C3A',
                             fontSize: '14px',
                             mb: 3
                         }}>
@@ -311,13 +309,12 @@ const LoginPage = ({ isModal = false, onClose, onSwitchToSignup }) => {
                         <Box sx={{
                             width: 50,
                             height: 3,
-                            background: 'linear-gradient(90deg, #FF6B35, #FFB347)',
+                            background: 'linear-gradient(90deg, #A0522D, #D4A373)',
                             borderRadius: 2,
                             mx: 'auto'
                         }} />
                     </Box>
 
-                    {/* Form */}
                     <Box component="form" onSubmit={handleSubmit} sx={{
                         p: { xs: 3, sm: 5 },
                         pt: { xs: 2, sm: 3 }
@@ -328,7 +325,7 @@ const LoginPage = ({ isModal = false, onClose, onSwitchToSignup }) => {
                                     mb: 3,
                                     borderRadius: '16px',
                                     fontSize: '13px',
-                                    bgcolor: alpha('#FF6B35', 0.05),
+                                    bgcolor: alpha('#D32F2F', 0.05),
                                     color: '#D32F2F',
                                     '& .MuiAlert-icon': { color: '#D32F2F' }
                                 }}>
@@ -352,7 +349,6 @@ const LoginPage = ({ isModal = false, onClose, onSwitchToSignup }) => {
                             </Fade>
                         )}
 
-                        {/* Email Field */}
                         <TextField
                             fullWidth
                             type="email"
@@ -368,28 +364,27 @@ const LoginPage = ({ isModal = false, onClose, onSwitchToSignup }) => {
                                     borderRadius: '12px',
                                     background: '#FAFAFA',
                                     '&:hover .MuiOutlinedInput-notchedOutline': {
-                                        borderColor: '#FFB347'
+                                        borderColor: '#D4A373'
                                     },
                                     '&.Mui-focused .MuiOutlinedInput-notchedOutline': {
-                                        borderColor: '#FF6B35',
+                                        borderColor: '#A0522D',
                                         borderWidth: '2px'
                                     }
                                 },
                                 '& .MuiInputLabel-root': {
                                     color: '#8A8A8A',
-                                    '&.Mui-focused': { color: '#FF6B35' }
+                                    '&.Mui-focused': { color: '#A0522D' }
                                 }
                             }}
                             InputProps={{
                                 startAdornment: (
                                     <InputAdornment position="start">
-                                        <Email sx={{ color: '#FF6B35', fontSize: 20 }} />
+                                        <Email sx={{ color: '#A0522D', fontSize: 20 }} />
                                     </InputAdornment>
                                 )
                             }}
                         />
 
-                        {/* Password Field */}
                         <TextField
                             fullWidth
                             type={showPassword ? 'text' : 'password'}
@@ -405,22 +400,22 @@ const LoginPage = ({ isModal = false, onClose, onSwitchToSignup }) => {
                                     borderRadius: '12px',
                                     background: '#FAFAFA',
                                     '&:hover .MuiOutlinedInput-notchedOutline': {
-                                        borderColor: '#FFB347'
+                                        borderColor: '#D4A373'
                                     },
                                     '&.Mui-focused .MuiOutlinedInput-notchedOutline': {
-                                        borderColor: '#FF6B35',
+                                        borderColor: '#A0522D',
                                         borderWidth: '2px'
                                     }
                                 },
                                 '& .MuiInputLabel-root': {
                                     color: '#8A8A8A',
-                                    '&.Mui-focused': { color: '#FF6B35' }
+                                    '&.Mui-focused': { color: '#A0522D' }
                                 }
                             }}
                             InputProps={{
                                 startAdornment: (
                                     <InputAdornment position="start">
-                                        <Person sx={{ color: '#FF6B35', fontSize: 20 }} />
+                                        <Person sx={{ color: '#A0522D', fontSize: 20 }} />
                                     </InputAdornment>
                                 ),
                                 endAdornment: (
@@ -438,7 +433,6 @@ const LoginPage = ({ isModal = false, onClose, onSwitchToSignup }) => {
                             }}
                         />
 
-                        {/* Remember Me & Forgot Password */}
                         <Box sx={{
                             display: 'flex',
                             justifyContent: 'space-between',
@@ -454,15 +448,15 @@ const LoginPage = ({ isModal = false, onClose, onSwitchToSignup }) => {
                                         onChange={handleRememberMeChange}
                                         size="small"
                                         sx={{
-                                            color: '#FFB347',
+                                            color: '#D4A373',
                                             '&.Mui-checked': {
-                                                color: '#FF6B35',
+                                                color: '#A0522D',
                                             }
                                         }}
                                     />
                                 }
                                 label={
-                                    <Typography sx={{ color: '#6B6B6B', fontSize: '13px', fontWeight: 500 }}>
+                                    <Typography sx={{ color: '#6B4C3A', fontSize: '13px', fontWeight: 500 }}>
                                         Remember me
                                     </Typography>
                                 }
@@ -470,34 +464,33 @@ const LoginPage = ({ isModal = false, onClose, onSwitchToSignup }) => {
                             <Button
                                 onClick={handleForgotPasswordClick}
                                 sx={{
-                                    color: '#FF6B35',
+                                    color: '#A0522D',
                                     textTransform: 'none',
                                     fontSize: '13px',
                                     fontWeight: 600,
-                                    '&:hover': { bgcolor: alpha('#FF6B35', 0.05) }
+                                    '&:hover': { bgcolor: alpha('#A0522D', 0.05) }
                                 }}
                             >
                                 Forgot Password?
                             </Button>
                         </Box>
 
-                        {/* Login Button */}
                         <Button
                             type="submit"
                             fullWidth
                             variant="contained"
                             disabled={loading}
                             sx={{
-                                background: 'linear-gradient(135deg, #FF6B35 0%, #FFB347 100%)',
+                                background: 'linear-gradient(135deg, #A0522D 0%, #D4A373 100%)',
                                 borderRadius: '12px',
                                 py: 1.5,
                                 fontSize: '16px',
                                 fontWeight: 600,
                                 textTransform: 'none',
-                                boxShadow: '0 4px 12px rgba(255,107,53,0.25)',
+                                boxShadow: '0 4px 12px rgba(160, 82, 45, 0.25)',
                                 '&:hover': {
                                     transform: 'translateY(-2px)',
-                                    boxShadow: '0 6px 16px rgba(255,107,53,0.35)'
+                                    boxShadow: '0 6px 16px rgba(160, 82, 45, 0.35)'
                                 },
                                 transition: 'all 0.3s'
                             }}
@@ -505,23 +498,22 @@ const LoginPage = ({ isModal = false, onClose, onSwitchToSignup }) => {
                             {loading ? <CircularProgress size={24} sx={{ color: 'white' }} /> : 'Sign In'}
                         </Button>
 
-                        {/* Sign Up Link */}
                         <Box sx={{
                             textAlign: 'center',
                             mt: 3,
                             pt: 2,
                             borderTop: '1px solid rgba(0,0,0,0.06)'
                         }}>
-                            <Typography sx={{ color: '#6B6B6B', fontSize: '14px' }}>
+                            <Typography sx={{ color: '#6B4C3A', fontSize: '14px' }}>
                                 Don't have an account?{' '}
                                 <Button
                                     onClick={handleSignUpClick}
                                     sx={{
-                                        color: '#FF6B35',
+                                        color: '#A0522D',
                                         textTransform: 'none',
                                         fontWeight: 700,
                                         fontSize: '14px',
-                                        '&:hover': { bgcolor: alpha('#FF6B35', 0.05) }
+                                        '&:hover': { bgcolor: alpha('#A0522D', 0.05) }
                                     }}
                                 >
                                     Sign Up
@@ -532,7 +524,6 @@ const LoginPage = ({ isModal = false, onClose, onSwitchToSignup }) => {
                 </Paper>
             </Box>
 
-            {/* Forgot Password Dialog */}
             <Dialog
                 open={forgotPasswordDialogOpen}
                 onClose={handleForgotPasswordClose}
@@ -547,7 +538,7 @@ const LoginPage = ({ isModal = false, onClose, onSwitchToSignup }) => {
                 }}
             >
                 <DialogTitle sx={{
-                    color: '#2C2C2C',
+                    color: '#3E2723',
                     fontSize: '24px',
                     fontWeight: 700,
                     fontFamily: "'Inter', sans-serif",
@@ -557,7 +548,7 @@ const LoginPage = ({ isModal = false, onClose, onSwitchToSignup }) => {
                 </DialogTitle>
                 <DialogContent>
                     <DialogContentText sx={{
-                        color: '#6B6B6B',
+                        color: '#6B4C3A',
                         fontSize: '14px',
                         fontFamily: "'Inter', sans-serif",
                         mb: 3
@@ -599,14 +590,14 @@ const LoginPage = ({ isModal = false, onClose, onSwitchToSignup }) => {
                                 borderRadius: '12px',
                                 background: '#FAFAFA',
                                 '&:hover .MuiOutlinedInput-notchedOutline': {
-                                    borderColor: '#FFB347'
+                                    borderColor: '#D4A373'
                                 },
                                 '&.Mui-focused .MuiOutlinedInput-notchedOutline': {
-                                    borderColor: '#FF6B35'
+                                    borderColor: '#A0522D'
                                 }
                             },
                             '& .MuiInputLabel-root': {
-                                '&.Mui-focused': { color: '#FF6B35' }
+                                '&.Mui-focused': { color: '#A0522D' }
                             }
                         }}
                     />
@@ -631,14 +622,14 @@ const LoginPage = ({ isModal = false, onClose, onSwitchToSignup }) => {
                         variant="contained"
                         disabled={forgotPasswordLoading || !!forgotPasswordMessage}
                         sx={{
-                            background: 'linear-gradient(135deg, #FF6B35 0%, #FFB347 100%)',
+                            background: 'linear-gradient(135deg, #A0522D 0%, #D4A373 100%)',
                             borderRadius: '40px',
                             px: 3,
                             textTransform: 'none',
                             fontWeight: 600,
                             '&:hover': {
                                 transform: 'translateY(-1px)',
-                                boxShadow: '0 4px 12px rgba(255,107,53,0.25)'
+                                boxShadow: '0 4px 12px rgba(160, 82, 45, 0.25)'
                             }
                         }}
                     >

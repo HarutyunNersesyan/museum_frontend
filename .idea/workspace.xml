@@ -4,11 +4,9 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="52f9de53-701b-4b52-b101-40303d7b40ec" name="Changes" comment="">
+    <list default="true" id="52f9de53-701b-4b52-b101-40303d7b40ec" name="Changes" comment="Bugs fix.">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/App.js" beforeDir="false" afterPath="$PROJECT_DIR$/src/App.js" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/pages/EventsPage.js" beforeDir="false" afterPath="$PROJECT_DIR$/src/pages/EventsPage.js" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/pages/HomePage.js" beforeDir="false" afterPath="$PROJECT_DIR$/src/pages/HomePage.js" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/pages/VerifyCodePage.js" beforeDir="false" afterPath="$PROJECT_DIR$/src/pages/VerifyCodePage.js" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -47,7 +45,7 @@
     "SHARE_PROJECT_CONFIGURATION_FILES": "true",
     "ToolWindowRun.ShowToolbar": "false",
     "WebServerToolWindowFactoryState": "false",
-    "last_opened_file_path": "C:/Users/HARUT_037/Desktop/party_frontend - Copy",
+    "last_opened_file_path": "C:/Users/HARUT_037/Desktop/museum_frontend",
     "node.js.detected.package.eslint": "true",
     "node.js.detected.package.tslint": "true",
     "node.js.selected.package.eslint": "(autodetect)",
@@ -174,6 +172,7 @@
       <workItem from="1776183329076" duration="26000" />
       <workItem from="1776183372501" duration="104000" />
       <workItem from="1776261153149" duration="19681000" />
+      <workItem from="1776285995951" duration="980000" />
     </task>
     <task id="LOCAL-00017" summary="Created page for adding logo">
       <created>1767521088579</created>
