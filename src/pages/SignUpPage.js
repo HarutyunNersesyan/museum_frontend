@@ -24,7 +24,9 @@ import {
     Lock,
     Email,
     Person,
-    LockOutlined
+    LockOutlined,
+    Close as CloseIcon,
+    Museum as MuseumIcon
 } from '@mui/icons-material';
 import { useAuth } from '../context/AuthContext';
 import { alpha, keyframes } from '@mui/material/styles';
@@ -229,8 +231,29 @@ const SignUpPage = ({ isModal = false, onClose, onSwitchToLogin, onSuccess }) =>
                     backdropFilter: 'blur(10px)',
                     boxShadow: '0 20px 40px rgba(0,0,0,0.08)',
                     border: '1px solid rgba(160, 82, 45, 0.15)',
-                    overflow: 'hidden'
+                    overflow: 'hidden',
+                    position: 'relative'
                 }}>
+                    {/* Close Button - Only show in modal mode */}
+                    {isModal && onClose && (
+                        <IconButton
+                            onClick={onClose}
+                            sx={{
+                                position: 'absolute',
+                                top: 16,
+                                right: 16,
+                                zIndex: 10,
+                                backgroundColor: alpha('#000', 0.5),
+                                color: '#FFF',
+                                '&:hover': {
+                                    backgroundColor: alpha('#000', 0.7)
+                                }
+                            }}
+                        >
+                            <CloseIcon />
+                        </IconButton>
+                    )}
+
                     <Box sx={{
                         textAlign: 'center',
                         pt: { xs: 4, sm: 5 },
@@ -251,7 +274,7 @@ const SignUpPage = ({ isModal = false, onClose, onSwitchToLogin, onSuccess }) =>
                                 alignItems: 'center',
                                 justifyContent: 'center'
                             }}>
-                                <Lock sx={{ color: 'white', fontSize: 24 }} />
+                                <MuseumIcon sx={{ color: 'white', fontSize: 24 }} />
                             </Box>
                             <Typography variant="h5" sx={{
                                 fontWeight: 800,
@@ -270,12 +293,6 @@ const SignUpPage = ({ isModal = false, onClose, onSwitchToLogin, onSuccess }) =>
                             mb: 1
                         }}>
                             Create Account
-                        </Typography>
-                        <Typography sx={{
-                            color: '#6B4C3A',
-                            fontSize: '14px',
-                            mb: 3
-                        }}>
                         </Typography>
                         <Box sx={{
                             width: 50,

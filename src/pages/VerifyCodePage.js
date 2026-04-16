@@ -12,11 +12,14 @@ import {
     Paper,
     useMediaQuery,
     useTheme,
-    GlobalStyles
+    GlobalStyles,
+    IconButton,
+    Stack
 } from '@mui/material';
 import {
     MarkEmailRead,
-    Refresh
+    Refresh,
+    Close as CloseIcon
 } from '@mui/icons-material';
 import { useAuth } from '../context/AuthContext';
 import { alpha, keyframes } from '@mui/material/styles';
@@ -41,22 +44,17 @@ const pulse = keyframes`
     50% { opacity: 1; transform: scale(1.05); }
 `;
 
-const VerifyCodePage = ({ isModal = false, onClose, email: propEmail }) => {
+const VerifyCodePage = ({ isModal = false, onClose, onVerificationSuccess, email: propEmail }) => {
     const navigate = useNavigate();
     const location = useLocation();
     const { verifyEmail } = useAuth();
-    const theme = useTheme();
-    const isMobile = useMediaQuery(theme.breakpoints.down('md'));
 
     const [pin, setPin] = useState(['', '', '', '', '', '']);
     const [loading, setLoading] = useState(false);
     const [resendLoading, setResendLoading] = useState(false);
     const [error, setError] = useState('');
-    const [success, setSuccess] = useState('');
-    const [countdown, setCountdown] = useState(120);
     const [resendAttempts, setResendAttempts] = useState(0);
     const MAX_RESEND_ATTEMPTS = 3;
-    const [isAutoResending, setIsAutoResending] = useState(false);
     const [backgroundPosition, setBackgroundPosition] = useState({ x: 0, y: 0 });
 
     const email = propEmail || location.state?.email || localStorage.getItem('verificationEmail') || '';
@@ -91,26 +89,7 @@ const VerifyCodePage = ({ isModal = false, onClose, email: propEmail }) => {
         } else if (email) {
             localStorage.setItem('verificationEmail', email);
         }
-
-        if (location.state?.autoSend) {
-            handleManualResendCode();
-        }
     }, [email, location.state]);
-
-    useEffect(() => {
-        if (countdown === 0 && resendAttempts < MAX_RESEND_ATTEMPTS && !isAutoResending) {
-            handleAutoResendCode();
-        }
-    }, [countdown]);
-
-    useEffect(() => {
-        if (countdown > 0) {
-            const timer = setTimeout(() => {
-                setCountdown(countdown - 1);
-            }, 1000);
-            return () => clearTimeout(timer);
-        }
-    }, [countdown]);
 
     const handleMaxAttemptsReached = () => {
         setError('Maximum verification attempts reached. Redirecting to signup...');
@@ -128,46 +107,6 @@ const VerifyCodePage = ({ isModal = false, onClose, email: propEmail }) => {
                 }
             });
         }, 2000);
-    };
-
-    const handleAutoResendCode = async () => {
-        if (resendAttempts >= MAX_RESEND_ATTEMPTS) {
-            handleMaxAttemptsReached();
-            return;
-        }
-
-        setIsAutoResending(true);
-
-        try {
-            const newAttempts = resendAttempts + 1;
-            setResendAttempts(newAttempts);
-            localStorage.setItem(`resendAttempts_${email}`, newAttempts.toString());
-
-            const response = await fetch('/api/public/user/resend-verification', {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                },
-                body: JSON.stringify({ email })
-            });
-
-            if (!response.ok) {
-                throw new Error('Failed to resend code');
-            }
-
-            setSuccess(`New verification code sent automatically (Attempt ${newAttempts}/${MAX_RESEND_ATTEMPTS})`);
-            setCountdown(120);
-            setPin(['', '', '', '', '', '']);
-
-            if (newAttempts === MAX_RESEND_ATTEMPTS) {
-                setError('This is your last attempt. After this, you will be redirected to signup.');
-            }
-
-        } catch (err) {
-            setError('Failed to auto-resend code. Please try manually.');
-        } finally {
-            setIsAutoResending(false);
-        }
     };
 
     const handlePinChange = (index, value) => {
@@ -226,33 +165,30 @@ const VerifyCodePage = ({ isModal = false, onClose, email: propEmail }) => {
             const result = await verifyEmail(email, pinCode);
 
             if (result.success) {
-                setSuccess('Email verified successfully! Redirecting to login...');
-
                 localStorage.removeItem('verificationEmail');
                 localStorage.removeItem(`resendAttempts_${email}`);
 
-                setTimeout(() => {
-                    if (isModal && onClose) {
-                        onClose();
-                    }
-                    navigate('/login', {
-                        state: {
-                            message: 'Email verified successfully! Please login.',
-                            verifiedEmail: email
-                        }
-                    });
-                }, 2000);
+                // Close verify modal
+                if (isModal && onClose) {
+                    onClose();
+                }
+
+                // Call the success callback to open login modal in HomePage
+                if (onVerificationSuccess) {
+                    onVerificationSuccess();
+                }
             } else {
                 setError(result.message || 'Verification failed. Please try again.');
             }
         } catch (err) {
+            console.error('Verification error:', err);
             setError('Verification failed. Please try again.');
         } finally {
             setLoading(false);
         }
     };
 
-    const handleManualResendCode = async () => {
+    const handleResendCode = async () => {
         if (resendAttempts >= MAX_RESEND_ATTEMPTS) {
             handleMaxAttemptsReached();
             return;
@@ -278,9 +214,11 @@ const VerifyCodePage = ({ isModal = false, onClose, email: propEmail }) => {
                 throw new Error('Failed to resend code');
             }
 
-            setSuccess(`Verification code resent manually (Attempt ${newAttempts}/${MAX_RESEND_ATTEMPTS})`);
-            setCountdown(120);
             setPin(['', '', '', '', '', '']);
+
+            if (newAttempts === MAX_RESEND_ATTEMPTS) {
+                setError('This is your last attempt. After this, you will be redirected to signup.');
+            }
 
         } catch (err) {
             setError('Failed to resend code. Please try again.');
@@ -326,7 +264,7 @@ const VerifyCodePage = ({ isModal = false, onClose, email: propEmail }) => {
             }}>
                 <Backdrop
                     sx={{ color: '#fff', zIndex: (theme) => theme.zIndex.drawer + 1 }}
-                    open={loading || isAutoResending}
+                    open={loading}
                 >
                     <CircularProgress sx={{ color: '#A0522D' }} />
                 </Backdrop>
@@ -337,23 +275,46 @@ const VerifyCodePage = ({ isModal = false, onClose, email: propEmail }) => {
                     margin: isModal ? 0 : '0 auto',
                     position: 'relative',
                     background: isModal ? 'transparent' : 'linear-gradient(135deg, #D7CCC8 0%, #BCAAA4 100%)',
-                    borderRadius: isModal ? 0 : '32px',
+                    borderRadius: '32px',
                     overflow: 'hidden',
                     fontFamily: 'Inter, sans-serif'
                 }}>
                     <Box sx={{ position: 'relative', zIndex: 2 }}>
                         <Paper elevation={0} sx={{
-                            borderRadius: isModal ? 0 : '32px',
+                            borderRadius: '32px',
                             background: alpha('#FFFFFF', 0.95),
                             backdropFilter: 'blur(10px)',
                             boxShadow: isModal ? 'none' : '0 20px 40px rgba(0,0,0,0.08)',
                             border: isModal ? 'none' : '1px solid rgba(160, 82, 45, 0.15)',
                             overflow: 'hidden',
-                            padding: isModal ? '0' : { xs: '30px 20px', sm: '40px 30px', md: '50px 40px' }
+                            padding: isModal ? '0' : { xs: '30px 20px', sm: '40px 30px', md: '50px 40px' },
+                            position: 'relative'
                         }}>
+                            {/* Close Button - Only show in modal mode */}
+                            {isModal && onClose && (
+                                <IconButton
+                                    onClick={onClose}
+                                    sx={{
+                                        position: 'absolute',
+                                        top: 16,
+                                        right: 16,
+                                        zIndex: 10,
+                                        backgroundColor: alpha('#000', 0.5),
+                                        color: '#FFF',
+                                        '&:hover': {
+                                            backgroundColor: alpha('#000', 0.7)
+                                        }
+                                    }}
+                                >
+                                    <CloseIcon />
+                                </IconButton>
+                            )}
+
                             <Box sx={{
                                 textAlign: 'center',
-                                mb: 3
+                                mb: 3,
+                                pt: { xs: 4, sm: 5 },
+                                px: { xs: 3, sm: 5 }
                             }}>
                                 <Box sx={{
                                     display: 'inline-flex',
@@ -380,7 +341,7 @@ const VerifyCodePage = ({ isModal = false, onClose, email: propEmail }) => {
                                         WebkitTextFillColor: 'transparent',
                                         letterSpacing: '-0.5px'
                                     }}>
-                                       Museum
+                                        Museum
                                     </Typography>
                                 </Box>
                                 <Typography variant="h4" sx={{
@@ -420,9 +381,10 @@ const VerifyCodePage = ({ isModal = false, onClose, email: propEmail }) => {
                                 }} />
                             </Box>
 
+                            {/* Attempts counter */}
                             <Box sx={{
                                 display: 'flex',
-                                flexDirection: 'column',
+                                justifyContent: 'center',
                                 alignItems: 'center',
                                 gap: '8px',
                                 marginBottom: '24px'
@@ -438,18 +400,6 @@ const VerifyCodePage = ({ isModal = false, onClose, email: propEmail }) => {
                                 }}>
                                     Attempts: <span style={{ color: '#A0522D', fontWeight: 700 }}>{resendAttempts}</span>/{MAX_RESEND_ATTEMPTS}
                                 </Typography>
-
-                                {resendAttempts < MAX_RESEND_ATTEMPTS && countdown > 0 && (
-                                    <Typography sx={{
-                                        color: '#A0522D',
-                                        fontSize: '13px',
-                                        fontStyle: 'italic',
-                                        fontWeight: 500,
-                                        animation: `${pulse} 2s ease-in-out infinite`
-                                    }}>
-                                        Next code will be sent automatically in {Math.floor(countdown / 60)}:{String(countdown % 60).padStart(2, '0')}
-                                    </Typography>
-                                )}
                             </Box>
 
                             {error && (
@@ -474,33 +424,14 @@ const VerifyCodePage = ({ isModal = false, onClose, email: propEmail }) => {
                                 </Fade>
                             )}
 
-                            {success && (
-                                <Fade in={!!success}>
-                                    <Alert
-                                        severity="success"
-                                        sx={{
-                                            marginBottom: '20px',
-                                            borderRadius: '16px',
-                                            fontSize: '13px',
-                                            padding: '8px 16px',
-                                            bgcolor: alpha('#4CAF50', 0.05),
-                                            color: '#2E7D32',
-                                            border: '1px solid rgba(46, 125, 50, 0.15)',
-                                            '& .MuiAlert-icon': {
-                                                color: '#2E7D32'
-                                            }
-                                        }}
-                                    >
-                                        {success}
-                                    </Alert>
-                                </Fade>
-                            )}
-
                             <Box component="form" onSubmit={handleSubmit} sx={{
                                 display: 'flex',
                                 flexDirection: 'column',
-                                gap: '24px'
+                                gap: '24px',
+                                p: { xs: 3, sm: 5 },
+                                pt: { xs: 2, sm: 3 }
                             }}>
+                                {/* PIN Input Fields */}
                                 <Box sx={{
                                     display: 'flex',
                                     justifyContent: 'center',
@@ -563,64 +494,63 @@ const VerifyCodePage = ({ isModal = false, onClose, email: propEmail }) => {
                                     ))}
                                 </Box>
 
-                                <Button
-                                    type="submit"
-                                    variant="contained"
-                                    disabled={loading || pin.join('').length !== 6 || resendAttempts >= MAX_RESEND_ATTEMPTS}
-                                    sx={{
-                                        background: 'linear-gradient(135deg, #A0522D 0%, #D4A373 100%)',
-                                        color: '#FFFFFF',
-                                        padding: '12px',
-                                        borderRadius: '12px',
-                                        fontSize: '16px',
-                                        fontWeight: 700,
-                                        textTransform: 'none',
-                                        height: '48px',
-                                        boxShadow: '0 4px 12px rgba(160, 82, 45, 0.25)',
-                                        '&:hover': {
-                                            transform: 'translateY(-2px)',
-                                            boxShadow: '0 6px 16px rgba(160, 82, 45, 0.35)',
-                                            background: 'linear-gradient(135deg, #8B4513 0%, #C49A6C 100%)'
-                                        },
-                                        '&:disabled': {
-                                            background: '#E0E0E0',
-                                            color: '#9E9E9E',
-                                            boxShadow: 'none',
-                                            transform: 'none'
-                                        },
-                                        transition: 'all 0.3s'
-                                    }}
-                                >
-                                    {loading ? (
-                                        <CircularProgress size={24} sx={{ color: '#FFFFFF' }} />
-                                    ) : (
-                                        'Verify Email'
-                                    )}
-                                </Button>
-
-                                <Box sx={{
-                                    display: 'flex',
-                                    flexDirection: 'column',
-                                    alignItems: 'center',
-                                    gap: '12px',
-                                    marginTop: '10px'
-                                }}>
+                                {/* Buttons side by side */}
+                                <Stack direction="row" spacing={2}>
                                     <Button
-                                        onClick={handleManualResendCode}
-                                        disabled={resendLoading || resendAttempts >= MAX_RESEND_ATTEMPTS}
-                                        startIcon={<Refresh />}
+                                        type="submit"
+                                        variant="contained"
+                                        disabled={loading || pin.join('').length !== 6 || resendAttempts >= MAX_RESEND_ATTEMPTS}
                                         sx={{
+                                            flex: 1,
+                                            background: 'linear-gradient(135deg, #A0522D 0%, #D4A373 100%)',
+                                            color: '#FFFFFF',
+                                            padding: '12px',
+                                            borderRadius: '12px',
+                                            fontSize: '16px',
+                                            fontWeight: 700,
+                                            textTransform: 'none',
+                                            height: '48px',
+                                            boxShadow: '0 4px 12px rgba(160, 82, 45, 0.25)',
+                                            '&:hover': {
+                                                transform: 'translateY(-2px)',
+                                                boxShadow: '0 6px 16px rgba(160, 82, 45, 0.35)',
+                                                background: 'linear-gradient(135deg, #8B4513 0%, #C49A6C 100%)'
+                                            },
+                                            '&:disabled': {
+                                                background: '#E0E0E0',
+                                                color: '#9E9E9E',
+                                                boxShadow: 'none',
+                                                transform: 'none'
+                                            },
+                                            transition: 'all 0.3s'
+                                        }}
+                                    >
+                                        {loading ? (
+                                            <CircularProgress size={24} sx={{ color: '#FFFFFF' }} />
+                                        ) : (
+                                            'Verify Email'
+                                        )}
+                                    </Button>
+
+                                    <Button
+                                        onClick={handleResendCode}
+                                        variant="outlined"
+                                        disabled={resendLoading || resendAttempts >= MAX_RESEND_ATTEMPTS}
+                                        startIcon={resendLoading ? <CircularProgress size={20} sx={{ color: '#A0522D' }} /> : <Refresh />}
+                                        sx={{
+                                            flex: 1,
                                             color: '#A0522D',
                                             textTransform: 'none',
-                                            fontSize: '14px',
+                                            fontSize: '16px',
                                             fontWeight: 600,
-                                            padding: '6px 20px',
-                                            border: '1px solid rgba(160, 82, 45, 0.3)',
-                                            borderRadius: '40px',
+                                            padding: '12px',
+                                            borderRadius: '12px',
+                                            border: '1px solid rgba(160, 82, 45, 0.5)',
+                                            height: '48px',
                                             '&:hover': {
                                                 backgroundColor: alpha('#A0522D', 0.05),
                                                 borderColor: '#A0522D',
-                                                transform: 'translateY(-1px)'
+                                                transform: 'translateY(-2px)'
                                             },
                                             '&:disabled': {
                                                 color: '#BDBDBD',
@@ -629,34 +559,9 @@ const VerifyCodePage = ({ isModal = false, onClose, email: propEmail }) => {
                                             transition: 'all 0.3s'
                                         }}
                                     >
-                                        {resendLoading ? (
-                                            <CircularProgress size={16} sx={{ color: '#A0522D' }} />
-                                        ) : resendAttempts >= MAX_RESEND_ATTEMPTS ? (
-                                            'Max attempts reached'
-                                        ) : (
-                                            'Manual Resend'
-                                        )}
+                                        {resendLoading ? 'Sending...' : (resendAttempts >= MAX_RESEND_ATTEMPTS ? 'Max attempts reached' : 'Resend Code')}
                                     </Button>
-                                </Box>
-                            </Box>
-
-                            <Box sx={{
-                                marginTop: '30px',
-                                padding: '16px',
-                                background: alpha('#A0522D', 0.03),
-                                borderRadius: '16px',
-                                border: '1px solid rgba(160, 82, 45, 0.15)',
-                                borderLeft: '4px solid #A0522D',
-                            }}>
-                                <Typography sx={{
-                                    color: '#6B4C3A',
-                                    fontSize: '13px',
-                                    lineHeight: 1.6
-                                }}>
-                                    <strong style={{ color: '#A0522D' }}>Auto-Resend Active:</strong> A new code will be automatically sent every 2 minutes.
-                                    You have <span style={{ color: '#A0522D', fontWeight: 700 }}>{MAX_RESEND_ATTEMPTS - resendAttempts}</span> attempts remaining.
-                                    {resendAttempts === MAX_RESEND_ATTEMPTS - 1 && ' This is your last attempt!'}
-                                </Typography>
+                                </Stack>
                             </Box>
                         </Paper>
                     </Box>

@@ -18,9 +18,6 @@ import {
     DialogContentText,
     DialogActions,
     Paper,
-    Container,
-    useMediaQuery,
-    useTheme,
     GlobalStyles
 } from '@mui/material';
 import {
@@ -29,7 +26,8 @@ import {
     Close as CloseIcon,
     Lock,
     Email,
-    Person
+    Person,
+    Museum as MuseumIcon
 } from '@mui/icons-material';
 import { useAuth } from '../context/AuthContext';
 import axios from 'axios';
@@ -37,19 +35,9 @@ import { alpha, keyframes } from '@mui/material/styles';
 
 const API_BASE_URL = 'http://localhost:8080/api/public';
 
-const float = keyframes`
-    0%, 100% { transform: translateY(0px); }
-    50% { transform: translateY(-10px); }
-`;
-
 const pulse = keyframes`
     0%, 100% { opacity: 0.6; transform: scale(1); }
     50% { opacity: 1; transform: scale(1.05); }
-`;
-
-const slideInRight = keyframes`
-    from { opacity: 0; transform: translateX(50px); }
-    to { opacity: 1; transform: translateX(0); }
 `;
 
 const scrollbarStyles = {
@@ -70,8 +58,6 @@ const scrollbarStyles = {
 const LoginPage = ({ isModal = false, onClose, onSwitchToSignup }) => {
     const navigate = useNavigate();
     const { login } = useAuth();
-    const theme = useTheme();
-    const isMobile = useMediaQuery(theme.breakpoints.down('md'));
 
     const [showPassword, setShowPassword] = useState(false);
     const [loading, setLoading] = useState(false);
@@ -257,8 +243,29 @@ const LoginPage = ({ isModal = false, onClose, onSwitchToSignup }) => {
                     backdropFilter: 'blur(10px)',
                     boxShadow: '0 20px 40px rgba(0,0,0,0.08)',
                     border: '1px solid rgba(160, 82, 45, 0.15)',
-                    overflow: 'hidden'
+                    overflow: 'hidden',
+                    position: 'relative'
                 }}>
+                    {/* Close Button - Only show in modal mode */}
+                    {isModal && onClose && (
+                        <IconButton
+                            onClick={onClose}
+                            sx={{
+                                position: 'absolute',
+                                top: 16,
+                                right: 16,
+                                zIndex: 10,
+                                backgroundColor: alpha('#000', 0.5),
+                                color: '#FFF',
+                                '&:hover': {
+                                    backgroundColor: alpha('#000', 0.7)
+                                }
+                            }}
+                        >
+                            <CloseIcon />
+                        </IconButton>
+                    )}
+
                     <Box sx={{
                         textAlign: 'center',
                         pt: { xs: 4, sm: 5 },
@@ -279,7 +286,7 @@ const LoginPage = ({ isModal = false, onClose, onSwitchToSignup }) => {
                                 alignItems: 'center',
                                 justifyContent: 'center'
                             }}>
-                                <Lock sx={{ color: 'white', fontSize: 24 }} />
+                                <MuseumIcon sx={{ color: 'white', fontSize: 24 }} />
                             </Box>
                             <Typography variant="h5" sx={{
                                 fontWeight: 800,
@@ -297,13 +304,7 @@ const LoginPage = ({ isModal = false, onClose, onSwitchToSignup }) => {
                             color: '#3E2723',
                             mb: 1
                         }}>
-                        </Typography>
-                        <Typography sx={{
-                            color: '#6B4C3A',
-                            fontSize: '14px',
-                            mb: 3
-                        }}>
-                            Sign in to continue to your account
+                            Sign In
                         </Typography>
                         <Box sx={{
                             width: 50,

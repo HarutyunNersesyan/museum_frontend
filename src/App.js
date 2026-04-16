@@ -1,4 +1,3 @@
-// App.js
 import React from 'react';
 import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-dom';
 import { AuthProvider } from './context/AuthContext';
@@ -9,7 +8,6 @@ import LoginPage from './pages/LoginPage';
 import SignUpPage from './pages/SignUpPage';
 import VerifyCodePage from './pages/VerifyCodePage';
 import EventsPage from './pages/EventsPage';
-import MuseumsPage from './pages/MuseumsPage';
 import AdminLoginPage from './pages/AdminLoginPage';
 import AdminDashboardPage from './pages/AdminDashboardPage';
 import './App.css';
@@ -18,11 +16,8 @@ const AppContent = () => {
     return (
         <div className="app-container">
             <Routes>
-                {/* Home Page */}
+                {/* Home Page - Shows museums */}
                 <Route path="/" element={<HomePage />} />
-
-                {/* Museums Page - Public */}
-                <Route path="/museums" element={<MuseumsPage />} />
 
                 {/* Auth Pages (Public) */}
                 <Route path="/login" element={<LoginPage />} />

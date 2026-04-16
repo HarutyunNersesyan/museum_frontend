@@ -1,40 +1,50 @@
-// src/pages/HomePage.js
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import {
-    Button,
     Container,
     Typography,
-    Grid,
     Box,
-    Alert,
-    Snackbar,
-    Modal,
+    Grid,
+    Card,
+    CardContent,
     IconButton,
     Menu,
     MenuItem,
-    Divider,
     Avatar,
-    Stack,
+    Chip,
     Fade,
+    Zoom,
     useMediaQuery,
     useTheme,
+    Tooltip,
+    alpha,
+    keyframes,
+    GlobalStyles,
+    Button,
+    Divider,
     Paper,
-    GlobalStyles
+    Stack,
+    Pagination,
+    Modal
 } from '@mui/material';
-import CloseIcon from '@mui/icons-material/Close';
-import AccountCircleIcon from '@mui/icons-material/AccountCircle';
-import LogoutIcon from '@mui/icons-material/Logout';
-import PersonIcon from '@mui/icons-material/Person';
-import AdminPanelSettingsIcon from '@mui/icons-material/AdminPanelSettings';
-import MuseumIcon from '@mui/icons-material/Museum';
-import EventIcon from '@mui/icons-material/Event';
-import InfoIcon from '@mui/icons-material/Info';
-import { alpha, keyframes } from '@mui/material/styles';
+import {
+    Museum as MuseumIcon,
+    AccountCircle as AccountCircleIcon,
+    Logout as LogoutIcon,
+    Person as PersonIcon,
+    AdminPanelSettings as AdminPanelSettingsIcon,
+    Event as EventIcon,
+    LocationOn as LocationOnIcon,
+    AccessTime as AccessTimeIcon,
+    Phone as PhoneIcon,
+    Star as StarIcon,
+    StarBorder as StarBorderIcon
+} from '@mui/icons-material';
+import { useAuth } from '../context/AuthContext';
+import { alpha as alphaMUI } from '@mui/material/styles';
 import LoginPage from './LoginPage';
 import SignUpPage from './SignUpPage';
 import VerifyCodePage from './VerifyCodePage';
-import { useAuth } from '../context/AuthContext';
 
 // Custom animations
 const pulse = keyframes`
@@ -42,7 +52,7 @@ const pulse = keyframes`
     50% { opacity: 0.7; transform: scale(1.05); }
 `;
 
-// Warm brown color palette for museum theme
+// Warm brown color palette
 const colors = {
     primary: '#C4A484',
     primaryDark: '#A0522D',
@@ -53,29 +63,236 @@ const colors = {
     text: '#4A3728',
     textLight: '#7A5C4A',
     border: '#E8D5B7',
-    gradient: 'linear-gradient(135deg, #C4A484 0%, #D2B48C 50%, #DEB887 100%)'
+    gradient: 'linear-gradient(135deg, #C4A484 0%, #D2B48C 50%, #DEB887 100%)',
+    error: '#f44336'
 };
 
-// Global scrollbar styles
+// Armenian Museums Data
+const ARMENIAN_MUSEUMS = [
+    {
+        id: 1,
+        name: 'History Museum of Armenia',
+        nameArm: 'Հայաստանի Պատմության Թանգարան',
+        location: 'Yerevan',
+        address: '4 Republic Square, Yerevan',
+        description: 'The History Museum of Armenia is a museum with departments of Archaeology, Numismatics, Ethnography, Modern History, and Restoration. It houses one of the richest collections of Armenian cultural heritage, with over 400,000 artifacts.',
+        image: 'http://localhost:8080/uploads/1.jpg',
+        hours: 'Tue-Sun: 11:00-18:00',
+        phone: '+374 10 520-690',
+        rating: 4.8,
+        featured: true
+    },
+    {
+        id: 2,
+        name: 'Matenadaran',
+        nameArm: 'Մատենադարան',
+        location: 'Yerevan',
+        address: '53 Mesrop Mashtots Ave, Yerevan',
+        description: 'The Mesrop Mashtots Institute of Ancient Manuscripts, known as Matenadaran, is a repository of ancient manuscripts and a research institute. It holds over 23,000 manuscripts.',
+        image: 'http://localhost:8080/uploads/2.jpg',
+        hours: 'Tue-Sun: 10:00-17:00',
+        phone: '+374 10 513-000',
+        rating: 4.9,
+        featured: true
+    },
+    {
+        id: 3,
+        name: 'Cafesjian Center for the Arts',
+        nameArm: 'Գաֆէսճեանի արուեստի կենտրոն',
+        location: 'Yerevan',
+        address: '3 Tamanyan St, Yerevan',
+        description: 'The Cafesjian Center for the Arts (CCA) is a contemporary art museum located in the heart of Yerevan. It features a diverse collection of modern and contemporary art.',
+        image: 'http://localhost:8080/uploads/3.jpg',
+        hours: 'Tue-Sun: 11:00-20:00',
+        phone: '+374 10 541-932',
+        rating: 4.7,
+        featured: true
+    },
+    {
+        id: 4,
+        name: 'Erebuni Fortress & Museum',
+        nameArm: 'Էրեբունի ամրոց և թանգարան',
+        location: 'Yerevan',
+        address: '38 Erebuni St, Yerevan',
+        description: 'Erebuni Museum was established in 1968 to celebrate Yerevan\'s 2750th anniversary. The fortress was founded in 782 BC by King Argishti I of Urartu.',
+        image: 'http://localhost:8080/uploads/4.jpg',
+        hours: 'Tue-Sun: 10:30-17:30',
+        phone: '+374 10 461-393',
+        rating: 4.6,
+        featured: false
+    },
+    {
+        id: 5,
+        name: 'Armenian Genocide Museum',
+        nameArm: 'Հայոց Ցեղասպանության Թանգարան',
+        location: 'Yerevan',
+        address: '8 Tsitsernakaberd Hwy, Yerevan',
+        description: 'The Armenian Genocide Museum-Institute is dedicated to preserving the memory of the Armenian Genocide of 1915. The museum features photographs, documents, and testimonies.',
+        image: 'http://localhost:8080/uploads/5.jpg',
+        hours: 'Mon-Sun: 11:00-16:00',
+        phone: '+374 10 390-980',
+        rating: 4.9,
+        featured: true
+    },
+    {
+        id: 6,
+        name: 'Dilijan Local Lore Museum',
+        nameArm: 'Դիլիջանի Երկրագիտական Թանգարան',
+        location: 'Dilijan',
+        address: '6 Myasnikyan St, Dilijan',
+        description: 'The Dilijan Local Lore Museum showcases the natural history, ethnography, and cultural heritage of the Dilijan region.',
+        image: 'http://localhost:8080/uploads/6.jpg',
+        hours: 'Tue-Sun: 10:00-18:00',
+        phone: '+374 268 2-42-07',
+        rating: 4.5,
+        featured: false
+    },
+    {
+        id: 7,
+        name: 'Gyumri Museum of Architecture',
+        nameArm: 'Գյումրու Ճարտարապետության Թանգարան',
+        location: 'Gyumri',
+        address: '20 Haghtanaki St, Gyumri',
+        description: 'The Museum of National Architecture and Urban Life of Gyumri is housed in a historic 19th-century mansion.',
+        image: 'http://localhost:8080/uploads/7.jpg',
+        hours: 'Tue-Sun: 11:00-17:00',
+        phone: '+374 312 5-16-57',
+        rating: 4.6,
+        featured: false
+    },
+    {
+        id: 8,
+        name: 'Khor Virap Museum',
+        nameArm: 'Խոր Վիրապի Թանգարան',
+        location: 'Ararat',
+        address: 'Near Khor Virap Monastery',
+        description: 'The Khor Virap Museum tells the story of the historic Khor Virap monastery, where St. Gregory the Illuminator was imprisoned for 13 years.',
+        image: 'http://localhost:8080/uploads/8.jpg',
+        hours: 'Tue-Sun: 10:00-18:00',
+        phone: '+374 10 000-000',
+        rating: 4.7,
+        featured: false
+    },
+    {
+        id: 9,
+        name: 'Sergey Parajanov Museum',
+        nameArm: 'Սերգեյ Փարաջանովի Թանգարան',
+        location: 'Yerevan',
+        address: '15-17 Dzoragyugh St, Yerevan',
+        description: 'The Sergey Parajanov Museum is dedicated to the legendary Armenian film director and artist. The museum displays over 1,400 works.',
+        image: 'http://localhost:8080/uploads/9.jpg',
+        hours: 'Tue-Sun: 11:00-17:00',
+        phone: '+374 10 538-773',
+        rating: 4.8,
+        featured: true
+    },
+    {
+        id: 10,
+        name: 'Megerian Carpet Museum',
+        nameArm: 'Մեգերյան Կարպետի Թանգարան',
+        location: 'Yerevan',
+        address: '9 Madoyan St, Yerevan',
+        description: 'The Megerian Carpet Museum showcases the rich tradition of Armenian carpet weaving. Visitors can see antique carpets and watch master weavers at work.',
+        image: 'http://localhost:8080/uploads/10.jpg',
+        hours: 'Mon-Sat: 10:00-18:00',
+        phone: '+374 10 000-000',
+        rating: 4.6,
+        featured: false
+    }
+];
+
+// Scrollbar styles
 const scrollbarStyles = {
     '*::-webkit-scrollbar': { width: '10px', height: '10px' },
     '*::-webkit-scrollbar-track': { background: '#E8D5B7', borderRadius: '10px' },
     '*::-webkit-scrollbar-thumb': { background: '#C4A484', borderRadius: '10px', '&:hover': { background: '#A0522D' } },
 };
 
-function HomePage() {
-    const { user, logout, isAdmin } = useAuth();
-    const navigate = useNavigate();
-    const theme = useTheme();
-    const isMobile = useMediaQuery(theme.breakpoints.down('md'));
+// Image component
+const MuseumImage = ({ src, alt }) => {
+    const [imageLoaded, setImageLoaded] = useState(false);
+    const [imageError, setImageError] = useState(false);
 
-    const [snackbar, setSnackbar] = useState({ open: false, message: '', severity: 'success' });
+    useEffect(() => {
+        if (!src) return;
+        const img = new Image();
+        img.onload = () => setImageLoaded(true);
+        img.onerror = () => setImageError(true);
+        img.src = src;
+    }, [src]);
+
+    return (
+        <Box sx={{
+            position: 'relative',
+            width: '100%',
+            height: '100%',
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'center',
+            backgroundColor: '#F5F0E8',
+            overflow: 'hidden'
+        }}>
+            {!imageLoaded && !imageError && (
+                <Box sx={{
+                    display: 'flex',
+                    alignItems: 'center',
+                    justifyContent: 'center',
+                    width: '100%',
+                    height: '100%'
+                }}>
+                    <Box sx={{
+                        width: 40,
+                        height: 40,
+                        borderRadius: '50%',
+                        border: `2px solid ${colors.primary}`,
+                        borderTopColor: 'transparent',
+                        animation: 'spin 1s linear infinite',
+                        '@keyframes spin': {
+                            '0%': { transform: 'rotate(0deg)' },
+                            '100%': { transform: 'rotate(360deg)' }
+                        }
+                    }} />
+                </Box>
+            )}
+            {imageError && (
+                <Box sx={{ textAlign: 'center', p: 2 }}>
+                    <MuseumIcon sx={{ fontSize: 48, color: alphaMUI(colors.primary, 0.3), mb: 1 }} />
+                    <Typography variant="caption" sx={{ color: colors.textLight, display: 'block' }}>
+                        Image not available
+                    </Typography>
+                </Box>
+            )}
+            {imageLoaded && (
+                <img
+                    src={src}
+                    alt={alt}
+                    style={{
+                        maxWidth: '100%',
+                        maxHeight: '100%',
+                        width: 'auto',
+                        height: 'auto',
+                        objectFit: 'contain',
+                        display: 'block'
+                    }}
+                />
+            )}
+        </Box>
+    );
+};
+
+function HomePage() {
+    const navigate = useNavigate();
+    const { user, logout, isAdmin } = useAuth();
+
+    const [anchorEl, setAnchorEl] = useState(null);
+    const [backgroundPosition, setBackgroundPosition] = useState({ x: 0, y: 0 });
+    const [page, setPage] = useState(1);
+    const [userInitial, setUserInitial] = useState('');
     const [loginModalOpen, setLoginModalOpen] = useState(false);
     const [signupModalOpen, setSignupModalOpen] = useState(false);
     const [verifyModalOpen, setVerifyModalOpen] = useState(false);
     const [verifyEmail, setVerifyEmail] = useState('');
-    const [anchorEl, setAnchorEl] = useState(null);
-    const [backgroundPosition, setBackgroundPosition] = useState({ x: 0, y: 0 });
+    const itemsPerPage = 6;
 
     useEffect(() => {
         const handleMouseMove = (e) => {
@@ -97,7 +314,6 @@ function HomePage() {
     const handleLogout = async () => {
         await logout();
         handleMenuClose();
-        setSnackbar({ open: true, message: 'Logged out successfully!', severity: 'success' });
         navigate('/');
     };
 
@@ -113,45 +329,53 @@ function HomePage() {
 
     const handleEventsClick = () => {
         if (!user) {
-            setSnackbar({ open: true, message: 'Please sign in to browse events', severity: 'warning' });
-            handleOpenLoginModal();
+            setLoginModalOpen(true);
             return;
         }
         navigate('/events');
     };
 
-    const handleMuseumsClick = () => {
-        navigate('/museums');
-    };
+    const handleLoginModalOpen = () => setLoginModalOpen(true);
+    const handleLoginModalClose = () => setLoginModalOpen(false);
 
-    const handleCloseSnackbar = () => setSnackbar({ ...snackbar, open: false });
+    const handleSignupModalOpen = () => setSignupModalOpen(true);
+    const handleSignupModalClose = () => setSignupModalOpen(false);
 
-    const handleOpenLoginModal = () => setLoginModalOpen(true);
-    const handleCloseLoginModal = () => setLoginModalOpen(false);
-    const handleOpenSignupModal = () => setSignupModalOpen(true);
-    const handleCloseSignupModal = () => setSignupModalOpen(false);
-    const handleOpenVerifyModal = (email = '') => {
+    const handleVerifyModalOpen = (email) => {
         setVerifyEmail(email);
         setVerifyModalOpen(true);
     };
-    const handleCloseVerifyModal = () => {
+    const handleVerifyModalClose = () => {
         setVerifyModalOpen(false);
         setVerifyEmail('');
     };
+
     const handleSwitchToSignup = () => {
-        handleCloseLoginModal();
-        setTimeout(() => handleOpenSignupModal(), 300);
-    };
-    const handleSwitchToLogin = () => {
-        handleCloseSignupModal();
-        setTimeout(() => handleOpenLoginModal(), 300);
-    };
-    const handleSignupSuccess = (email) => {
-        handleCloseSignupModal();
-        setTimeout(() => handleOpenVerifyModal(email), 300);
+        handleLoginModalClose();
+        setTimeout(() => handleSignupModalOpen(), 100);
     };
 
-    const [userInitial, setUserInitial] = useState('');
+    const handleSwitchToLogin = () => {
+        handleSignupModalClose();
+        setTimeout(() => handleLoginModalOpen(), 100);
+    };
+
+    const handleSignupSuccess = (email) => {
+        handleSignupModalClose();
+        setTimeout(() => handleVerifyModalOpen(email), 100);
+    };
+
+    const handleVerificationSuccess = () => {
+        // After successful verification, close verify modal and open login modal
+        handleVerifyModalClose();
+        setTimeout(() => handleLoginModalOpen(), 300);
+    };
+
+    const totalPages = Math.ceil(ARMENIAN_MUSEUMS.length / itemsPerPage);
+    const paginatedMuseums = ARMENIAN_MUSEUMS.slice(
+        (page - 1) * itemsPerPage,
+        page * itemsPerPage
+    );
 
     return (
         <Box sx={{
@@ -197,7 +421,7 @@ function HomePage() {
                         width: `${150 + (idx * 20)}px`,
                         height: `${150 + (idx * 20)}px`,
                         borderRadius: '50%',
-                        background: `radial-gradient(circle, ${alpha(['#C4A484', '#D2B48C', '#DEB887', '#8B7355'][idx % 4], 0.06)} 0%, transparent 70%)`,
+                        background: `radial-gradient(circle, ${alphaMUI(['#C4A484', '#D2B48C', '#DEB887', '#8B7355'][idx % 4], 0.06)} 0%, transparent 70%)`,
                         animation: `${pulse} ${8 + idx}s ease-in-out infinite`,
                         pointerEvents: 'none'
                     }} />
@@ -209,14 +433,14 @@ function HomePage() {
                 position: 'sticky',
                 top: 0,
                 zIndex: 100,
-                backgroundColor: alpha('#FFFDF7', 0.95),
+                backgroundColor: alphaMUI('#FFFDF7', 0.95),
                 backdropFilter: 'blur(10px)',
                 borderBottom: `1px solid ${colors.border}`,
                 boxShadow: '0 2px 20px rgba(0,0,0,0.03)'
             }}>
                 <Container maxWidth="xl">
                     <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', height: 70 }}>
-                        {/* Logo - Left side */}
+                        {/* Logo */}
                         <Box onClick={() => navigate('/')} sx={{ display: 'flex', alignItems: 'center', gap: 1.5, cursor: 'pointer' }}>
                             <Box sx={{
                                 width: 38, height: 38, borderRadius: '12px', background: colors.gradient,
@@ -232,22 +456,9 @@ function HomePage() {
                             </Typography>
                         </Box>
 
-                        {/* Right side - Navigation and User Menu */}
+                        {/* Navigation */}
                         <Box sx={{ display: 'flex', alignItems: 'center', gap: 4 }}>
-                            {/* Navigation Links */}
                             <Box sx={{ display: { xs: 'none', md: 'flex' }, gap: 2 }}>
-                                <Button
-                                    startIcon={<MuseumIcon />}
-                                    onClick={handleMuseumsClick}
-                                    sx={{
-                                        fontWeight: 500,
-                                        color: colors.textLight,
-                                        '&:hover': { color: colors.primary },
-                                        fontSize: '0.9rem'
-                                    }}
-                                >
-                                    Museums
-                                </Button>
                                 <Button
                                     startIcon={<EventIcon />}
                                     onClick={handleEventsClick}
@@ -266,13 +477,11 @@ function HomePage() {
                             <Box sx={{ display: 'flex', alignItems: 'center', gap: 2 }}>
                                 {user ? (
                                     <>
-                                        {/* Profile Icon */}
                                         <IconButton onClick={handleMenuOpen} sx={{ background: colors.gradient, width: 38, height: 38 }}>
                                             <Avatar sx={{ width: 38, height: 38, bgcolor: 'transparent', color: 'white' }}>
                                                 {userInitial || <AccountCircleIcon />}
                                             </Avatar>
                                         </IconButton>
-
                                         <Menu anchorEl={anchorEl} open={Boolean(anchorEl)} onClose={handleMenuClose} PaperProps={{ sx: { bgcolor: '#FFFDF7', borderRadius: '16px', minWidth: 200 } }}>
                                             <MenuItem onClick={handleProfile}><PersonIcon sx={{ mr: 2, color: colors.primary }} />Profile</MenuItem>
                                             {isAdmin && <MenuItem onClick={handleAdminPanel}><AdminPanelSettingsIcon sx={{ mr: 2, color: colors.primaryDark }} />Admin Panel</MenuItem>}
@@ -282,8 +491,14 @@ function HomePage() {
                                     </>
                                 ) : (
                                     <>
-                                        <Button onClick={() => navigate('/login')} sx={{ fontWeight: 500, color: colors.textLight }}>Sign In</Button>
-                                        <Button variant="contained" onClick={() => navigate('/signup')} sx={{ fontWeight: 600, borderRadius: '12px', background: colors.gradient, '&:hover': { transform: 'translateY(-2px)' } }}>Sign Up</Button>
+                                        <Button onClick={handleLoginModalOpen} sx={{ fontWeight: 500, color: colors.textLight }}>Sign In</Button>
+                                        <Button
+                                            variant="contained"
+                                            onClick={handleSignupModalOpen}
+                                            sx={{ fontWeight: 600, borderRadius: '12px', background: colors.gradient }}
+                                        >
+                                            Sign Up
+                                        </Button>
                                     </>
                                 )}
                             </Box>
@@ -292,110 +507,248 @@ function HomePage() {
                 </Container>
             </Box>
 
-            {/* Main Content */}
-            <Box sx={{ position: 'relative', zIndex: 3 }}>
-                {/* About Us Section - Museum Theme */}
-                <Box id="about-us" sx={{ py: { xs: 8, md: 10 }, borderTop: `1px solid ${alpha(colors.border, 0.5)}`, borderBottom: `1px solid ${alpha(colors.border, 0.5)}`, background: 'transparent' }}>
-                    <Container maxWidth="lg">
-                        <Fade in timeout={1000}>
-                            <Grid container spacing={6} alignItems="flex-start">
-                                {/* Left side - Image */}
-                                <Grid item xs={12} md={6}>
-                                    <Box sx={{
-                                        position: 'relative',
-                                        borderRadius: '32px',
+            {/* Hero Section */}
+            <Box sx={{ position: 'relative', zIndex: 3, py: { xs: 4, md: 6 } }}>
+                <Container maxWidth="lg" sx={{ mb: 5 }}>
+                    <Fade in timeout={1000}>
+                        <Box sx={{ textAlign: 'center' }}>
+                            <Typography variant="h2" sx={{
+                                fontSize: { xs: '2rem', md: '3rem' },
+                                fontWeight: 700,
+                                color: colors.text,
+                                mb: 2
+                            }}>
+                                Discover Armenia's <span style={{ color: colors.primary }}>Cultural Heritage</span>
+                            </Typography>
+                            <Typography variant="h5" sx={{
+                                color: colors.textLight,
+                                fontSize: { xs: '1rem', md: '1.25rem' }
+                            }}>
+                                Explore the finest museums and cultural events across Armenia
+                            </Typography>
+                        </Box>
+                    </Fade>
+                </Container>
+
+                {/* Museums Grid */}
+                <Container maxWidth={false} sx={{ px: { xs: 2, sm: 3, md: 4, lg: 6 } }}>
+                    <Grid container spacing={3}>
+                        {paginatedMuseums.map((museum, index) => (
+                            <Grid item xs={12} sm={6} md={4} key={museum.id}>
+                                <Zoom in timeout={300 + index * 100}>
+                                    <Paper elevation={0} sx={{
+                                        borderRadius: '20px',
                                         overflow: 'hidden',
-                                        boxShadow: '0 20px 40px rgba(0,0,0,0.1)',
-                                        transition: 'transform 0.3s ease',
-                                        '&:hover': { transform: 'scale(1.02)' }
+                                        transition: 'all 0.3s ease',
+                                        background: alphaMUI('#FFFDF7', 0.95),
+                                        backdropFilter: 'blur(5px)',
+                                        border: `1px solid ${alphaMUI(colors.border, 0.5)}`,
+                                        height: '100%',
+                                        display: 'flex',
+                                        flexDirection: 'column',
+                                        '&:hover': {
+                                            transform: 'translateY(-5px)',
+                                            boxShadow: `0 15px 35px ${alphaMUI(colors.primary, 0.12)}`,
+                                            borderColor: alphaMUI(colors.primary, 0.3)
+                                        }
                                     }}>
-                                        <img
-                                            src="https://images.unsplash.com/photo-1534432586043-ead5b99229fb?ixlib=rb-4.0.3&auto=format&fit=crop&w=1170&q=80"
-                                            alt="Museum interior with ancient artifacts"
-                                            style={{ width: '100%', height: 'auto', display: 'block', objectFit: 'cover' }}
-                                        />
-                                    </Box>
-                                </Grid>
-
-                                {/* Right side - Text */}
-                                <Grid item xs={12} md={6}>
-                                    <Box sx={{ p: { xs: 2, md: 4 }, pt: { xs: 2, md: 0 } }}>
-                                        <Typography variant="h3" sx={{ fontSize: { xs: 28, md: 38 }, fontWeight: 700, color: colors.text, mb: 3 }}>
-                                            About <span style={{ color: colors.primary }}>Museum Events</span>
-                                        </Typography>
-                                        <Typography variant="body1" sx={{
-                                            color: colors.textLight,
-                                            fontSize: { xs: 16, md: 18 },
-                                            lineHeight: 1.9,
-                                            fontWeight: 450,
-                                            letterSpacing: '0.01em',
-                                            mb: 3
+                                        <Box sx={{
+                                            position: 'relative',
+                                            width: '100%',
+                                            paddingTop: '66.67%',
+                                            backgroundColor: '#F5F0E8',
+                                            overflow: 'hidden'
                                         }}>
-                                            <span style={{ fontWeight: 600, color: colors.primary }}>Museum Events</span> is your premier platform for discovering and experiencing the rich cultural heritage of Armenia. We bring together the finest museums, exhibitions, and cultural events across the country, making it easy for you to explore art, history, science, and tradition in one place.
-                                        </Typography>
+                                            <Box sx={{
+                                                position: 'absolute',
+                                                top: 0,
+                                                left: 0,
+                                                width: '100%',
+                                                height: '100%',
+                                                display: 'flex',
+                                                alignItems: 'center',
+                                                justifyContent: 'center'
+                                            }}>
+                                                <MuseumImage src={museum.image} alt={museum.name} />
+                                            </Box>
+                                            {museum.featured && (
+                                                <Chip
+                                                    label="Featured"
+                                                    size="small"
+                                                    sx={{
+                                                        position: 'absolute',
+                                                        bottom: 12,
+                                                        left: 12,
+                                                        bgcolor: colors.primary,
+                                                        color: 'white',
+                                                        fontWeight: 600,
+                                                        fontSize: '0.7rem',
+                                                        height: 24,
+                                                        zIndex: 1
+                                                    }}
+                                                />
+                                            )}
+                                        </Box>
 
-                                        <Typography variant="body1" sx={{
-                                            color: colors.textLight,
-                                            fontSize: { xs: 16, md: 18 },
-                                            lineHeight: 1.9,
-                                            fontWeight: 450,
-                                            letterSpacing: '0.01em',
-                                            mb: 3
-                                        }}>
-                                            From ancient archaeological treasures to contemporary art exhibitions, from natural history displays to interactive science centers — our platform connects you with Armenia's most prestigious cultural institutions. Whether you're a history enthusiast, art lover, student, or curious traveler, you'll find events and exhibitions that inspire and educate.
-                                        </Typography>
-
-                                        <Typography variant="body1" sx={{
-                                            color: colors.textLight,
-                                            fontSize: { xs: 16, md: 18 },
-                                            lineHeight: 1.9,
-                                            fontWeight: 450,
-                                            letterSpacing: '0.01em',
-                                            fontStyle: 'italic'
-                                        }}>
-                                            Let <span style={{ fontWeight: 600, color: colors.primary }}>Museum Events</span> be your guide to Armenia's cultural treasures — where history comes alive, art speaks volumes, and every visit becomes an unforgettable journey through time.
-                                        </Typography>
-                                    </Box>
-                                </Grid>
+                                        <CardContent sx={{ p: 2, flexGrow: 1 }}>
+                                            <Typography variant="subtitle1" sx={{ fontWeight: 700, color: colors.text, mb: 0.5, fontSize: '1rem' }}>
+                                                {museum.name}
+                                            </Typography>
+                                            <Typography variant="caption" sx={{ color: colors.primary, fontStyle: 'italic', mb: 1, display: 'block', fontSize: '0.7rem' }}>
+                                                {museum.nameArm}
+                                            </Typography>
+                                            <Stack direction="row" spacing={0.5} alignItems="center" sx={{ mb: 1 }}>
+                                                <LocationOnIcon sx={{ fontSize: 14, color: colors.primary }} />
+                                                <Typography variant="caption" sx={{ color: colors.textLight, fontSize: '0.7rem' }}>
+                                                    {museum.location}
+                                                </Typography>
+                                            </Stack>
+                                            <Typography variant="body2" sx={{ color: colors.textLight, mb: 1.5, lineHeight: 1.4, fontSize: '0.75rem' }}>
+                                                {museum.description.substring(0, 100)}...
+                                            </Typography>
+                                            <Divider sx={{ my: 1 }} />
+                                            <Stack direction="row" spacing={1} sx={{ mt: 0.5, flexWrap: 'wrap', gap: 0.5 }}>
+                                                <Stack direction="row" spacing={0.5} alignItems="center">
+                                                    <AccessTimeIcon sx={{ fontSize: 12, color: colors.primary }} />
+                                                    <Typography variant="caption" sx={{ color: colors.textLight, fontSize: '0.65rem' }}>{museum.hours}</Typography>
+                                                </Stack>
+                                                <Stack direction="row" spacing={0.5} alignItems="center">
+                                                    <PhoneIcon sx={{ fontSize: 12, color: colors.primary }} />
+                                                    <Typography variant="caption" sx={{ color: colors.textLight, fontSize: '0.65rem' }}>{museum.phone}</Typography>
+                                                </Stack>
+                                            </Stack>
+                                            <Stack direction="row" alignItems="center" sx={{ mt: 1.5 }}>
+                                                <Stack direction="row" spacing={0.3} alignItems="center">
+                                                    {[...Array(5)].map((_, i) => (
+                                                        i < Math.floor(museum.rating) ?
+                                                            <StarIcon key={i} sx={{ fontSize: 12, color: '#FFB800' }} /> :
+                                                            <StarBorderIcon key={i} sx={{ fontSize: 12, color: '#FFB800' }} />
+                                                    ))}
+                                                    <Typography variant="caption" sx={{ ml: 0.3, color: colors.textLight, fontSize: '0.65rem' }}>
+                                                        ({museum.rating})
+                                                    </Typography>
+                                                </Stack>
+                                            </Stack>
+                                        </CardContent>
+                                    </Paper>
+                                </Zoom>
                             </Grid>
-                        </Fade>
-                    </Container>
-                </Box>
+                        ))}
+                    </Grid>
 
-                {/* Footer */}
-                <Box sx={{ py: 5, textAlign: 'center', background: '#FFFFFF', borderTop: `1px solid ${colors.border}` }}>
-                    <Container maxWidth="lg">
-                        <Typography variant="body2" sx={{ color: colors.textLight }}>© 2026 Museum Events. All rights reserved.</Typography>
-                    </Container>
-                </Box>
+                    {totalPages > 1 && (
+                        <Box sx={{ display: 'flex', justifyContent: 'center', mt: 5 }}>
+                            <Pagination
+                                count={totalPages}
+                                page={page}
+                                onChange={(e, value) => setPage(value)}
+                                sx={{
+                                    '& .MuiPaginationItem-root': {
+                                        color: colors.textLight,
+                                        '&.Mui-selected': {
+                                            backgroundColor: colors.primary,
+                                            color: 'white',
+                                            '&:hover': { backgroundColor: colors.primaryDark }
+                                        }
+                                    }
+                                }}
+                            />
+                        </Box>
+                    )}
+                </Container>
             </Box>
 
-            {/* Modals */}
-            <Modal open={loginModalOpen} onClose={handleCloseLoginModal} sx={{ display: 'flex', alignItems: 'center', justifyContent: 'center', backdropFilter: 'blur(8px)' }}>
-                <Box sx={{ width: '90%', maxWidth: 470, maxHeight: '90vh', bgcolor: '#FFFFFF', borderRadius: '24px', border: `1px solid ${colors.border}`, position: 'relative', overflow: 'hidden', boxShadow: '0 24px 48px rgba(0,0,0,0.15)' }}>
-                    <IconButton onClick={handleCloseLoginModal} sx={{ position: 'absolute', top: 16, right: 16, zIndex: 10, backgroundColor: alpha('#000', 0.5), color: '#FFF', '&:hover': { backgroundColor: alpha('#000', 0.7) } }}><CloseIcon /></IconButton>
-                    <LoginPage isModal={true} onClose={handleCloseLoginModal} onSwitchToSignup={handleSwitchToSignup} />
+            {/* Footer */}
+            <Box sx={{ py: 3, textAlign: 'center', background: '#FFFFFF', borderTop: `1px solid ${colors.border}` }}>
+                <Container maxWidth="lg">
+                    <Typography variant="body2" sx={{ color: colors.textLight, fontSize: '0.8rem' }}>
+                        © 2026 Museum Events. All rights reserved.
+                    </Typography>
+                </Container>
+            </Box>
+
+            {/* Login Modal */}
+            <Modal
+                open={loginModalOpen}
+                onClose={handleLoginModalClose}
+                sx={{
+                    display: 'flex',
+                    alignItems: 'center',
+                    justifyContent: 'center',
+                    backdropFilter: 'blur(8px)'
+                }}
+            >
+                <Box sx={{
+                    position: 'relative',
+                    width: '90%',
+                    maxWidth: 500,
+                    maxHeight: '90vh',
+                    bgcolor: 'transparent',
+                    outline: 'none'
+                }}>
+                    <LoginPage
+                        isModal={true}
+                        onClose={handleLoginModalClose}
+                        onSwitchToSignup={handleSwitchToSignup}
+                    />
                 </Box>
             </Modal>
 
-            <Modal open={signupModalOpen} onClose={handleCloseSignupModal} sx={{ display: 'flex', alignItems: 'center', justifyContent: 'center', backdropFilter: 'blur(8px)' }}>
-                <Box sx={{ width: '90%', maxWidth: 470, maxHeight: '90vh', bgcolor: '#FFFFFF', borderRadius: '24px', border: `1px solid ${colors.border}`, position: 'relative', overflow: 'hidden', boxShadow: '0 24px 48px rgba(0,0,0,0.15)' }}>
-                    <IconButton onClick={handleCloseSignupModal} sx={{ position: 'absolute', top: 16, right: 16, zIndex: 10, backgroundColor: alpha('#000', 0.5), color: '#FFF', '&:hover': { backgroundColor: alpha('#000', 0.7) } }}><CloseIcon /></IconButton>
-                    <SignUpPage isModal={true} onClose={handleCloseSignupModal} onSwitchToLogin={handleSwitchToLogin} onSuccess={handleSignupSuccess} />
+            {/* SignUp Modal */}
+            <Modal
+                open={signupModalOpen}
+                onClose={handleSignupModalClose}
+                sx={{
+                    display: 'flex',
+                    alignItems: 'center',
+                    justifyContent: 'center',
+                    backdropFilter: 'blur(8px)'
+                }}
+            >
+                <Box sx={{
+                    position: 'relative',
+                    width: '90%',
+                    maxWidth: 500,
+                    maxHeight: '90vh',
+                    bgcolor: 'transparent',
+                    outline: 'none'
+                }}>
+                    <SignUpPage
+                        isModal={true}
+                        onClose={handleSignupModalClose}
+                        onSwitchToLogin={handleSwitchToLogin}
+                        onSuccess={handleSignupSuccess}
+                    />
                 </Box>
             </Modal>
 
-            <Modal open={verifyModalOpen} onClose={handleCloseVerifyModal} sx={{ display: 'flex', alignItems: 'center', justifyContent: 'center', backdropFilter: 'blur(8px)' }}>
-                <Box sx={{ width: '90%', maxWidth: 470, bgcolor: '#FFFFFF', borderRadius: '24px', border: `1px solid ${colors.border}`, position: 'relative', overflow: 'hidden', boxShadow: '0 24px 48px rgba(0,0,0,0.15)' }}>
-                    <IconButton onClick={handleCloseVerifyModal} sx={{ position: 'absolute', top: 16, right: 16, zIndex: 10, backgroundColor: alpha('#000', 0.5), color: '#FFF', '&:hover': { backgroundColor: alpha('#000', 0.7) } }}><CloseIcon /></IconButton>
-                    <VerifyCodePage isModal={true} onClose={handleCloseVerifyModal} email={verifyEmail} />
+            {/* VerifyCode Modal */}
+            <Modal
+                open={verifyModalOpen}
+                onClose={handleVerifyModalClose}
+                sx={{
+                    display: 'flex',
+                    alignItems: 'center',
+                    justifyContent: 'center',
+                    backdropFilter: 'blur(8px)'
+                }}
+            >
+                <Box sx={{
+                    position: 'relative',
+                    width: '90%',
+                    maxWidth: 500,
+                    maxHeight: '90vh',
+                    bgcolor: 'transparent',
+                    outline: 'none'
+                }}>
+                    <VerifyCodePage
+                        isModal={true}
+                        onClose={handleVerifyModalClose}
+                        onVerificationSuccess={handleVerificationSuccess}
+                        email={verifyEmail}
+                    />
                 </Box>
             </Modal>
-
-            {/* Snackbar */}
-            <Snackbar open={snackbar.open} autoHideDuration={6000} onClose={handleCloseSnackbar} anchorOrigin={{ vertical: 'bottom', horizontal: 'center' }}>
-                <Alert onClose={handleCloseSnackbar} severity={snackbar.severity} sx={{ bgcolor: '#FFFDF7', color: colors.text, borderRadius: '16px', boxShadow: '0 4px 12px rgba(0,0,0,0.1)', borderLeft: `4px solid ${snackbar.severity === 'success' ? colors.success : colors.primary}` }}>{snackbar.message}</Alert>
-            </Snackbar>
         </Box>
     );
 }
