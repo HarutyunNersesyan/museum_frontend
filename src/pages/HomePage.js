@@ -67,7 +67,7 @@ const colors = {
     error: '#f44336'
 };
 
-// Armenian Museums Data
+// Armenian Museums Data - All descriptions under 250 characters
 const ARMENIAN_MUSEUMS = [
     {
         id: 1,
@@ -75,12 +75,12 @@ const ARMENIAN_MUSEUMS = [
         nameArm: 'Հայաստանի Պատմության Թանգարան',
         location: 'Yerevan',
         address: '4 Republic Square, Yerevan',
-        description: 'The History Museum of Armenia is a museum with departments of Archaeology, Numismatics, Ethnography, Modern History, and Restoration. It houses one of the richest collections of Armenian cultural heritage, with over 400,000 artifacts.',
+        description: 'The History Museum of Armenia houses one of the richest collections of Armenian cultural heritage, with over 400,000 artifacts spanning archaeology, numismatics, ethnography, and modern history.',
         image: 'http://localhost:8080/uploads/1.jpg',
         hours: 'Tue-Sun: 11:00-18:00',
         phone: '+374 10 520-690',
         rating: 4.8,
-        featured: true
+
     },
     {
         id: 2,
@@ -88,12 +88,12 @@ const ARMENIAN_MUSEUMS = [
         nameArm: 'Մատենադարան',
         location: 'Yerevan',
         address: '53 Mesrop Mashtots Ave, Yerevan',
-        description: 'The Mesrop Mashtots Institute of Ancient Manuscripts, known as Matenadaran, is a repository of ancient manuscripts and a research institute. It holds over 23,000 manuscripts.',
+        description: 'The Mesrop Mashtots Institute of Ancient Manuscripts, known as Matenadaran, is a repository of over 23,000 ancient manuscripts and a leading research institute of Armenian written heritage.',
         image: 'http://localhost:8080/uploads/2.jpg',
         hours: 'Tue-Sun: 10:00-17:00',
         phone: '+374 10 513-000',
         rating: 4.9,
-        featured: true
+
     },
     {
         id: 3,
@@ -101,12 +101,12 @@ const ARMENIAN_MUSEUMS = [
         nameArm: 'Գաֆէսճեանի արուեստի կենտրոն',
         location: 'Yerevan',
         address: '3 Tamanyan St, Yerevan',
-        description: 'The Cafesjian Center for the Arts (CCA) is a contemporary art museum located in the heart of Yerevan. It features a diverse collection of modern and contemporary art.',
+        description: 'The Cafesjian Center for the Arts (CCA) is a contemporary art museum in the heart of Yerevan, featuring a diverse collection of modern and contemporary art from around the world.',
         image: 'http://localhost:8080/uploads/3.jpg',
         hours: 'Tue-Sun: 11:00-20:00',
         phone: '+374 10 541-932',
         rating: 4.7,
-        featured: true
+
     },
     {
         id: 4,
@@ -114,12 +114,12 @@ const ARMENIAN_MUSEUMS = [
         nameArm: 'Էրեբունի ամրոց և թանգարան',
         location: 'Yerevan',
         address: '38 Erebuni St, Yerevan',
-        description: 'Erebuni Museum was established in 1968 to celebrate Yerevan\'s 2750th anniversary. The fortress was founded in 782 BC by King Argishti I of Urartu.',
+        description: 'Erebuni Museum was established in 1968 to celebrate Yerevan\'s 2750th anniversary. The fortress was founded in 782 BC by King Argishti I of Urartu and showcases Urartian artifacts.',
         image: 'http://localhost:8080/uploads/4.jpg',
         hours: 'Tue-Sun: 10:30-17:30',
         phone: '+374 10 461-393',
         rating: 4.6,
-        featured: false
+
     },
     {
         id: 5,
@@ -127,12 +127,11 @@ const ARMENIAN_MUSEUMS = [
         nameArm: 'Հայոց Ցեղասպանության Թանգարան',
         location: 'Yerevan',
         address: '8 Tsitsernakaberd Hwy, Yerevan',
-        description: 'The Armenian Genocide Museum-Institute is dedicated to preserving the memory of the Armenian Genocide of 1915. The museum features photographs, documents, and testimonies.',
+        description: 'The Armenian Genocide Museum-Institute is dedicated to preserving the memory of the Armenian Genocide of 1915. The museum features photographs, documents, and personal testimonies.',
         image: 'http://localhost:8080/uploads/5.jpg',
         hours: 'Mon-Sun: 11:00-16:00',
         phone: '+374 10 390-980',
         rating: 4.9,
-        featured: true
     },
     {
         id: 6,
@@ -140,12 +139,11 @@ const ARMENIAN_MUSEUMS = [
         nameArm: 'Դիլիջանի Երկրագիտական Թանգարան',
         location: 'Dilijan',
         address: '6 Myasnikyan St, Dilijan',
-        description: 'The Dilijan Local Lore Museum showcases the natural history, ethnography, and cultural heritage of the Dilijan region.',
+        description: 'The Dilijan Local Lore Museum showcases the natural history, ethnography, and cultural heritage of the Dilijan region, including unique exhibits about local flora and fauna.',
         image: 'http://localhost:8080/uploads/6.jpg',
         hours: 'Tue-Sun: 10:00-18:00',
         phone: '+374 268 2-42-07',
         rating: 4.5,
-        featured: false
     },
     {
         id: 7,
@@ -153,12 +151,11 @@ const ARMENIAN_MUSEUMS = [
         nameArm: 'Գյումրու Ճարտարապետության Թանգարան',
         location: 'Gyumri',
         address: '20 Haghtanaki St, Gyumri',
-        description: 'The Museum of National Architecture and Urban Life of Gyumri is housed in a historic 19th-century mansion.',
+        description: 'The Museum of National Architecture and Urban Life of Gyumri is housed in a historic 19th-century mansion, showcasing traditional Armenian architecture and daily life.',
         image: 'http://localhost:8080/uploads/7.jpg',
         hours: 'Tue-Sun: 11:00-17:00',
         phone: '+374 312 5-16-57',
         rating: 4.6,
-        featured: false
     },
     {
         id: 8,
@@ -166,12 +163,11 @@ const ARMENIAN_MUSEUMS = [
         nameArm: 'Խոր Վիրապի Թանգարան',
         location: 'Ararat',
         address: 'Near Khor Virap Monastery',
-        description: 'The Khor Virap Museum tells the story of the historic Khor Virap monastery, where St. Gregory the Illuminator was imprisoned for 13 years.',
+        description: 'The Khor Virap Museum tells the story of the historic Khor Virap monastery, where St. Gregory the Illuminator was imprisoned for 13 years before converting Armenia to Christianity.',
         image: 'http://localhost:8080/uploads/8.jpg',
         hours: 'Tue-Sun: 10:00-18:00',
         phone: '+374 10 000-000',
         rating: 4.7,
-        featured: false
     },
     {
         id: 9,
@@ -179,12 +175,11 @@ const ARMENIAN_MUSEUMS = [
         nameArm: 'Սերգեյ Փարաջանովի Թանգարան',
         location: 'Yerevan',
         address: '15-17 Dzoragyugh St, Yerevan',
-        description: 'The Sergey Parajanov Museum is dedicated to the legendary Armenian film director and artist. The museum displays over 1,400 works.',
+        description: 'The Sergey Parajanov Museum is dedicated to the legendary Armenian film director and artist. The museum displays over 1,400 works including collages, drawings, and installations.',
         image: 'http://localhost:8080/uploads/9.jpg',
         hours: 'Tue-Sun: 11:00-17:00',
         phone: '+374 10 538-773',
         rating: 4.8,
-        featured: true
     },
     {
         id: 10,
@@ -192,12 +187,11 @@ const ARMENIAN_MUSEUMS = [
         nameArm: 'Մեգերյան Կարպետի Թանգարան',
         location: 'Yerevan',
         address: '9 Madoyan St, Yerevan',
-        description: 'The Megerian Carpet Museum showcases the rich tradition of Armenian carpet weaving. Visitors can see antique carpets and watch master weavers at work.',
+        description: 'The Megerian Carpet Museum showcases the rich tradition of Armenian carpet weaving. Visitors can see antique carpets, watch master weavers at work, and learn about this ancient craft.',
         image: 'http://localhost:8080/uploads/10.jpg',
         hours: 'Mon-Sat: 10:00-18:00',
         phone: '+374 10 000-000',
         rating: 4.6,
-        featured: false
     }
 ];
 
@@ -366,7 +360,6 @@ function HomePage() {
     };
 
     const handleVerificationSuccess = () => {
-        // After successful verification, close verify modal and open login modal
         handleVerifyModalClose();
         setTimeout(() => handleLoginModalOpen(), 300);
     };
@@ -604,7 +597,7 @@ function HomePage() {
                                                 </Typography>
                                             </Stack>
                                             <Typography variant="body2" sx={{ color: colors.textLight, mb: 1.5, lineHeight: 1.4, fontSize: '0.75rem' }}>
-                                                {museum.description.substring(0, 100)}...
+                                                {museum.description}
                                             </Typography>
                                             <Divider sx={{ my: 1 }} />
                                             <Stack direction="row" spacing={1} sx={{ mt: 0.5, flexWrap: 'wrap', gap: 0.5 }}>

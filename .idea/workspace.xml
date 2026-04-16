@@ -5,13 +5,7 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="52f9de53-701b-4b52-b101-40303d7b40ec" name="Changes" comment="">
-      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/App.js" beforeDir="false" afterPath="$PROJECT_DIR$/src/App.js" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/pages/HomePage.js" beforeDir="false" afterPath="$PROJECT_DIR$/src/pages/HomePage.js" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/pages/LoginPage.js" beforeDir="false" afterPath="$PROJECT_DIR$/src/pages/LoginPage.js" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/pages/MuseumsPage.js" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/pages/SignUpPage.js" beforeDir="false" afterPath="$PROJECT_DIR$/src/pages/SignUpPage.js" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/pages/VerifyCodePage.js" beforeDir="false" afterPath="$PROJECT_DIR$/src/pages/VerifyCodePage.js" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -178,14 +172,7 @@
       <workItem from="1776183372501" duration="104000" />
       <workItem from="1776261153149" duration="19681000" />
       <workItem from="1776285995951" duration="2177000" />
-      <workItem from="1776335731965" duration="5045000" />
-    </task>
-    <task id="LOCAL-00019" summary="Created frontend piece for VeilVision project, &#10;created HomePage, Login, SignUp, Verify pages, AuthContext and JWT resolver">
-      <created>1768035888608</created>
-      <option name="number" value="00019" />
-      <option name="presentableId" value="LOCAL-00019" />
-      <option name="project" value="LOCAL" />
-      <updated>1768035888608</updated>
+      <workItem from="1776335731965" duration="5509000" />
     </task>
     <task id="LOCAL-00020" summary="Created EncodePage.js for encoding texts.">
       <created>1768035959511</created>
@@ -523,7 +510,14 @@
       <option name="project" value="LOCAL" />
       <updated>1776335945300</updated>
     </task>
-    <option name="localTasksCounter" value="68" />
+    <task id="LOCAL-00068" summary="Bugs fix.">
+      <created>1776341718041</created>
+      <option name="number" value="00068" />
+      <option name="presentableId" value="LOCAL-00068" />
+      <option name="project" value="LOCAL" />
+      <updated>1776341718041</updated>
+    </task>
+    <option name="localTasksCounter" value="69" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
