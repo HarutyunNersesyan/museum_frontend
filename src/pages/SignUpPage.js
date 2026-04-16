@@ -260,7 +260,7 @@ const SignUpPage = ({ isModal = false, onClose, onSwitchToLogin, onSuccess }) =>
                                 WebkitTextFillColor: 'transparent',
                                 letterSpacing: '-0.5px'
                             }}>
-                                Festivy
+                                Museum
                             </Typography>
                         </Box>
                         <Typography variant="h4" sx={{
@@ -276,7 +276,6 @@ const SignUpPage = ({ isModal = false, onClose, onSwitchToLogin, onSuccess }) =>
                             fontSize: '14px',
                             mb: 3
                         }}>
-                            Join Festivy and start planning amazing events
                         </Typography>
                         <Box sx={{
                             width: 50,

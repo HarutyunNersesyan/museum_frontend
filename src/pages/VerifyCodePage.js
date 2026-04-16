@@ -380,7 +380,7 @@ const VerifyCodePage = ({ isModal = false, onClose, email: propEmail }) => {
                                         WebkitTextFillColor: 'transparent',
                                         letterSpacing: '-0.5px'
                                     }}>
-                                        Festivy
+                                       Museum
                                     </Typography>
                                 </Box>
                                 <Typography variant="h4" sx={{

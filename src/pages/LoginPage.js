@@ -288,7 +288,7 @@ const LoginPage = ({ isModal = false, onClose, onSwitchToSignup }) => {
                                 WebkitTextFillColor: 'transparent',
                                 letterSpacing: '-0.5px'
                             }}>
-                                Festivy
+                                Museum
                             </Typography>
                         </Box>
                         <Typography variant="h4" sx={{
@@ -297,7 +297,6 @@ const LoginPage = ({ isModal = false, onClose, onSwitchToSignup }) => {
                             color: '#3E2723',
                             mb: 1
                         }}>
-                            Welcome Back
                         </Typography>
                         <Typography sx={{
                             color: '#6B4C3A',
