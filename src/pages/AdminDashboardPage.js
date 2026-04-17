@@ -309,7 +309,11 @@ const AdminDashboardPage = () => {
 
     const [museumFormData, setMuseumFormData] = useState({ name: '' });
 
-    const validateArmenianPhone = (phone) => /^[0-9]{8}$/.test(phone);
+    // MODIFIED: Removed the 8-digit restriction, now validates that it contains only digits if not empty
+    const validateArmenianPhone = (phone) => {
+        if (!phone) return true; // Empty is allowed (optional field)
+        return /^\d+$/.test(phone); // Only digits, any length
+    };
 
     useEffect(() => {
         const token = localStorage.getItem('token');
@@ -483,8 +487,9 @@ const AdminDashboardPage = () => {
             return;
         }
 
+        // MODIFIED: Phone validation without length restriction
         if (phoneNumber && !validateArmenianPhone(phoneNumber)) {
-            setSnackbar({ open: true, message: 'Phone number must be exactly 8 digits', severity: 'warning' });
+            setSnackbar({ open: true, message: 'Phone number must contain only digits', severity: 'warning' });
             return;
         }
 
@@ -1097,11 +1102,11 @@ const AdminDashboardPage = () => {
                                 />
                                 <FlatTextField
                                     fullWidth
-                                    label="Phone Number (8 digits)"
+                                    label="Phone Number (digits only)"
                                     value={phoneNumber}
                                     onChange={(e) => setPhoneNumber(e.target.value)}
-                                    placeholder="e.g., 12345678"
-                                    helperText="Enter exactly 8 digits"
+                                    placeholder="e.g., 37412345678 or 12345678"
+                                    helperText="Enter digits only, any length (optional)"
                                 />
                             </Box>
 
