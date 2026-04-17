@@ -309,10 +309,9 @@ const AdminDashboardPage = () => {
 
     const [museumFormData, setMuseumFormData] = useState({ name: '' });
 
-    // MODIFIED: Removed the 8-digit restriction, now validates that it contains only digits if not empty
-    const validateArmenianPhone = (phone) => {
-        if (!phone) return true; // Empty is allowed (optional field)
-        return /^\d+$/.test(phone); // Only digits, any length
+    // UPDATED: No validation at all - any input is allowed
+    const validatePhoneNumber = (phone) => {
+        return true; // Allow any format, any characters, empty, anything
     };
 
     useEffect(() => {
@@ -487,11 +486,8 @@ const AdminDashboardPage = () => {
             return;
         }
 
-        // MODIFIED: Phone validation without length restriction
-        if (phoneNumber && !validateArmenianPhone(phoneNumber)) {
-            setSnackbar({ open: true, message: 'Phone number must contain only digits', severity: 'warning' });
-            return;
-        }
+        // UPDATED: No phone number validation - any input is accepted
+        // Phone number can be anything: empty, any format, any characters
 
         setLoading(true);
         try {
@@ -883,7 +879,7 @@ const AdminDashboardPage = () => {
                                                                 </DetailItem>
                                                             )}
 
-                                                            {/* Contact Information - Single Phone Number */}
+                                                            {/* Contact Information - Phone Number (no restrictions) */}
                                                             {(event.contactEmail || event.phoneNumber) && (
                                                                 <Box sx={{ mt: 2, p: 2, bgcolor: '#FFF8F0', borderRadius: '12px', border: '1px solid #A0784C' }}>
                                                                     <Typography variant="subtitle2" sx={{ fontWeight: 700, color: '#4A2A1A', mb: 1.5 }}>📞 Contact Information</Typography>
@@ -1089,7 +1085,7 @@ const AdminDashboardPage = () => {
                                 </Grid>
                             </Grid>
 
-                            {/* Contact Information - Single Phone Number */}
+                            {/* Contact Information - Phone Number with NO restrictions */}
                             <Box>
                                 <Typography variant="subtitle1" sx={{ fontWeight: 700, color: '#4A2A1A', mb: 2 }}>Contact Information</Typography>
                                 <FlatTextField
@@ -1102,11 +1098,11 @@ const AdminDashboardPage = () => {
                                 />
                                 <FlatTextField
                                     fullWidth
-                                    label="Phone Number (digits only)"
+                                    label="Phone Number"
                                     value={phoneNumber}
                                     onChange={(e) => setPhoneNumber(e.target.value)}
-                                    placeholder="e.g., 37412345678 or 12345678"
-                                    helperText="Enter digits only, any length (optional)"
+                                    placeholder="Any format allowed (optional)"
+                                    helperText="No restrictions - any format, any characters"
                                 />
                             </Box>
 
