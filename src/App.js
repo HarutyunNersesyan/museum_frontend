@@ -1,6 +1,6 @@
 import React from 'react';
-import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-dom';
-import { AuthProvider } from './context/AuthContext';
+import {BrowserRouter as Router, Routes, Route, Navigate} from 'react-router-dom';
+import {AuthProvider} from './context/AuthContext';
 import ProtectedRoute from './components/ProtectedRoute';
 import HomePage from './pages/HomePage';
 import ProfilePage from './pages/ProfilePage';
@@ -17,31 +17,31 @@ const AppContent = () => {
         <div className="app-container">
             <Routes>
                 {/* Home Page - Shows museums */}
-                <Route path="/" element={<HomePage />} />
+                <Route path="/" element={<HomePage/>}/>
 
                 {/* Auth Pages (Public) */}
-                <Route path="/login" element={<LoginPage />} />
-                <Route path="/signup" element={<SignUpPage />} />
-                <Route path="/verify-code" element={<VerifyCodePage />} />
+                <Route path="/login" element={<LoginPage/>}/>
+                <Route path="/signup" element={<SignUpPage/>}/>
+                <Route path="/verify-code" element={<VerifyCodePage/>}/>
 
                 {/* Admin Routes */}
-                <Route path="/admin/auth" element={<AdminLoginPage />} />
+                <Route path="/admin/auth" element={<AdminLoginPage/>}/>
                 <Route
                     path="/admin/dashboard"
                     element={
                         <ProtectedRoute>
-                            <AdminDashboardPage />
+                            <AdminDashboardPage/>
                         </ProtectedRoute>
                     }
                 />
-                <Route path="/admin" element={<Navigate to="/admin/auth" replace />} />
+                <Route path="/admin" element={<Navigate to="/admin/auth" replace/>}/>
 
                 {/* Events Pages - Require Authentication */}
                 <Route
                     path="/events"
                     element={
                         <ProtectedRoute>
-                            <EventsPage />
+                            <EventsPage/>
                         </ProtectedRoute>
                     }
                 />
@@ -51,13 +51,13 @@ const AppContent = () => {
                     path="/profile"
                     element={
                         <ProtectedRoute>
-                            <ProfilePage />
+                            <ProfilePage/>
                         </ProtectedRoute>
                     }
                 />
 
                 {/* Catch-all route - redirect to home */}
-                <Route path="*" element={<Navigate to="/" replace />} />
+                <Route path="*" element={<Navigate to="/" replace/>}/>
             </Routes>
         </div>
     );
@@ -67,7 +67,7 @@ function App() {
     return (
         <Router>
             <AuthProvider>
-                <AppContent />
+                <AppContent/>
             </AuthProvider>
         </Router>
     );

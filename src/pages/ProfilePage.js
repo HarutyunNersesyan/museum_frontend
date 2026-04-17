@@ -22,7 +22,9 @@ import {
     Card,
     Chip,
     Tooltip,
-    GlobalStyles
+    GlobalStyles,
+    Modal,
+    Stack
 } from '@mui/material';
 import {
     Visibility,
@@ -42,52 +44,55 @@ import {
     Shield as ShieldIcon,
     VerifiedUser as VerifiedUserIcon,
     HowToReg as HowToRegIcon,
-    AdminPanelSettings as AdminPanelSettingsIcon
+    AdminPanelSettings as AdminPanelSettingsIcon,
+    Museum as MuseumIcon,
+    Event as EventIcon,
+    LocationOn as LocationOnIcon,
+    AccessTime as AccessTimeIcon,
+    Phone as PhoneIcon,
+    Star as StarIcon,
+    StarBorder as StarBorderIcon,
+    ArrowBack as ArrowBackIcon,
+    VpnKey as VpnKeyIcon,
+    Password as PasswordIcon
 } from '@mui/icons-material';
-import { alpha, keyframes } from '@mui/material/styles';
+import { alpha as alphaMUI, keyframes } from '@mui/material/styles';
 import { useAuth } from '../context/AuthContext';
+import LoginPage from './LoginPage';
+import SignUpPage from './SignUpPage';
+import VerifyCodePage from './VerifyCodePage';
 
 // Custom animations
-const float = keyframes`
-    0%, 100% { transform: translateY(0px) rotate(0deg); }
-    25% { transform: translateY(-15px) rotate(3deg); }
-    50% { transform: translateY(-25px) rotate(-3deg); }
-    75% { transform: translateY(-10px) rotate(2deg); }
-`;
-
-const floatReverse = keyframes`
-    0%, 100% { transform: translateY(0px) rotate(0deg); }
-    25% { transform: translateY(15px) rotate(-3deg); }
-    50% { transform: translateY(25px) rotate(3deg); }
-    75% { transform: translateY(10px) rotate(-2deg); }
-`;
-
 const pulse = keyframes`
     0%, 100% { opacity: 0.4; transform: scale(1); }
     50% { opacity: 0.7; transform: scale(1.05); }
 `;
 
-// Global scrollbar styles
+const slideIn = keyframes`
+    from { opacity: 0; transform: translateY(30px); }
+    to { opacity: 1; transform: translateY(0); }
+`;
+
+// Warm brown color palette (same as HomePage)
+const colors = {
+    primary: '#C4A484',
+    primaryDark: '#A0522D',
+    primaryLight: '#D2B48C',
+    secondary: '#8B7355',
+    background: '#FFF8F0',
+    surface: '#FFFDF7',
+    text: '#4A3728',
+    textLight: '#7A5C4A',
+    border: '#E8D5B7',
+    gradient: 'linear-gradient(135deg, #C4A484 0%, #D2B48C 50%, #DEB887 100%)',
+    error: '#f44336'
+};
+
+// Scrollbar styles
 const scrollbarStyles = {
-    '*::-webkit-scrollbar': {
-        width: '10px',
-        height: '10px',
-    },
-    '*::-webkit-scrollbar-track': {
-        background: '#F5F0E8',
-        borderRadius: '10px',
-    },
-    '*::-webkit-scrollbar-thumb': {
-        background: '#FF6B35',
-        borderRadius: '10px',
-        '&:hover': {
-            background: '#E55A2B',
-        },
-    },
-    '*': {
-        scrollbarColor: '#FF6B35 #F5F0E8',
-        scrollbarWidth: 'thin',
-    },
+    '*::-webkit-scrollbar': { width: '8px', height: '8px' },
+    '*::-webkit-scrollbar-track': { background: '#E8D5B7', borderRadius: '10px' },
+    '*::-webkit-scrollbar-thumb': { background: '#C4A484', borderRadius: '10px', '&:hover': { background: '#A0522D' } },
 };
 
 const ProfilePage = () => {
@@ -108,6 +113,11 @@ const ProfilePage = () => {
     const [anchorEl, setAnchorEl] = useState(null);
     const [userInitial, setUserInitial] = useState('');
     const [backgroundPosition, setBackgroundPosition] = useState({ x: 0, y: 0 });
+    const [loginModalOpen, setLoginModalOpen] = useState(false);
+    const [signupModalOpen, setSignupModalOpen] = useState(false);
+    const [verifyModalOpen, setVerifyModalOpen] = useState(false);
+    const [verifyEmail, setVerifyEmail] = useState('');
+    const [activeTab, setActiveTab] = useState('profile'); // 'profile' or 'security'
 
     const [formData, setFormData] = useState({
         oldPassword: '',
@@ -153,13 +163,8 @@ const ProfilePage = () => {
         setPasswordStrength({ ...strength, score });
     }, [formData.newPassword]);
 
-    const handleMenuOpen = (event) => {
-        setAnchorEl(event.currentTarget);
-    };
-
-    const handleMenuClose = () => {
-        setAnchorEl(null);
-    };
+    const handleMenuOpen = (event) => setAnchorEl(event.currentTarget);
+    const handleMenuClose = () => setAnchorEl(null);
 
     const handleLogout = async () => {
         await logout();
@@ -168,25 +173,21 @@ const ProfilePage = () => {
     };
 
     const handleEventsClick = () => {
+        if (!user) {
+            setLoginModalOpen(true);
+            return;
+        }
         handleMenuClose();
         navigate('/events');
     };
 
-    const handleHomeClick = () => {
-        navigate('/');
-    };
-
-    const handleAboutClick = () => {
-        navigate('/about');
-    };
-
+    const handleHomeClick = () => navigate('/');
+    const handleAboutClick = () => navigate('/about');
     const handleHowItWorksClick = () => {
         navigate('/');
         setTimeout(() => {
             const element = document.getElementById('how-it-works');
-            if (element) {
-                element.scrollIntoView({ behavior: 'smooth' });
-            }
+            if (element) element.scrollIntoView({ behavior: 'smooth' });
         }, 100);
     };
 
@@ -195,12 +196,42 @@ const ProfilePage = () => {
         navigate('/admin/dashboard');
     };
 
+    const handleProfile = () => {
+        handleMenuClose();
+        navigate('/profile');
+    };
+
+    const handleLoginModalClose = () => setLoginModalOpen(false);
+    const handleSignupModalOpen = () => setSignupModalOpen(true);
+    const handleSignupModalClose = () => setSignupModalOpen(false);
+    const handleSwitchToSignup = () => {
+        handleLoginModalClose();
+        setTimeout(() => handleSignupModalOpen(), 100);
+    };
+    const handleSwitchToLogin = () => {
+        handleSignupModalClose();
+        setTimeout(() => setLoginModalOpen(true), 100);
+    };
+    const handleVerifyModalOpen = (email) => {
+        setVerifyEmail(email);
+        setVerifyModalOpen(true);
+    };
+    const handleVerifyModalClose = () => {
+        setVerifyModalOpen(false);
+        setVerifyEmail('');
+    };
+    const handleSignupSuccess = (email) => {
+        handleSignupModalClose();
+        setTimeout(() => handleVerifyModalOpen(email), 100);
+    };
+    const handleVerificationSuccess = () => {
+        handleVerifyModalClose();
+        setTimeout(() => setLoginModalOpen(true), 300);
+    };
+
     const handleInputChange = (e) => {
         const { name, value } = e.target;
-        setFormData(prev => ({
-            ...prev,
-            [name]: value
-        }));
+        setFormData(prev => ({ ...prev, [name]: value }));
         setError('');
         setSuccess('');
     };
@@ -239,9 +270,8 @@ const ProfilePage = () => {
 
     const handleSubmit = async (e) => {
         e.preventDefault();
-        if (!validateForm()) {
-            return;
-        }
+        if (!validateForm()) return;
+
         setLoading(true);
         setError('');
         setSuccess('');
@@ -268,55 +298,33 @@ const ProfilePage = () => {
             }
 
             setSuccess('Password changed successfully!');
-            setSnackbar({
-                open: true,
-                message: 'Password updated successfully!',
-                severity: 'success'
-            });
-            setFormData({
-                oldPassword: '',
-                newPassword: '',
-                confirmPassword: ''
-            });
+            setSnackbar({ open: true, message: 'Password updated successfully!', severity: 'success' });
+            setFormData({ oldPassword: '', newPassword: '', confirmPassword: '' });
         } catch (err) {
             let errorMessage = err.message;
-            if (errorMessage.includes('Invalid old password')) {
-                errorMessage = 'Current password is incorrect';
-            } else if (errorMessage.includes('new password cannot be the same')) {
-                errorMessage = 'New password cannot be the same as current password';
-            } else if (errorMessage.includes('Email must be verified')) {
-                errorMessage = 'Your email must be verified to change password';
-            }
+            if (errorMessage.includes('Invalid old password')) errorMessage = 'Current password is incorrect';
+            else if (errorMessage.includes('new password cannot be the same')) errorMessage = 'New password cannot be the same as current password';
+            else if (errorMessage.includes('Email must be verified')) errorMessage = 'Your email must be verified to change password';
+
             setError(errorMessage);
-            setSnackbar({
-                open: true,
-                message: errorMessage,
-                severity: 'error'
-            });
+            setSnackbar({ open: true, message: errorMessage, severity: 'error' });
         } finally {
             setLoading(false);
         }
     };
 
     const handleCancel = () => {
-        setFormData({
-            oldPassword: '',
-            newPassword: '',
-            confirmPassword: ''
-        });
+        setFormData({ oldPassword: '', newPassword: '', confirmPassword: '' });
         setError('');
         setSuccess('');
     };
 
-    const handleCloseSnackbar = () => {
-        setSnackbar({ ...snackbar, open: false });
-    };
+    const handleCloseSnackbar = () => setSnackbar({ ...snackbar, open: false });
 
     const getPasswordStrengthColor = () => {
         const score = passwordStrength.score;
         if (score <= 2) return '#f44336';
         if (score === 3) return '#ff9800';
-        if (score === 4) return '#4caf50';
         return '#4caf50';
     };
 
@@ -324,548 +332,444 @@ const ProfilePage = () => {
         const score = passwordStrength.score;
         if (score <= 2) return 'Weak';
         if (score === 3) return 'Medium';
-        if (score === 4) return 'Strong';
-        return 'Very Strong';
+        return 'Strong';
     };
 
     if (!user) {
         return (
-            <Box sx={{
-                minHeight: '100vh',
-                display: 'flex',
-                alignItems: 'center',
-                justifyContent: 'center',
-                background: 'linear-gradient(135deg, #FFF9F0 0%, #F5F0E8 100%)'
-            }}>
-                <CircularProgress sx={{ color: '#FF6B35' }} />
+            <Box sx={{ minHeight: '100vh', display: 'flex', alignItems: 'center', justifyContent: 'center', background: 'linear-gradient(135deg, #FFF8F0 0%, #F5EDE3 100%)' }}>
+                <CircularProgress sx={{ color: colors.primary }} />
             </Box>
         );
     }
 
     return (
-        <Box sx={{
-            minHeight: '100vh',
-            background: 'linear-gradient(135deg, #FFF9F0 0%, #F5F0E8 100%)',
-            fontFamily: "'Inter', sans-serif",
-            position: 'relative'
-        }}>
-            {/* Global Scrollbar Styles */}
+        <Box sx={{ minHeight: '100vh', background: 'linear-gradient(135deg, #FFF8F0 0%, #F5EDE3 100%)', position: 'relative', overflowX: 'hidden' }}>
             <GlobalStyles styles={scrollbarStyles} />
 
             {/* Animated Background */}
             <Box sx={{
-                position: 'fixed',
-                top: 0,
-                left: 0,
-                width: '100%',
-                height: '100%',
-                zIndex: 0,
+                position: 'fixed', top: 0, left: 0, width: '100%', height: '100%', zIndex: 0,
                 background: `
-                    radial-gradient(circle at ${backgroundPosition.x * 100}% ${backgroundPosition.y * 100}%, rgba(255,107,53,0.08) 0%, transparent 50%),
-                    radial-gradient(circle at ${100 - backgroundPosition.x * 100}% ${100 - backgroundPosition.y * 100}%, rgba(255,193,7,0.08) 0%, transparent 50%)
+                    radial-gradient(circle at ${backgroundPosition.x * 100}% ${backgroundPosition.y * 100}%, rgba(196,164,132,0.08) 0%, transparent 50%),
+                    radial-gradient(circle at ${100 - backgroundPosition.x * 100}% ${100 - backgroundPosition.y * 100}%, rgba(210,180,140,0.08) 0%, transparent 50%)
                 `,
                 transition: 'background 0.3s ease-out'
             }} />
 
-            <style>{`
-                @keyframes float {
-                    0%, 100% { transform: translateY(0) translateX(0); }
-                    25% { transform: translateY(-10px) translateX(5px); }
-                    50% { transform: translateY(-20px) translateX(-5px); }
-                    75% { transform: translateY(-10px) translateX(5px); }
-                }
-                @keyframes pulse {
-                    0%, 100% { opacity: 0.5; transform: scale(1); }
-                    50% { opacity: 0.8; transform: scale(1.05); }
-                }
-                @keyframes gradient {
-                    0% { background-position: 0% 50%; }
-                    50% { background-position: 100% 50%; }
-                    100% { background-position: 0% 50%; }
-                }
-            `}</style>
+            {/* Floating circles */}
+            <Box sx={{ position: 'fixed', top: 0, left: 0, right: 0, bottom: 0, zIndex: 1, pointerEvents: 'none', overflow: 'hidden' }}>
+                {[...Array(8)].map((_, idx) => (
+                    <Box key={`bg-circle-${idx}`} sx={{
+                        position: 'absolute',
+                        top: `${(idx * 15) % 100}%`,
+                        left: `${(idx * 20) % 100}%`,
+                        width: `${100 + (idx * 30)}px`,
+                        height: `${100 + (idx * 30)}px`,
+                        borderRadius: '50%',
+                        background: `radial-gradient(circle, ${alphaMUI(['#C4A484', '#D2B48C', '#DEB887'][idx % 3], 0.05)} 0%, transparent 70%)`,
+                        animation: `${pulse} ${10 + idx}s ease-in-out infinite`,
+                        pointerEvents: 'none'
+                    }} />
+                ))}
+            </Box>
 
-            {/* Header - Navbar identical to HomePage */}
+            {/* Header */}
             <Box sx={{
-                position: 'sticky',
-                top: 0,
-                zIndex: 100,
-                backgroundColor: alpha('#FFFFFF', 0.95),
-                backdropFilter: 'blur(10px)',
-                borderBottom: '1px solid rgba(0,0,0,0.08)',
-                boxShadow: '0 2px 20px rgba(0,0,0,0.03)'
+                position: 'sticky', top: 0, zIndex: 100, backgroundColor: alphaMUI('#FFFDF7', 0.95),
+                backdropFilter: 'blur(10px)', borderBottom: `1px solid ${colors.border}`
             }}>
                 <Container maxWidth="xl">
-                    <Box sx={{
-                        display: 'flex',
-                        alignItems: 'center',
-                        justifyContent: 'space-between',
-                        height: 70,
-                    }}>
-                        <Box
-                            onClick={handleHomeClick}
-                            sx={{
-                                display: 'flex',
-                                alignItems: 'center',
-                                gap: 1.5,
-                                cursor: 'pointer'
-                            }}
-                        >
-                            <Box sx={{
-                                width: 38,
-                                height: 38,
-                                borderRadius: '12px',
-                                background: 'linear-gradient(135deg, #FF6B35 0%, #FFB347 100%)',
-                                display: 'flex',
-                                alignItems: 'center',
-                                justifyContent: 'center'
-                            }}>
-                                <CelebrationIcon sx={{ color: 'white', fontSize: 22 }} />
+                    <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', height: 70 }}>
+                        <Box onClick={handleHomeClick} sx={{ display: 'flex', alignItems: 'center', gap: 1.5, cursor: 'pointer' }}>
+                            <Box sx={{ width: 38, height: 38, borderRadius: '12px', background: colors.gradient, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+                                <MuseumIcon sx={{ color: 'white', fontSize: 22 }} />
                             </Box>
-                            <Typography variant="h6" sx={{
-                                fontWeight: 800,
-                                background: 'linear-gradient(135deg, #FF6B35 0%, #FFB347 100%)',
-                                WebkitBackgroundClip: 'text',
-                                WebkitTextFillColor: 'transparent',
-                                letterSpacing: '-0.5px'
-                            }}>
-                                Festivy
+                            <Typography variant="h6" sx={{ fontWeight: 800, background: colors.gradient, WebkitBackgroundClip: 'text', WebkitTextFillColor: 'transparent' }}>
+                                Museum
                             </Typography>
                         </Box>
 
-                        <Box sx={{ display: { xs: 'none', md: 'flex' }, alignItems: 'center', gap: 3 }}>
-                            <Button
-                                startIcon={<InfoIcon />}
-                                sx={{ fontWeight: 500, color: '#4A4A4A', '&:hover': { color: '#FF6B35' } }}
-                                onClick={handleAboutClick}
-                            >
-                                About Us
-                            </Button>
-                            <Button
-                                startIcon={<HowToRegIcon />}
-                                sx={{ fontWeight: 500, color: '#4A4A4A', '&:hover': { color: '#FF6B35' } }}
-                                onClick={handleHowItWorksClick}
-                            >
-                                How It Works
-                            </Button>
-                            <Button
-                                startIcon={<CelebrationIcon />}
-                                sx={{ fontWeight: 500, color: '#4A4A4A', '&:hover': { color: '#FF6B35' } }}
-                                onClick={handleEventsClick}
-                            >
+                        <Box sx={{ display: 'flex', alignItems: 'center', gap: 4 }}>
+                            <Button startIcon={<EventIcon />} onClick={handleEventsClick} sx={{ fontWeight: 500, color: colors.textLight, '&:hover': { color: colors.primary } }}>
                                 Events
                             </Button>
-                        </Box>
 
-                        <Box sx={{ display: 'flex', alignItems: 'center', gap: 2 }}>
-                            {/* Welcome Chip */}
-                            <Chip
-                                label={`Welcome, ${user.userName}`}
-                                size="small"
-                                sx={{
-                                    display: { xs: 'none', sm: 'flex' },
-                                    bgcolor: alpha('#FF6B35', 0.1),
-                                    color: '#FF6B35',
-                                    border: `1px solid ${alpha('#FF6B35', 0.2)}`
-                                }}
-                            />
-
-                            {/* Profile Icon */}
-                            <IconButton
-                                onClick={handleMenuOpen}
-                                sx={{
-                                    background: 'linear-gradient(135deg, #FF6B35 0%, #FFB347 100%)',
-                                    width: 38,
-                                    height: 38,
-                                    '&:hover': { transform: 'scale(1.05)' }
-                                }}
-                            >
-                                <Avatar sx={{ width: 38, height: 38, bgcolor: 'transparent', color: 'white' }}>
-                                    {userInitial || <AccountCircleIcon />}
-                                </Avatar>
-                            </IconButton>
-
-                            <Menu
-                                anchorEl={anchorEl}
-                                open={Boolean(anchorEl)}
-                                onClose={handleMenuClose}
-                                PaperProps={{
-                                    sx: {
-                                        bgcolor: '#FFFFFF',
-                                        color: '#1A1A1A',
-                                        border: '1px solid #E0E0E0',
-                                        minWidth: 200,
-                                        borderRadius: '16px',
-                                        boxShadow: '0 4px 20px rgba(0,0,0,0.1)'
-                                    }
-                                }}
-                            >
-                                <MenuItem onClick={() => { handleMenuClose(); navigate('/profile'); }}>
-                                    <PersonIcon sx={{ mr: 2, fontSize: 20, color: '#FF6B35' }} />
-                                    Profile
-                                </MenuItem>
-                                {isAdmin && (
-                                    <MenuItem onClick={handleAdminPanel}>
-                                        <AdminPanelSettingsIcon sx={{ mr: 2, fontSize: 20, color: '#FF9800' }} />
-                                        Admin Panel
-                                    </MenuItem>
-                                )}
-                                <Divider />
-                                <MenuItem onClick={handleLogout}>
-                                    <LogoutIcon sx={{ mr: 2, fontSize: 20, color: '#FF6B35' }} />
-                                    Logout
-                                </MenuItem>
-                            </Menu>
+                            <Box sx={{ display: 'flex', alignItems: 'center', gap: 2 }}>
+                                <Chip label={`Welcome, ${user.userName}`} size="small" sx={{ display: { xs: 'none', sm: 'flex' }, bgcolor: alphaMUI(colors.primary, 0.1), color: colors.primary }} />
+                                <IconButton onClick={handleMenuOpen} sx={{ background: colors.gradient, width: 38, height: 38 }}>
+                                    <Avatar sx={{ width: 38, height: 38, bgcolor: 'transparent', color: 'white' }}>{userInitial || <AccountCircleIcon />}</Avatar>
+                                </IconButton>
+                                <Menu anchorEl={anchorEl} open={Boolean(anchorEl)} onClose={handleMenuClose} PaperProps={{ sx: { bgcolor: '#FFFDF7', border: `1px solid ${colors.border}`, borderRadius: '16px' } }}>
+                                    <MenuItem onClick={handleProfile}><PersonIcon sx={{ mr: 2, color: colors.primary }} />Profile</MenuItem>
+                                    {isAdmin && <MenuItem onClick={handleAdminPanel}><AdminPanelSettingsIcon sx={{ mr: 2, color: colors.primaryDark }} />Admin Panel</MenuItem>}
+                                    <Divider />
+                                    <MenuItem onClick={handleLogout}><LogoutIcon sx={{ mr: 2, color: colors.error }} />Logout</MenuItem>
+                                </Menu>
+                            </Box>
                         </Box>
                     </Box>
                 </Container>
             </Box>
 
-            {/* Main Content */}
-            <Container maxWidth="md" sx={{ position: 'relative', zIndex: 1, py: 5 }}>
-                <Box sx={{ width: '100%' }}>
-                    {/* Profile Header Card */}
-                    <Card sx={{
-                        background: '#FFFFFF',
-                        borderRadius: '24px',
-                        mb: 4,
-                        overflow: 'hidden',
-                        boxShadow: '0 4px 20px rgba(0,0,0,0.04)',
-                        border: '1px solid #F0E8E0'
-                    }}>
-                        <Box sx={{
-                            background: 'linear-gradient(135deg, #FF6B35 0%, #FFB347 100%)',
-                            height: '100px',
-                            position: 'relative'
-                        }} />
-                        <Box sx={{ display: 'flex', alignItems: 'flex-end', px: 4, pb: 3, position: 'relative', mt: -50 }}>
-                            <Avatar sx={{
-                                width: 100,
-                                height: 100,
-                                background: 'linear-gradient(135deg, #FF6B35 0%, #FFB347 100%)',
-                                fontSize: '42px',
-                                fontWeight: 'bold',
-                                border: '4px solid #FFFFFF',
-                                boxShadow: '0 4px 12px rgba(0,0,0,0.1)'
+            {/* Main Content - NEW LAYOUT with Sidebar Arrow */}
+            <Container maxWidth="lg" sx={{ position: 'relative', zIndex: 3, py: 4 }}>
+                <Box sx={{ animation: `${slideIn} 0.5s ease-out` }}>
+                    {/* Page Title with Back Arrow */}
+                    <Box sx={{ display: 'flex', alignItems: 'center', gap: 2, mb: 4 }}>
+                        <IconButton
+                            onClick={handleHomeClick}
+                            sx={{
+                                color: colors.primary,
+                                bgcolor: alphaMUI(colors.primary, 0.1),
+                                '&:hover': { bgcolor: alphaMUI(colors.primary, 0.2) }
+                            }}
+                        >
+                            <ArrowBackIcon />
+                        </IconButton>
+                        <Box>
+                            <Typography variant="h4" sx={{ fontWeight: 700, color: colors.text }}>
+                                My Profile
+                            </Typography>
+                            <Typography variant="body1" sx={{ color: colors.textLight }}>
+                                Manage your account settings and security preferences
+                            </Typography>
+                        </Box>
+                    </Box>
+
+                    <Grid container spacing={4}>
+                        {/* Sidebar - Profile Menu */}
+                        <Grid item xs={12} md={4}>
+                            <Card sx={{
+                                background: alphaMUI('#FFFDF7', 0.95),
+                                borderRadius: '20px',
+                                border: `1px solid ${colors.border}`,
+                                overflow: 'hidden',
+                                position: 'sticky',
+                                top: 90
                             }}>
-                                {user?.userName?.charAt(0).toUpperCase() || 'U'}
-                            </Avatar>
-                            <Box sx={{ ml: 3, mb: 1 }}>
-                                <Typography variant="h4" sx={{ fontWeight: 700, color: '#2C2C2C', mb: 0.5 }}>
-                                    {user?.userName || 'User'}
-                                </Typography>
-                                <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
-                                    <EmailIcon sx={{ color: '#8A8A8A', fontSize: 16 }} />
-                                    <Typography sx={{ color: '#6A6A6A', fontSize: '14px' }}>
-                                        {user?.email || 'user@example.com'}
+                                {/* Profile Summary */}
+                                <Box sx={{ textAlign: 'center', p: 3, borderBottom: `1px solid ${colors.border}` }}>
+                                    <Avatar sx={{
+                                        width: 100, height: 100, margin: '0 auto', mb: 2,
+                                        background: colors.gradient, fontSize: 48, fontWeight: 'bold'
+                                    }}>
+                                        {user?.userName?.charAt(0).toUpperCase() || 'U'}
+                                    </Avatar>
+                                    <Typography variant="h6" sx={{ fontWeight: 600, color: colors.text }}>
+                                        {user?.userName || 'User'}
                                     </Typography>
-                                </Box>
-                            </Box>
-                            <Box sx={{ ml: 'auto', mb: 1 }}>
-                                <Chip
-                                    icon={<VerifiedUserIcon sx={{ fontSize: 16 }} />}
-                                    label="Verified Account"
-                                    sx={{
-                                        bgcolor: alpha('#4CAF50', 0.1),
-                                        color: '#4CAF50',
-                                        borderRadius: '20px',
-                                        fontWeight: 500
-                                    }}
-                                />
-                            </Box>
-                        </Box>
-                    </Card>
-
-                    {/* Alerts */}
-                    {error && (
-                        <Fade in={!!error}>
-                            <Alert
-                                severity="error"
-                                icon={<ErrorIcon />}
-                                sx={{
-                                    mb: 3,
-                                    borderRadius: '16px',
-                                    bgcolor: alpha('#f44336', 0.08),
-                                    color: '#c62828',
-                                    border: '1px solid #f44336'
-                                }}
-                            >
-                                {error}
-                            </Alert>
-                        </Fade>
-                    )}
-
-                    {success && (
-                        <Fade in={!!success}>
-                            <Alert
-                                severity="success"
-                                icon={<CheckCircleIcon />}
-                                sx={{
-                                    mb: 3,
-                                    borderRadius: '16px',
-                                    bgcolor: alpha('#4CAF50', 0.08),
-                                    color: '#2e7d32',
-                                    border: '1px solid #4CAF50'
-                                }}
-                            >
-                                {success}
-                            </Alert>
-                        </Fade>
-                    )}
-
-                    {/* Security Info Card */}
-                    <Paper sx={{
-                        p: 3,
-                        mb: 4,
-                        bgcolor: alpha('#FF6B35', 0.05),
-                        borderRadius: '20px',
-                        border: `1px solid ${alpha('#FF6B35', 0.2)}`,
-                        display: 'flex',
-                        alignItems: 'center',
-                        gap: 2,
-                        flexWrap: 'wrap'
-                    }}>
-                        <ShieldIcon sx={{ color: '#FF6B35', fontSize: 32 }} />
-                        <Box sx={{ flex: 1 }}>
-                            <Typography sx={{ color: '#2C2C2C', fontWeight: 600, mb: 0.5 }}>
-                                Password Security Guidelines
-                            </Typography>
-                            <Typography sx={{ color: '#6A6A6A', fontSize: '13px' }}>
-                                Password must be at least 8 characters long and contain: uppercase letter, lowercase letter, number, and special character (!@#$%^&*).
-                            </Typography>
-                        </Box>
-                    </Paper>
-
-                    {/* Password Change Form Card */}
-                    <Card sx={{
-                        background: '#FFFFFF',
-                        borderRadius: '24px',
-                        overflow: 'hidden',
-                        boxShadow: '0 4px 20px rgba(0,0,0,0.04)',
-                        border: '1px solid #F0E8E0'
-                    }}>
-                        <Box sx={{ p: 3, borderBottom: '1px solid #F0E8E0', bgcolor: '#FAFAFA' }}>
-                            <Typography variant="h6" sx={{ fontWeight: 700, color: '#2C2C2C', display: 'flex', alignItems: 'center', gap: 1 }}>
-                                <LockIcon sx={{ color: '#FF6B35' }} />
-                                Change Password
-                            </Typography>
-                            <Typography variant="body2" sx={{ color: '#8A8A8A', mt: 0.5 }}>
-                                Update your password to keep your account secure
-                            </Typography>
-                        </Box>
-
-                        <Box component="form" onSubmit={handleSubmit} sx={{ p: 3 }}>
-                            <Grid container spacing={3}>
-                                <Grid item xs={12}>
-                                    <TextField
-                                        fullWidth
-                                        type={showOldPassword ? 'text' : 'password'}
-                                        name="oldPassword"
-                                        label="Current Password"
-                                        value={formData.oldPassword}
-                                        onChange={handleInputChange}
-                                        required
-                                        InputProps={{
-                                            endAdornment: (
-                                                <InputAdornment position="end">
-                                                    <IconButton onClick={() => setShowOldPassword(!showOldPassword)} edge="end" sx={{ color: '#8A8A8A' }}>
-                                                        {showOldPassword ? <VisibilityOff /> : <Visibility />}
-                                                    </IconButton>
-                                                </InputAdornment>
-                                            ),
-                                        }}
-                                        sx={{
-                                            '& .MuiOutlinedInput-root': {
-                                                bgcolor: '#FAFAFA',
-                                                borderRadius: '12px',
-                                                '&:hover fieldset': { borderColor: '#FF6B35' },
-                                                '&.Mui-focused fieldset': { borderColor: '#FF6B35' }
-                                            },
-                                            '& .MuiInputLabel-root': { color: '#8A8A8A', '&.Mui-focused': { color: '#FF6B35' } }
-                                        }}
-                                    />
-                                </Grid>
-
-                                <Grid item xs={12}>
-                                    <TextField
-                                        fullWidth
-                                        type={showNewPassword ? 'text' : 'password'}
-                                        name="newPassword"
-                                        label="New Password"
-                                        value={formData.newPassword}
-                                        onChange={handleInputChange}
-                                        required
-                                        InputProps={{
-                                            endAdornment: (
-                                                <InputAdornment position="end">
-                                                    <IconButton onClick={() => setShowNewPassword(!showNewPassword)} edge="end" sx={{ color: '#8A8A8A' }}>
-                                                        {showNewPassword ? <VisibilityOff /> : <Visibility />}
-                                                    </IconButton>
-                                                </InputAdornment>
-                                            ),
-                                        }}
-                                        sx={{
-                                            '& .MuiOutlinedInput-root': {
-                                                bgcolor: '#FAFAFA',
-                                                borderRadius: '12px',
-                                                '&:hover fieldset': { borderColor: '#FF6B35' },
-                                                '&.Mui-focused fieldset': { borderColor: '#FF6B35' }
-                                            },
-                                            '& .MuiInputLabel-root': { color: '#8A8A8A', '&.Mui-focused': { color: '#FF6B35' } }
-                                        }}
-                                    />
-
-                                    {formData.newPassword && (
-                                        <Box sx={{ mt: 2 }}>
-                                            <Box sx={{ display: 'flex', justifyContent: 'space-between', mb: 1 }}>
-                                                <Typography sx={{ color: '#6A6A6A', fontSize: '12px' }}>Password Strength:</Typography>
-                                                <Typography sx={{ color: getPasswordStrengthColor(), fontSize: '12px', fontWeight: 600 }}>{getPasswordStrengthText()}</Typography>
-                                            </Box>
-                                            <Box sx={{ width: '100%', height: '4px', bgcolor: '#F0E8E0', borderRadius: '2px', overflow: 'hidden' }}>
-                                                <Box sx={{ width: `${(passwordStrength.score / 5) * 100}%`, height: '100%', background: getPasswordStrengthColor(), transition: 'width 0.3s ease' }} />
-                                            </Box>
-                                            <Box sx={{ display: 'flex', flexWrap: 'wrap', gap: 1.5, mt: 1.5 }}>
-                                                <Chip label="8+ characters" size="small" sx={{
-                                                    bgcolor: passwordStrength.hasMinLength ? alpha('#4CAF50', 0.1) : alpha('#f44336', 0.1),
-                                                    color: passwordStrength.hasMinLength ? '#4CAF50' : '#f44336',
-                                                    fontSize: '11px', height: '24px'
-                                                }} />
-                                                <Chip label="Uppercase" size="small" sx={{
-                                                    bgcolor: passwordStrength.hasUpperCase ? alpha('#4CAF50', 0.1) : alpha('#f44336', 0.1),
-                                                    color: passwordStrength.hasUpperCase ? '#4CAF50' : '#f44336',
-                                                    fontSize: '11px', height: '24px'
-                                                }} />
-                                                <Chip label="Lowercase" size="small" sx={{
-                                                    bgcolor: passwordStrength.hasLowerCase ? alpha('#4CAF50', 0.1) : alpha('#f44336', 0.1),
-                                                    color: passwordStrength.hasLowerCase ? '#4CAF50' : '#f44336',
-                                                    fontSize: '11px', height: '24px'
-                                                }} />
-                                                <Chip label="Number" size="small" sx={{
-                                                    bgcolor: passwordStrength.hasNumber ? alpha('#4CAF50', 0.1) : alpha('#f44336', 0.1),
-                                                    color: passwordStrength.hasNumber ? '#4CAF50' : '#f44336',
-                                                    fontSize: '11px', height: '24px'
-                                                }} />
-                                                <Chip label="Special char" size="small" sx={{
-                                                    bgcolor: passwordStrength.hasSpecialChar ? alpha('#4CAF50', 0.1) : alpha('#f44336', 0.1),
-                                                    color: passwordStrength.hasSpecialChar ? '#4CAF50' : '#f44336',
-                                                    fontSize: '11px', height: '24px'
-                                                }} />
-                                            </Box>
-                                        </Box>
-                                    )}
-                                </Grid>
-
-                                <Grid item xs={12}>
-                                    <TextField
-                                        fullWidth
-                                        type={showConfirmPassword ? 'text' : 'password'}
-                                        name="confirmPassword"
-                                        label="Confirm New Password"
-                                        value={formData.confirmPassword}
-                                        onChange={handleInputChange}
-                                        required
-                                        InputProps={{
-                                            endAdornment: (
-                                                <InputAdornment position="end">
-                                                    <IconButton onClick={() => setShowConfirmPassword(!showConfirmPassword)} edge="end" sx={{ color: '#8A8A8A' }}>
-                                                        {showConfirmPassword ? <VisibilityOff /> : <Visibility />}
-                                                    </IconButton>
-                                                </InputAdornment>
-                                            ),
-                                        }}
-                                        sx={{
-                                            '& .MuiOutlinedInput-root': {
-                                                bgcolor: '#FAFAFA',
-                                                borderRadius: '12px',
-                                                '&:hover fieldset': { borderColor: '#FF6B35' },
-                                                '&.Mui-focused fieldset': { borderColor: '#FF6B35' }
-                                            },
-                                            '& .MuiInputLabel-root': { color: '#8A8A8A', '&.Mui-focused': { color: '#FF6B35' } }
-                                        }}
-                                    />
-                                </Grid>
-
-                                <Grid item xs={12}>
-                                    <Box sx={{ display: 'flex', gap: 2, justifyContent: 'flex-end' }}>
-                                        <Button
-                                            variant="outlined"
-                                            onClick={handleCancel}
-                                            disabled={loading}
-                                            startIcon={<CancelIcon />}
-                                            sx={{
-                                                py: 1.5,
-                                                px: 4,
-                                                borderColor: '#E0E0E0',
-                                                color: '#8A8A8A',
-                                                borderRadius: '30px',
-                                                textTransform: 'none',
-                                                fontWeight: 600,
-                                                '&:hover': { borderColor: '#FF6B35', color: '#FF6B35', bgcolor: alpha('#FF6B35', 0.05) }
-                                            }}
-                                        >
-                                            Reset
-                                        </Button>
-                                        <Button
-                                            type="submit"
-                                            variant="contained"
-                                            disabled={loading}
-                                            startIcon={loading ? <CircularProgress size={20} sx={{ color: 'white' }} /> : <SaveIcon />}
-                                            sx={{
-                                                py: 1.5,
-                                                px: 4,
-                                                background: 'linear-gradient(135deg, #FF6B35 0%, #FFB347 100%)',
-                                                borderRadius: '30px',
-                                                textTransform: 'none',
-                                                fontWeight: 600,
-                                                boxShadow: '0 4px 12px rgba(255,107,53,0.25)',
-                                                '&:hover': { transform: 'translateY(-1px)', boxShadow: '0 6px 16px rgba(255,107,53,0.35)' }
-                                            }}
-                                        >
-                                            {loading ? 'Updating...' : 'Change Password'}
-                                        </Button>
+                                    <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 0.5, mt: 0.5 }}>
+                                        <EmailIcon sx={{ color: colors.textLight, fontSize: 14 }} />
+                                        <Typography variant="body2" sx={{ color: colors.textLight }}>
+                                            {user?.email || 'user@example.com'}
+                                        </Typography>
                                     </Box>
-                                </Grid>
-                            </Grid>
-                        </Box>
-                    </Card>
+                                    <Chip
+                                        icon={<VerifiedUserIcon sx={{ fontSize: 14 }} />}
+                                        label="Verified Account"
+                                        size="small"
+                                        sx={{ mt: 1.5, bgcolor: alphaMUI('#4CAF50', 0.1), color: '#4CAF50' }}
+                                    />
+                                </Box>
 
-                    {/* Security Tips Card */}
-                    <Card sx={{
-                        mt: 3,
-                        background: '#FFFFFF',
-                        borderRadius: '20px',
-                        border: '1px solid #F0E8E0',
-                        boxShadow: '0 2px 8px rgba(0,0,0,0.03)'
-                    }}>
-                        <Box sx={{ p: 2.5, display: 'flex', alignItems: 'center', gap: 2, flexWrap: 'wrap' }}>
-                            <SecurityIcon sx={{ color: '#FFB347', fontSize: 28 }} />
-                            <Box sx={{ flex: 1 }}>
-                                <Typography variant="subtitle2" sx={{ fontWeight: 600, color: '#2C2C2C', mb: 0.5 }}>
-                                    Security Tips
-                                </Typography>
-                                <Typography variant="caption" sx={{ color: '#8A8A8A', display: 'block' }}>
-                                    • Use a unique password that you don't use for other services<br />
-                                    • Never share your password with anyone<br />
-                                    • Consider changing your password regularly
-                                </Typography>
-                            </Box>
-                        </Box>
-                    </Card>
+                                {/* Menu Items */}
+                                <Stack sx={{ p: 1 }}>
+                                    <Button
+                                        fullWidth
+                                        startIcon={<PersonIcon />}
+                                        onClick={() => setActiveTab('profile')}
+                                        sx={{
+                                            justifyContent: 'flex-start',
+                                            px: 2, py: 1.5,
+                                            borderRadius: '12px',
+                                            mb: 0.5,
+                                            bgcolor: activeTab === 'profile' ? alphaMUI(colors.primary, 0.1) : 'transparent',
+                                            color: activeTab === 'profile' ? colors.primary : colors.textLight,
+                                            '&:hover': { bgcolor: alphaMUI(colors.primary, 0.08) }
+                                        }}
+                                    >
+                                        Profile Information
+                                    </Button>
+                                    <Button
+                                        fullWidth
+                                        startIcon={<SecurityIcon />}
+                                        onClick={() => setActiveTab('security')}
+                                        sx={{
+                                            justifyContent: 'flex-start',
+                                            px: 2, py: 1.5,
+                                            borderRadius: '12px',
+                                            bgcolor: activeTab === 'security' ? alphaMUI(colors.primary, 0.1) : 'transparent',
+                                            color: activeTab === 'security' ? colors.primary : colors.textLight,
+                                            '&:hover': { bgcolor: alphaMUI(colors.primary, 0.08) }
+                                        }}
+                                    >
+                                        Security & Password
+                                    </Button>
+                                </Stack>
+                            </Card>
+                        </Grid>
+
+                        {/* Main Content Area */}
+                        <Grid item xs={12} md={8}>
+                            {activeTab === 'profile' ? (
+                                // Profile Information Tab
+                                <Card sx={{
+                                    background: alphaMUI('#FFFDF7', 0.95),
+                                    borderRadius: '20px',
+                                    border: `1px solid ${colors.border}`,
+                                    overflow: 'hidden'
+                                }}>
+                                    <Box sx={{ p: 3, borderBottom: `1px solid ${colors.border}`, bgcolor: alphaMUI(colors.surface, 0.5) }}>
+                                        <Typography variant="h6" sx={{ fontWeight: 600, color: colors.text }}>
+                                            Profile Information
+                                        </Typography>
+                                        <Typography variant="body2" sx={{ color: colors.textLight }}>
+                                            Your personal information
+                                        </Typography>
+                                    </Box>
+                                    <Box sx={{ p: 3 }}>
+                                        <Stack spacing={3}>
+                                            <Box>
+                                                <Typography variant="subtitle2" sx={{ color: colors.text, mb: 1, fontWeight: 600 }}>
+                                                    Username
+                                                </Typography>
+                                                <Paper sx={{ p: 2, bgcolor: alphaMUI(colors.background, 0.5), borderRadius: '12px' }}>
+                                                    <Typography variant="body1" sx={{ color: colors.text }}>
+                                                        {user?.userName || 'User'}
+                                                    </Typography>
+                                                </Paper>
+                                            </Box>
+                                            <Box>
+                                                <Typography variant="subtitle2" sx={{ color: colors.text, mb: 1, fontWeight: 600 }}>
+                                                    Email Address
+                                                </Typography>
+                                                <Paper sx={{ p: 2, bgcolor: alphaMUI(colors.background, 0.5), borderRadius: '12px' }}>
+                                                    <Typography variant="body1" sx={{ color: colors.text }}>
+                                                        {user?.email || 'user@example.com'}
+                                                    </Typography>
+                                                </Paper>
+                                            </Box>
+                                            <Box>
+                                                <Typography variant="subtitle2" sx={{ color: colors.text, mb: 1, fontWeight: 600 }}>
+                                                    Account Type
+                                                </Typography>
+                                                <Paper sx={{ p: 2, bgcolor: alphaMUI(colors.background, 0.5), borderRadius: '12px' }}>
+                                                    <Chip
+                                                        label={isAdmin ? "Administrator" : "Regular User"}
+                                                        sx={{
+                                                            bgcolor: isAdmin ? alphaMUI(colors.primary, 0.1) : alphaMUI('#4CAF50', 0.1),
+                                                            color: isAdmin ? colors.primary : '#4CAF50'
+                                                        }}
+                                                    />
+                                                </Paper>
+                                            </Box>
+                                            <Box sx={{ pt: 2 }}>
+                                                <Button
+                                                    variant="outlined"
+                                                    startIcon={<LockIcon />}
+                                                    onClick={() => setActiveTab('security')}
+                                                    sx={{
+                                                        borderColor: colors.border,
+                                                        color: colors.primary,
+                                                        '&:hover': { borderColor: colors.primary, bgcolor: alphaMUI(colors.primary, 0.05) }
+                                                    }}
+                                                >
+                                                    Change Password
+                                                </Button>
+                                            </Box>
+                                        </Stack>
+                                    </Box>
+                                </Card>
+                            ) : (
+                                // Security & Password Tab
+                                <Card sx={{
+                                    background: alphaMUI('#FFFDF7', 0.95),
+                                    borderRadius: '20px',
+                                    border: `1px solid ${colors.border}`,
+                                    overflow: 'hidden'
+                                }}>
+                                    <Box sx={{ p: 3, borderBottom: `1px solid ${colors.border}`, bgcolor: alphaMUI(colors.surface, 0.5) }}>
+                                        <Typography variant="h6" sx={{ fontWeight: 600, color: colors.text, display: 'flex', alignItems: 'center', gap: 1 }}>
+                                            <VpnKeyIcon sx={{ color: colors.primary }} />
+                                            Change Password
+                                        </Typography>
+                                        <Typography variant="body2" sx={{ color: colors.textLight }}>
+                                            Update your password to keep your account secure
+                                        </Typography>
+                                    </Box>
+
+                                    <Box sx={{ p: 3 }}>
+                                        {error && (
+                                            <Alert severity="error" sx={{ mb: 3, borderRadius: '12px' }} onClose={() => setError('')}>
+                                                {error}
+                                            </Alert>
+                                        )}
+                                        {success && (
+                                            <Alert severity="success" sx={{ mb: 3, borderRadius: '12px' }} onClose={() => setSuccess('')}>
+                                                {success}
+                                            </Alert>
+                                        )}
+
+                                        {/* Security Info Banner */}
+                                        <Paper sx={{ p: 2, mb: 3, bgcolor: alphaMUI(colors.primary, 0.05), borderRadius: '12px', display: 'flex', alignItems: 'center', gap: 1.5 }}>
+                                            <ShieldIcon sx={{ color: colors.primary }} />
+                                            <Typography variant="caption" sx={{ color: colors.textLight }}>
+                                                Password must be at least 8 characters with uppercase, lowercase, number, and special character
+                                            </Typography>
+                                        </Paper>
+
+                                        <form onSubmit={handleSubmit}>
+                                            <Stack spacing={3}>
+                                                <TextField
+                                                    fullWidth
+                                                    type={showOldPassword ? 'text' : 'password'}
+                                                    name="oldPassword"
+                                                    label="Current Password"
+                                                    value={formData.oldPassword}
+                                                    onChange={handleInputChange}
+                                                    required
+                                                    InputProps={{
+                                                        endAdornment: (
+                                                            <InputAdornment position="end">
+                                                                <IconButton onClick={() => setShowOldPassword(!showOldPassword)} edge="end">
+                                                                    {showOldPassword ? <VisibilityOff /> : <Visibility />}
+                                                                </IconButton>
+                                                            </InputAdornment>
+                                                        ),
+                                                    }}
+                                                    sx={{ '& .MuiOutlinedInput-root': { borderRadius: '12px' } }}
+                                                />
+
+                                                <TextField
+                                                    fullWidth
+                                                    type={showNewPassword ? 'text' : 'password'}
+                                                    name="newPassword"
+                                                    label="New Password"
+                                                    value={formData.newPassword}
+                                                    onChange={handleInputChange}
+                                                    required
+                                                    InputProps={{
+                                                        endAdornment: (
+                                                            <InputAdornment position="end">
+                                                                <IconButton onClick={() => setShowNewPassword(!showNewPassword)} edge="end">
+                                                                    {showNewPassword ? <VisibilityOff /> : <Visibility />}
+                                                                </IconButton>
+                                                            </InputAdornment>
+                                                        ),
+                                                    }}
+                                                    sx={{ '& .MuiOutlinedInput-root': { borderRadius: '12px' } }}
+                                                />
+
+                                                {formData.newPassword && (
+                                                    <Box>
+                                                        <Box sx={{ display: 'flex', justifyContent: 'space-between', mb: 1 }}>
+                                                            <Typography variant="caption" sx={{ color: colors.textLight }}>Password Strength:</Typography>
+                                                            <Typography variant="caption" sx={{ color: getPasswordStrengthColor(), fontWeight: 600 }}>{getPasswordStrengthText()}</Typography>
+                                                        </Box>
+                                                        <Box sx={{ width: '100%', height: '4px', bgcolor: colors.border, borderRadius: '2px', overflow: 'hidden' }}>
+                                                            <Box sx={{ width: `${(passwordStrength.score / 5) * 100}%`, height: '100%', background: getPasswordStrengthColor(), transition: 'width 0.3s' }} />
+                                                        </Box>
+                                                        <Box sx={{ display: 'flex', flexWrap: 'wrap', gap: 1, mt: 1.5 }}>
+                                                            <Chip label="8+ chars" size="small" sx={{ bgcolor: passwordStrength.hasMinLength ? alphaMUI('#4CAF50', 0.1) : alphaMUI(colors.error, 0.1), color: passwordStrength.hasMinLength ? '#4CAF50' : colors.error, fontSize: '10px', height: '22px' }} />
+                                                            <Chip label="Uppercase" size="small" sx={{ bgcolor: passwordStrength.hasUpperCase ? alphaMUI('#4CAF50', 0.1) : alphaMUI(colors.error, 0.1), color: passwordStrength.hasUpperCase ? '#4CAF50' : colors.error, fontSize: '10px', height: '22px' }} />
+                                                            <Chip label="Lowercase" size="small" sx={{ bgcolor: passwordStrength.hasLowerCase ? alphaMUI('#4CAF50', 0.1) : alphaMUI(colors.error, 0.1), color: passwordStrength.hasLowerCase ? '#4CAF50' : colors.error, fontSize: '10px', height: '22px' }} />
+                                                            <Chip label="Number" size="small" sx={{ bgcolor: passwordStrength.hasNumber ? alphaMUI('#4CAF50', 0.1) : alphaMUI(colors.error, 0.1), color: passwordStrength.hasNumber ? '#4CAF50' : colors.error, fontSize: '10px', height: '22px' }} />
+                                                            <Chip label="Special char" size="small" sx={{ bgcolor: passwordStrength.hasSpecialChar ? alphaMUI('#4CAF50', 0.1) : alphaMUI(colors.error, 0.1), color: passwordStrength.hasSpecialChar ? '#4CAF50' : colors.error, fontSize: '10px', height: '22px' }} />
+                                                        </Box>
+                                                    </Box>
+                                                )}
+
+                                                <TextField
+                                                    fullWidth
+                                                    type={showConfirmPassword ? 'text' : 'password'}
+                                                    name="confirmPassword"
+                                                    label="Confirm New Password"
+                                                    value={formData.confirmPassword}
+                                                    onChange={handleInputChange}
+                                                    required
+                                                    InputProps={{
+                                                        endAdornment: (
+                                                            <InputAdornment position="end">
+                                                                <IconButton onClick={() => setShowConfirmPassword(!showConfirmPassword)} edge="end">
+                                                                    {showConfirmPassword ? <VisibilityOff /> : <Visibility />}
+                                                                </IconButton>
+                                                            </InputAdornment>
+                                                        ),
+                                                    }}
+                                                    sx={{ '& .MuiOutlinedInput-root': { borderRadius: '12px' } }}
+                                                />
+
+                                                <Box sx={{ display: 'flex', gap: 2, justifyContent: 'flex-end' }}>
+                                                    <Button
+                                                        variant="outlined"
+                                                        onClick={handleCancel}
+                                                        disabled={loading}
+                                                        startIcon={<CancelIcon />}
+                                                        sx={{ borderRadius: '30px', textTransform: 'none', px: 4 }}
+                                                    >
+                                                        Cancel
+                                                    </Button>
+                                                    <Button
+                                                        type="submit"
+                                                        variant="contained"
+                                                        disabled={loading}
+                                                        startIcon={loading ? <CircularProgress size={20} /> : <SaveIcon />}
+                                                        sx={{
+                                                            background: colors.gradient,
+                                                            borderRadius: '30px',
+                                                            textTransform: 'none',
+                                                            px: 4,
+                                                            '&:hover': { transform: 'translateY(-1px)' }
+                                                        }}
+                                                    >
+                                                        {loading ? 'Updating...' : 'Update Password'}
+                                                    </Button>
+                                                </Box>
+                                            </Stack>
+                                        </form>
+                                    </Box>
+                                </Card>
+                            )}
+                        </Grid>
+                    </Grid>
                 </Box>
             </Container>
 
+            {/* Footer */}
+            <Box sx={{ py: 3, textAlign: 'center', background: '#FFFFFF', borderTop: `1px solid ${colors.border}`, mt: 4 }}>
+                <Container maxWidth="lg">
+                    <Typography variant="body2" sx={{ color: colors.textLight, fontSize: '0.8rem' }}>
+                        © 2026 Museum Events. All rights reserved.
+                    </Typography>
+                </Container>
+            </Box>
+
             {/* Snackbar */}
             <Snackbar open={snackbar.open} autoHideDuration={6000} onClose={handleCloseSnackbar} anchorOrigin={{ vertical: 'bottom', horizontal: 'center' }}>
-                <Alert onClose={handleCloseSnackbar} severity={snackbar.severity} sx={{
-                    bgcolor: '#FFFFFF',
-                    color: '#1A1A1A',
-                    borderRadius: '16px',
-                    boxShadow: '0 4px 12px rgba(0,0,0,0.1)',
-                    borderLeft: `4px solid ${snackbar.severity === 'success' ? '#4CAF50' : '#FF6B35'}`
-                }}>
+                <Alert onClose={handleCloseSnackbar} severity={snackbar.severity} sx={{ bgcolor: '#FFFDF7', borderRadius: '16px', borderLeft: `4px solid ${snackbar.severity === 'success' ? '#4CAF50' : colors.primary}` }}>
                     {snackbar.message}
                 </Alert>
             </Snackbar>
+
+            {/* Modals */}
+            <Modal open={loginModalOpen} onClose={handleLoginModalClose} sx={{ display: 'flex', alignItems: 'center', justifyContent: 'center', backdropFilter: 'blur(8px)' }}>
+                <Box sx={{ width: '90%', maxWidth: 500, maxHeight: '90vh', bgcolor: 'transparent', outline: 'none' }}>
+                    <LoginPage isModal={true} onClose={handleLoginModalClose} onSwitchToSignup={handleSwitchToSignup} />
+                </Box>
+            </Modal>
+
+            <Modal open={signupModalOpen} onClose={handleSignupModalClose} sx={{ display: 'flex', alignItems: 'center', justifyContent: 'center', backdropFilter: 'blur(8px)' }}>
+                <Box sx={{ width: '90%', maxWidth: 500, maxHeight: '90vh', bgcolor: 'transparent', outline: 'none' }}>
+                    <SignUpPage isModal={true} onClose={handleSignupModalClose} onSwitchToLogin={handleSwitchToLogin} onSuccess={handleSignupSuccess} />
+                </Box>
+            </Modal>
+
+            <Modal open={verifyModalOpen} onClose={handleVerifyModalClose} sx={{ display: 'flex', alignItems: 'center', justifyContent: 'center', backdropFilter: 'blur(8px)' }}>
+                <Box sx={{ width: '90%', maxWidth: 500, maxHeight: '90vh', bgcolor: 'transparent', outline: 'none' }}>
+                    <VerifyCodePage isModal={true} onClose={handleVerifyModalClose} onVerificationSuccess={handleVerificationSuccess} email={verifyEmail} />
+                </Box>
+            </Modal>
         </Box>
     );
 };

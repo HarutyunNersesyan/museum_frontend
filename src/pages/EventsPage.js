@@ -152,6 +152,20 @@ const EVENT_CATEGORIES = [
     { value: 'OPEN_AIR', label: '🌳 Open Air' }
 ];
 
+// Armenian Museums List
+const ARMENIAN_MUSEUMS = [
+    { value: 'History Museum of Armenia', label: '🏛️ History Museum of Armenia' },
+    { value: 'Matenadaran', label: '📜 Matenadaran' },
+    { value: 'Cafesjian Center for the Arts', label: '🎨 Cafesjian Center for the Arts' },
+    { value: 'Erebuni Fortress & Museum', label: '🏺 Erebuni Fortress & Museum' },
+    { value: 'Armenian Genocide Museum', label: '🕯️ Armenian Genocide Museum' },
+    { value: 'Dilijan Local Lore Museum', label: '🌲 Dilijan Local Lore Museum' },
+    { value: 'Megerian Carpet Museum', label: '🪢 Megerian Carpet Museum' },
+    { value: 'Sergey Parajanov Museum', label: '🎬 Sergey Parajanov Museum' },
+    { value: 'Khor Virap Museum', label: '⛪ Khor Virap Museum' },
+    { value: 'Gyumri Museum of Architecture', label: '🏛️ Gyumri Museum of Architecture' }
+];
+
 // Locations
 const ARMENIAN_LOCATIONS = [
     { value: 'YEREVAN', label: 'Yerevan' },
@@ -256,12 +270,16 @@ const EventsPage = () => {
     const [searchQuery, setSearchQuery] = useState('');
     const [selectedCategory, setSelectedCategory] = useState('');
     const [selectedLocation, setSelectedLocation] = useState('');
+    const [selectedMuseum, setSelectedMuseum] = useState('');
     const [showFilters, setShowFilters] = useState(false);
 
     // Price filter states
     const [minTicketPrice, setMinTicketPrice] = useState('');
     const [maxTicketPrice, setMaxTicketPrice] = useState('');
     const [ticketPriceRange, setTicketPriceRange] = useState([0, 1000000]);
+
+    // Flag to track if search has been performed
+    const [hasSearched, setHasSearched] = useState(false);
 
     useEffect(() => {
         const savedParams = sessionStorage.getItem('eventsSearchParams');
@@ -270,6 +288,7 @@ const EventsPage = () => {
             if (params.query) setSearchQuery(params.query);
             if (params.category) setSelectedCategory(params.category);
             if (params.location) setSelectedLocation(params.location);
+            if (params.museum) setSelectedMuseum(params.museum);
             if (params.minTicketPrice) setMinTicketPrice(params.minTicketPrice);
             if (params.maxTicketPrice) setMaxTicketPrice(params.maxTicketPrice);
             if (params.minTicketPrice && params.maxTicketPrice) {
@@ -282,22 +301,30 @@ const EventsPage = () => {
         const queryFromUrl = urlParams.get('query');
         const categoryFromUrl = urlParams.get('category');
         const locationFromUrl = urlParams.get('location');
+        const museumFromUrl = urlParams.get('museum');
         const minPriceFromUrl = urlParams.get('minTicketPrice');
         const maxPriceFromUrl = urlParams.get('maxTicketPrice');
 
         if (queryFromUrl) setSearchQuery(queryFromUrl);
         if (categoryFromUrl) setSelectedCategory(categoryFromUrl);
         if (locationFromUrl) setSelectedLocation(locationFromUrl);
+        if (museumFromUrl) setSelectedMuseum(museumFromUrl);
         if (minPriceFromUrl) setMinTicketPrice(minPriceFromUrl);
         if (maxPriceFromUrl) setMaxTicketPrice(maxPriceFromUrl);
         if (minPriceFromUrl && maxPriceFromUrl) {
             setTicketPriceRange([parseInt(minPriceFromUrl), parseInt(maxPriceFromUrl)]);
         }
+
+        // Load events only on initial mount (without filters)
+        loadEvents();
     }, []);
 
+    // Separate useEffect for page and sort changes only (not for filter changes)
     useEffect(() => {
-        loadEvents();
-    }, [page, sortBy, sortDirection, searchQuery, selectedCategory, selectedLocation, minTicketPrice, maxTicketPrice]);
+        if (hasSearched) {
+            loadEvents();
+        }
+    }, [page, sortBy, sortDirection]);
 
     const loadEvents = async () => {
         setLoading(true);
@@ -305,30 +332,37 @@ const EventsPage = () => {
             const response = await eventAPI.getAllEvents(page, 10, sortBy, sortDirection);
             let filteredEvents = response.data.content || [];
 
-            if (searchQuery) {
-                filteredEvents = filteredEvents.filter(event =>
-                    event.name?.toLowerCase().includes(searchQuery.toLowerCase()) ||
-                    event.description?.toLowerCase().includes(searchQuery.toLowerCase())
-                );
-            }
+            // Apply filters only if search has been performed
+            if (hasSearched) {
+                if (searchQuery) {
+                    filteredEvents = filteredEvents.filter(event =>
+                        event.name?.toLowerCase().includes(searchQuery.toLowerCase()) ||
+                        event.description?.toLowerCase().includes(searchQuery.toLowerCase())
+                    );
+                }
 
-            if (selectedCategory) {
-                filteredEvents = filteredEvents.filter(event => event.eventCategory === selectedCategory);
-            }
+                if (selectedCategory) {
+                    filteredEvents = filteredEvents.filter(event => event.eventCategory === selectedCategory);
+                }
 
-            if (selectedLocation) {
-                filteredEvents = filteredEvents.filter(event => event.location === selectedLocation);
-            }
+                if (selectedLocation) {
+                    filteredEvents = filteredEvents.filter(event => event.location === selectedLocation);
+                }
 
-            if (minTicketPrice && !isNaN(parseInt(minTicketPrice))) {
-                filteredEvents = filteredEvents.filter(event =>
-                    event.ticketPrice >= parseInt(minTicketPrice)
-                );
-            }
-            if (maxTicketPrice && !isNaN(parseInt(maxTicketPrice))) {
-                filteredEvents = filteredEvents.filter(event =>
-                    event.ticketPrice <= parseInt(maxTicketPrice)
-                );
+                if (selectedMuseum) {
+                    filteredEvents = filteredEvents.filter(event => event.museumName === selectedMuseum);
+                }
+
+                if (minTicketPrice && !isNaN(parseInt(minTicketPrice))) {
+                    filteredEvents = filteredEvents.filter(event =>
+                        event.ticketPrice >= parseInt(minTicketPrice)
+                    );
+                }
+                if (maxTicketPrice && !isNaN(parseInt(maxTicketPrice))) {
+                    filteredEvents = filteredEvents.filter(event =>
+                        event.ticketPrice <= parseInt(maxTicketPrice)
+                    );
+                }
             }
 
             setEvents(filteredEvents);
@@ -350,6 +384,7 @@ const EventsPage = () => {
 
     const handleSearch = () => {
         setPage(0);
+        setHasSearched(true);
         loadEvents();
     };
 
@@ -357,10 +392,12 @@ const EventsPage = () => {
         setSearchQuery('');
         setSelectedCategory('');
         setSelectedLocation('');
+        setSelectedMuseum('');
         setMinTicketPrice('');
         setMaxTicketPrice('');
         setTicketPriceRange([0, 1000000]);
         setPage(0);
+        setHasSearched(false);
         setTimeout(() => loadEvents(), 100);
     };
 
@@ -370,8 +407,15 @@ const EventsPage = () => {
         setMaxTicketPrice(newValue[1].toString());
     };
 
-    const handleSortChange = (e) => { setSortBy(e.target.value); setPage(0); };
-    const handleSortDirectionToggle = () => { setSortDirection(prev => prev === 'asc' ? 'desc' : 'asc'); setPage(0); };
+    const handleSortChange = (e) => {
+        setSortBy(e.target.value);
+        setPage(0);
+    };
+
+    const handleSortDirectionToggle = () => {
+        setSortDirection(prev => prev === 'asc' ? 'desc' : 'asc');
+        setPage(0);
+    };
 
     const handleMenuOpen = (event) => setAnchorEl(event.currentTarget);
     const handleMenuClose = () => setAnchorEl(null);
@@ -393,7 +437,7 @@ const EventsPage = () => {
     };
 
     const handleHomeClick = () => navigate('/');
-    const handleMuseumsClick = () => navigate('/museums');
+    const handleEventsClick = () => navigate('/events');
 
     const handleNextImage = (eventId, totalImages, e) => {
         e.stopPropagation();
@@ -412,7 +456,7 @@ const EventsPage = () => {
     };
 
     const userInitial = user?.userName ? user.userName.charAt(0).toUpperCase() : '';
-    const activeFiltersCount = [searchQuery, selectedCategory, selectedLocation, minTicketPrice].filter(Boolean).length;
+    const activeFiltersCount = [searchQuery, selectedCategory, selectedLocation, selectedMuseum, minTicketPrice].filter(Boolean).length;
 
     return (
         <LocalizationProvider dateAdapter={AdapterDayjs}>
@@ -424,7 +468,7 @@ const EventsPage = () => {
             }}>
                 <GlobalStyles styles={scrollbarStyles} />
 
-                {/* Header - Same as HomePage */}
+                {/* Header */}
                 <Box sx={{
                     position: 'sticky',
                     top: 0,
@@ -466,22 +510,11 @@ const EventsPage = () => {
 
                             {/* Right side - Navigation and User Menu */}
                             <Box sx={{ display: 'flex', alignItems: 'center', gap: 4 }}>
-                                {/* Navigation Links */}
+                                {/* Navigation Links - Museums button REMOVED */}
                                 <Box sx={{ display: { xs: 'none', md: 'flex' }, gap: 2 }}>
                                     <Button
-                                        startIcon={<MuseumIcon />}
-                                        onClick={handleMuseumsClick}
-                                        sx={{
-                                            fontWeight: 500,
-                                            color: colors.textLight,
-                                            '&:hover': { color: colors.primary },
-                                            fontSize: '0.9rem'
-                                        }}
-                                    >
-                                        Museums
-                                    </Button>
-                                    <Button
                                         startIcon={<EventIcon />}
+                                        onClick={handleEventsClick}
                                         sx={{
                                             fontWeight: 500,
                                             color: colors.primary,
@@ -522,7 +555,7 @@ const EventsPage = () => {
                     </Container>
                 </Box>
 
-                {/* Main Content - Same as before */}
+                {/* Main Content */}
                 <Box sx={{ py: 4, px: { xs: 2, sm: 3, md: 4, lg: 6 } }}>
                     {/* Search and Filters */}
                     <Paper elevation={0} sx={{
@@ -534,7 +567,7 @@ const EventsPage = () => {
                         boxShadow: '0 4px 12px rgba(0,0,0,0.04)'
                     }}>
                         <Grid container spacing={2} alignItems="center">
-                            <Grid item xs={12} md={4}>
+                            <Grid item xs={12} md={3}>
                                 <TextField
                                     fullWidth
                                     placeholder="Search events by name or description..."
@@ -555,7 +588,7 @@ const EventsPage = () => {
                                     }}
                                 />
                             </Grid>
-                            <Grid item xs={12} md={3}>
+                            <Grid item xs={12} md={2}>
                                 <FormControl fullWidth>
                                     <InputLabel sx={{ color: colors.textLight }}>Category</InputLabel>
                                     <Select
@@ -580,7 +613,7 @@ const EventsPage = () => {
                                     </Select>
                                 </FormControl>
                             </Grid>
-                            <Grid item xs={12} md={3}>
+                            <Grid item xs={12} md={2}>
                                 <FormControl fullWidth>
                                     <InputLabel sx={{ color: colors.textLight }}>Location</InputLabel>
                                     <Select
@@ -605,9 +638,49 @@ const EventsPage = () => {
                                     </Select>
                                 </FormControl>
                             </Grid>
+                            <Grid item xs={12} md={3}>
+                                <FormControl fullWidth>
+                                    <InputLabel sx={{ color: colors.textLight }}>Museum</InputLabel>
+                                    <Select
+                                        value={selectedMuseum}
+                                        onChange={(e) => setSelectedMuseum(e.target.value)}
+                                        label="Museum"
+                                        sx={{
+                                            borderRadius: '40px',
+                                            bgcolor: '#FAFAFA',
+                                            '& .MuiOutlinedInput-notchedOutline': { borderColor: colors.border },
+                                            '&:hover .MuiOutlinedInput-notchedOutline': { borderColor: colors.primary }
+                                        }}
+                                        renderValue={(selected) => {
+                                            const museum = ARMENIAN_MUSEUMS.find(m => m.value === selected);
+                                            return museum ? museum.label : selected;
+                                        }}
+                                    >
+                                        <MenuItem value=""><em>All Museums</em></MenuItem>
+                                        {ARMENIAN_MUSEUMS.map((museum) => (
+                                            <MenuItem key={museum.value} value={museum.value}>{museum.label}</MenuItem>
+                                        ))}
+                                    </Select>
+                                </FormControl>
+                            </Grid>
                             <Grid item xs={12} md={2}>
                                 <Stack direction="row" spacing={1}>
-                                    <Button fullWidth variant="contained" onClick={handleSearch} sx={{ borderRadius: '40px', background: colors.gradient, height: '56px', textTransform: 'none', fontWeight: 600 }}>
+                                    <Button
+                                        fullWidth
+                                        variant="contained"
+                                        onClick={handleSearch}
+                                        sx={{
+                                            borderRadius: '40px',
+                                            background: colors.gradient,
+                                            height: '56px',
+                                            textTransform: 'none',
+                                            fontWeight: 600,
+                                            '&:hover': {
+                                                transform: 'translateY(-1px)',
+                                                boxShadow: '0 4px 12px rgba(196, 164, 132, 0.3)'
+                                            }
+                                        }}
+                                    >
                                         Search
                                     </Button>
                                     <Tooltip title="Filters">
@@ -743,9 +816,15 @@ const EventsPage = () => {
                     </Paper>
 
                     {/* Results Count */}
-                    {!loading && events.length > 0 && (
+                    {!loading && events.length > 0 && hasSearched && (
                         <Box sx={{ mb: 3 }}>
                             <Typography sx={{ color: colors.textLight }}>Found <strong style={{ color: colors.primary }}>{totalElements}</strong> events</Typography>
+                        </Box>
+                    )}
+
+                    {!loading && events.length > 0 && !hasSearched && (
+                        <Box sx={{ mb: 3 }}>
+                            <Typography sx={{ color: colors.textLight }}>Showing <strong style={{ color: colors.primary }}>{events.length}</strong> events - Use filters and click Search to refine results</Typography>
                         </Box>
                     )}
 
@@ -961,7 +1040,7 @@ const EventsPage = () => {
                     )}
 
                     {/* Pagination */}
-                    {totalPages > 1 && (
+                    {totalPages > 1 && hasSearched && (
                         <Box sx={{ display: 'flex', justifyContent: 'center', mt: 5 }}>
                             <Pagination
                                 count={totalPages}
