@@ -71,8 +71,9 @@ import { alpha, styled } from '@mui/material/styles';
 import { adminMuseumAPI, adminEventAPI, adminStatsAPI } from '../services/adminAPI';
 import { isAdmin } from '../utils/jwtUtils';
 
+// Gradient Button - warm brown/orange gradient
 const GradientButton = styled(Button)(({ theme }) => ({
-    background: 'linear-gradient(135deg, #FF9800 0%, #FF5722 100%)',
+    background: 'linear-gradient(135deg, #8B5E3C 0%, #6B3A2A 100%)',
     borderRadius: '12px',
     padding: '10px 24px',
     fontWeight: 600,
@@ -80,23 +81,25 @@ const GradientButton = styled(Button)(({ theme }) => ({
     color: '#FFFFFF',
     '&:hover': {
         transform: 'translateY(-2px)',
-        boxShadow: '0 8px 25px rgba(255, 152, 0, 0.3)'
+        boxShadow: '0 8px 25px rgba(107, 58, 42, 0.3)'
     }
 }));
 
+// Outlined Button - warm brown border
 const OutlinedButton = styled(Button)(({ theme }) => ({
     borderRadius: '12px',
     padding: '10px 24px',
     fontWeight: 600,
     textTransform: 'none',
-    border: '1px solid #D4A574',
-    color: '#5A3A2A',
+    border: '1px solid #A0784C',
+    color: '#4A2A1A',
     '&:hover': {
-        borderColor: '#FF9800',
-        backgroundColor: alpha('#FF9800', 0.1)
+        borderColor: '#8B5E3C',
+        backgroundColor: alpha('#8B5E3C', 0.1)
     }
 }));
 
+// Stat Card - cream background with warm brown accents
 const StatCard = styled(Paper)(({ theme }) => ({
     background: '#FFF8F0',
     borderRadius: '20px',
@@ -105,24 +108,25 @@ const StatCard = styled(Paper)(({ theme }) => ({
     boxShadow: '0 2px 8px rgba(0, 0, 0, 0.08)',
     '&:hover': {
         transform: 'translateY(-4px)',
-        boxShadow: '0 12px 28px rgba(255, 152, 0, 0.15)'
+        boxShadow: '0 12px 28px rgba(139, 94, 60, 0.15)'
     }
 }));
 
+// Flat Text Field - warm cream background
 const FlatTextField = styled(TextField)(({ theme }) => ({
     '& .MuiOutlinedInput-root': {
         backgroundColor: '#FFF8F0',
         borderRadius: '8px',
         '& fieldset': { border: 'none' },
-        '&:hover': { backgroundColor: '#FFEFE0' },
+        '&:hover': { backgroundColor: '#FFF0E0' },
         '&.Mui-focused': {
-            backgroundColor: '#FFEFE0',
-            boxShadow: '0 0 0 2px rgba(255, 152, 0, 0.2)',
+            backgroundColor: '#FFF0E0',
+            boxShadow: '0 0 0 2px rgba(139, 94, 60, 0.2)',
         }
     },
     '& .MuiInputLabel-root': {
         color: '#5A3A2A',
-        '&.Mui-focused': { color: '#FF9800' }
+        '&.Mui-focused': { color: '#8B5E3C' }
     },
     '& .MuiOutlinedInput-input': {
         color: '#3D2A1A',
@@ -130,13 +134,14 @@ const FlatTextField = styled(TextField)(({ theme }) => ({
     }
 }));
 
+// Flat Select - warm cream background
 const FlatSelect = styled(Select)(({ theme }) => ({
     backgroundColor: '#FFF8F0',
     borderRadius: '8px',
-    '&:hover': { backgroundColor: '#FFEFE0' },
+    '&:hover': { backgroundColor: '#FFF0E0' },
     '&.Mui-focused': {
-        backgroundColor: '#FFEFE0',
-        boxShadow: '0 0 0 2px rgba(255, 152, 0, 0.2)',
+        backgroundColor: '#FFF0E0',
+        boxShadow: '0 0 0 2px rgba(139, 94, 60, 0.2)',
     },
     '& .MuiOutlinedInput-notchedOutline': { border: 'none' },
     '& .MuiSelect-select': {
@@ -168,9 +173,9 @@ const DetailIcon = styled(Box)(({ theme }) => ({
     display: 'flex',
     alignItems: 'center',
     justifyContent: 'center',
-    backgroundColor: alpha('#FF9800', 0.15),
+    backgroundColor: alpha('#8B5E3C', 0.15),
     borderRadius: '10px',
-    color: '#FF9800'
+    color: '#8B5E3C'
 }));
 
 const DetailText = styled(Box)(({ theme }) => ({
@@ -624,8 +629,8 @@ const AdminDashboardPage = () => {
 
     if (!user) {
         return (
-            <Backdrop open={true} sx={{ zIndex: 9999, backgroundColor: 'rgba(210, 180, 140, 0.9)' }}>
-                <CircularProgress sx={{ color: '#FF9800' }} />
+            <Backdrop open={true} sx={{ zIndex: 9999, backgroundColor: 'rgba(107, 58, 42, 0.9)' }}>
+                <CircularProgress sx={{ color: '#8B5E3C' }} />
             </Backdrop>
         );
     }
@@ -636,8 +641,8 @@ const AdminDashboardPage = () => {
                 'body': { backgroundColor: '#F5E6D3' },
                 '*::-webkit-scrollbar': { width: '10px' },
                 '*::-webkit-scrollbar-track': { background: '#E8D5B7' },
-                '*::-webkit-scrollbar-thumb': { background: '#FF9800', borderRadius: '10px' },
-                '*::-webkit-scrollbar-thumb:hover': { background: '#FF5722' }
+                '*::-webkit-scrollbar-thumb': { background: '#8B5E3C', borderRadius: '10px' },
+                '*::-webkit-scrollbar-thumb:hover': { background: '#6B3A2A' }
             }} />
             <Box sx={{ minHeight: '100vh', background: '#F5E6D3' }}>
                 {/* Header */}
@@ -646,29 +651,29 @@ const AdminDashboardPage = () => {
                     top: 0,
                     zIndex: 1000,
                     backgroundColor: '#FFF8F0',
-                    borderBottom: '1px solid #D4A574',
+                    borderBottom: '1px solid #A0784C',
                     boxShadow: '0 2px 10px rgba(0,0,0,0.05)',
                     px: { xs: 2, sm: 3, md: 4, lg: 6 }
                 }}>
                     <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', py: 1.5, flexWrap: 'wrap', gap: 2 }}>
                         <Box sx={{ display: 'flex', alignItems: 'center', gap: 2 }}>
-                            <Box sx={{ width: '45px', height: '45px', borderRadius: '12px', background: 'linear-gradient(135deg, #FF9800 0%, #FF5722 100%)', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+                            <Box sx={{ width: '45px', height: '45px', borderRadius: '12px', background: 'linear-gradient(135deg, #8B5E3C 0%, #6B3A2A 100%)', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
                                 <AdminIcon sx={{ color: 'white', fontSize: 28 }} />
                             </Box>
                             <Box>
-                                <Typography variant="h6" sx={{ fontWeight: 700, color: '#3D2A1A' }}>Admin Dashboard</Typography>
+                                <Typography variant="h6" sx={{ fontWeight: 700, color: '#4A2A1A' }}>Admin Dashboard</Typography>
                                 <Typography variant="caption" sx={{ color: '#8B6914' }}>Manage museums and events</Typography>
                             </Box>
                         </Box>
-                        <IconButton onClick={handleMenuOpen} sx={{ background: 'linear-gradient(135deg, #FF9800 0%, #FF5722 100%)', width: '45px', height: '45px' }}>
+                        <IconButton onClick={handleMenuOpen} sx={{ background: 'linear-gradient(135deg, #8B5E3C 0%, #6B3A2A 100%)', width: '45px', height: '45px' }}>
                             <Typography sx={{ fontWeight: 600, color: 'white' }}>{userInitial}</Typography>
                         </IconButton>
                     </Box>
                 </Box>
 
                 <Menu anchorEl={anchorEl} open={Boolean(anchorEl)} onClose={handleMenuClose} PaperProps={{ sx: { bgcolor: '#FFF8F0', color: '#3D2A1A', minWidth: '200px', borderRadius: '12px' } }}>
-                    <MenuItem onClick={() => navigate('/profile')}><PersonIcon sx={{ mr: 2, color: '#FF9800' }} /> Profile</MenuItem>
-                    <Divider sx={{ borderColor: '#D4A574' }} />
+                    <MenuItem onClick={() => navigate('/profile')}><PersonIcon sx={{ mr: 2, color: '#8B5E3C' }} /> Profile</MenuItem>
+                    <Divider sx={{ borderColor: '#A0784C' }} />
                     <MenuItem onClick={handleLogout}><LogoutIcon sx={{ mr: 2, color: '#f44336' }} /> Logout</MenuItem>
                 </Menu>
 
@@ -681,10 +686,10 @@ const AdminDashboardPage = () => {
                                 <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
                                     <Box>
                                         <Typography variant="body2" sx={{ color: '#8B6914', mb: 1, fontWeight: 600 }}>Total Museums</Typography>
-                                        <Typography variant="h3" sx={{ fontWeight: 700, color: '#FF9800' }}>{stats.totalMuseums}</Typography>
+                                        <Typography variant="h3" sx={{ fontWeight: 700, color: '#8B5E3C' }}>{stats.totalMuseums}</Typography>
                                     </Box>
-                                    <Avatar sx={{ bgcolor: alpha('#FF9800', 0.15), width: 56, height: 56 }}>
-                                        <MuseumIcon sx={{ fontSize: 32, color: '#FF9800' }} />
+                                    <Avatar sx={{ bgcolor: alpha('#8B5E3C', 0.15), width: 56, height: 56 }}>
+                                        <MuseumIcon sx={{ fontSize: 32, color: '#8B5E3C' }} />
                                     </Avatar>
                                 </Box>
                             </StatCard>
@@ -694,10 +699,10 @@ const AdminDashboardPage = () => {
                                 <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
                                     <Box>
                                         <Typography variant="body2" sx={{ color: '#8B6914', mb: 1, fontWeight: 600 }}>Total Events</Typography>
-                                        <Typography variant="h3" sx={{ fontWeight: 700, color: '#4CAF50' }}>{stats.totalEvents}</Typography>
+                                        <Typography variant="h3" sx={{ fontWeight: 700, color: '#6B8E23' }}>{stats.totalEvents}</Typography>
                                     </Box>
-                                    <Avatar sx={{ bgcolor: alpha('#4CAF50', 0.15), width: 56, height: 56 }}>
-                                        <EventIcon sx={{ fontSize: 32, color: '#4CAF50' }} />
+                                    <Avatar sx={{ bgcolor: alpha('#6B8E23', 0.15), width: 56, height: 56 }}>
+                                        <EventIcon sx={{ fontSize: 32, color: '#6B8E23' }} />
                                     </Avatar>
                                 </Box>
                             </StatCard>
@@ -705,10 +710,10 @@ const AdminDashboardPage = () => {
                     </Grid>
 
                     {/* Tabs */}
-                    <Box sx={{ borderBottom: '1px solid #D4A574', mb: 3 }}>
+                    <Box sx={{ borderBottom: '1px solid #A0784C', mb: 3 }}>
                         <Tabs value={activeTab} onChange={(e, v) => setActiveTab(v)}>
-                            <Tab label={`Events (${stats.totalEvents})`} sx={{ textTransform: 'none', fontWeight: 600, color: '#3D2A1A', '&.Mui-selected': { color: '#FF9800' } }} />
-                            <Tab label={`Museums (${stats.totalMuseums})`} sx={{ textTransform: 'none', fontWeight: 600, color: '#3D2A1A', '&.Mui-selected': { color: '#FF9800' } }} />
+                            <Tab label={`Events (${stats.totalEvents})`} sx={{ textTransform: 'none', fontWeight: 600, color: '#4A2A1A', '&.Mui-selected': { color: '#8B5E3C' } }} />
+                            <Tab label={`Museums (${stats.totalMuseums})`} sx={{ textTransform: 'none', fontWeight: 600, color: '#4A2A1A', '&.Mui-selected': { color: '#8B5E3C' } }} />
                         </Tabs>
                     </Box>
 
@@ -716,16 +721,16 @@ const AdminDashboardPage = () => {
                     {activeTab === 0 && (
                         <Box>
                             <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 3, flexWrap: 'wrap', gap: 2 }}>
-                                <Typography variant="h6" sx={{ fontWeight: 700, color: '#3D2A1A' }}>All Events ({events.length})</Typography>
+                                <Typography variant="h6" sx={{ fontWeight: 700, color: '#4A2A1A' }}>All Events ({events.length})</Typography>
                                 <GradientButton startIcon={<AddIcon />} onClick={handleOpenCreateEventDialog}>Add New Event</GradientButton>
                             </Box>
 
                             {loading ? (
-                                <Box sx={{ display: 'flex', justifyContent: 'center', py: 8 }}><CircularProgress sx={{ color: '#FF9800' }} /></Box>
+                                <Box sx={{ display: 'flex', justifyContent: 'center', py: 8 }}><CircularProgress sx={{ color: '#8B5E3C' }} /></Box>
                             ) : events.length === 0 ? (
                                 <Box sx={{ textAlign: 'center', py: 8 }}>
                                     <Typography sx={{ color: '#8B6914' }}>No events found</Typography>
-                                    <Button onClick={handleOpenCreateEventDialog} sx={{ mt: 2, color: '#FF9800' }}>Create your first event</Button>
+                                    <Button onClick={handleOpenCreateEventDialog} sx={{ mt: 2, color: '#8B5E3C' }}>Create your first event</Button>
                                 </Box>
                             ) : (
                                 <Box>
@@ -738,7 +743,7 @@ const AdminDashboardPage = () => {
                                             <Grow in={true} key={event.id}>
                                                 <Box sx={{
                                                     py: 3,
-                                                    borderBottom: index < events.length - 1 ? '1px solid #D4A574' : 'none',
+                                                    borderBottom: index < events.length - 1 ? '1px solid #A0784C' : 'none',
                                                     backgroundColor: index % 2 === 0 ? 'transparent' : alpha('#FFF8F0', 0.5),
                                                     borderRadius: '16px'
                                                 }}>
@@ -754,7 +759,7 @@ const AdminDashboardPage = () => {
                                                                 alignItems: 'center',
                                                                 justifyContent: 'center',
                                                                 overflow: 'hidden',
-                                                                border: '1px solid #D4A574'
+                                                                border: '1px solid #A0784C'
                                                             }}>
                                                                 {images.length > 0 ? (
                                                                     <>
@@ -773,7 +778,7 @@ const AdminDashboardPage = () => {
                                                                     </>
                                                                 ) : (
                                                                     <Box sx={{ textAlign: 'center' }}>
-                                                                        <ImageIcon sx={{ fontSize: 60, color: alpha('#FF9800', 0.3) }} />
+                                                                        <ImageIcon sx={{ fontSize: 60, color: alpha('#8B5E3C', 0.3) }} />
                                                                         <Typography variant="body2" sx={{ color: '#8B6914', mt: 1 }}>No images</Typography>
                                                                     </Box>
                                                                 )}
@@ -783,8 +788,8 @@ const AdminDashboardPage = () => {
                                                         {/* Event Details */}
                                                         <Grid item xs={12} md={7}>
                                                             <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', mb: 2, flexWrap: 'wrap', gap: 1 }}>
-                                                                <Typography variant="h5" sx={{ fontWeight: 700, color: '#3D2A1A' }}>{event.name}</Typography>
-                                                                <Chip label="Active" size="small" sx={{ bgcolor: alpha('#4CAF50', 0.15), color: '#2E7D32', fontWeight: 600 }} />
+                                                                <Typography variant="h5" sx={{ fontWeight: 700, color: '#4A2A1A' }}>{event.name}</Typography>
+                                                                <Chip label="Active" size="small" sx={{ bgcolor: alpha('#6B8E23', 0.15), color: '#556B2F', fontWeight: 600 }} />
                                                             </Box>
                                                             <Typography variant="body2" sx={{ color: '#5A3A2A', mb: 3, lineHeight: 1.6 }}>{event.description}</Typography>
 
@@ -798,7 +803,7 @@ const AdminDashboardPage = () => {
                                                                             </DetailIcon>
                                                                             <DetailText>
                                                                                 <div className="label">Guide Price</div>
-                                                                                <div className="value" style={{ color: '#FF9800' }}>{event.guidePrice?.toLocaleString()} ֏</div>
+                                                                                <div className="value" style={{ color: '#8B5E3C' }}>{event.guidePrice?.toLocaleString()} ֏</div>
                                                                             </DetailText>
                                                                         </DetailItem>
                                                                     </Grid>
@@ -809,7 +814,7 @@ const AdminDashboardPage = () => {
                                                                             </DetailIcon>
                                                                             <DetailText>
                                                                                 <div className="label">Ticket Price</div>
-                                                                                <div className="value" style={{ color: '#4CAF50' }}>{event.ticketPrice?.toLocaleString()} ֏</div>
+                                                                                <div className="value" style={{ color: '#6B8E23' }}>{event.ticketPrice?.toLocaleString()} ֏</div>
                                                                             </DetailText>
                                                                         </DetailItem>
                                                                     </Grid>
@@ -875,8 +880,8 @@ const AdminDashboardPage = () => {
 
                                                             {/* Contact Information - Single Phone Number */}
                                                             {(event.contactEmail || event.phoneNumber) && (
-                                                                <Box sx={{ mt: 2, p: 2, bgcolor: '#FFF8F0', borderRadius: '12px', border: '1px solid #D4A574' }}>
-                                                                    <Typography variant="subtitle2" sx={{ fontWeight: 700, color: '#3D2A1A', mb: 1.5 }}>📞 Contact Information</Typography>
+                                                                <Box sx={{ mt: 2, p: 2, bgcolor: '#FFF8F0', borderRadius: '12px', border: '1px solid #A0784C' }}>
+                                                                    <Typography variant="subtitle2" sx={{ fontWeight: 700, color: '#4A2A1A', mb: 1.5 }}>📞 Contact Information</Typography>
                                                                     {event.contactEmail && (
                                                                         <DetailItem sx={{ mb: 1 }}>
                                                                             <DetailIcon sx={{ width: '28px', height: '28px' }}>
@@ -901,7 +906,7 @@ const AdminDashboardPage = () => {
                                                             )}
 
                                                             <Box sx={{ display: 'flex', justifyContent: 'flex-end', gap: 1, mt: 2 }}>
-                                                                <IconButton onClick={() => handleOpenEditEventDialog(event)} sx={{ color: '#FF9800', '&:hover': { bgcolor: alpha('#FF9800', 0.1) } }}><EditIcon /></IconButton>
+                                                                <IconButton onClick={() => handleOpenEditEventDialog(event)} sx={{ color: '#8B5E3C', '&:hover': { bgcolor: alpha('#8B5E3C', 0.1) } }}><EditIcon /></IconButton>
                                                                 <IconButton onClick={() => handleDeleteEvent(event.id)} sx={{ color: '#f44336', '&:hover': { bgcolor: alpha('#f44336', 0.1) } }}><DeleteIcon /></IconButton>
                                                             </Box>
                                                         </Grid>
@@ -919,8 +924,8 @@ const AdminDashboardPage = () => {
                                         page={eventsPage + 1}
                                         onChange={(e, p) => setEventsPage(p - 1)}
                                         sx={{
-                                            '& .MuiPaginationItem-root': { color: '#3D2A1A', fontWeight: 500 },
-                                            '& .Mui-selected': { bgcolor: '#FF9800', color: 'white', '&:hover': { bgcolor: '#FF9800' } }
+                                            '& .MuiPaginationItem-root': { color: '#4A2A1A', fontWeight: 500 },
+                                            '& .Mui-selected': { bgcolor: '#8B5E3C', color: 'white', '&:hover': { bgcolor: '#8B5E3C' } }
                                         }}
                                     />
                                 </Box>
@@ -932,15 +937,15 @@ const AdminDashboardPage = () => {
                     {activeTab === 1 && (
                         <Box>
                             <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 3 }}>
-                                <Typography variant="h6" sx={{ fontWeight: 700, color: '#3D2A1A' }}>All Museums ({museums.length})</Typography>
+                                <Typography variant="h6" sx={{ fontWeight: 700, color: '#4A2A1A' }}>All Museums ({museums.length})</Typography>
                                 <GradientButton startIcon={<AddIcon />} onClick={handleOpenCreateMuseumDialog}>Add New Museum</GradientButton>
                             </Box>
                             {loading ? (
-                                <Box sx={{ display: 'flex', justifyContent: 'center', py: 8 }}><CircularProgress sx={{ color: '#FF9800' }} /></Box>
+                                <Box sx={{ display: 'flex', justifyContent: 'center', py: 8 }}><CircularProgress sx={{ color: '#8B5E3C' }} /></Box>
                             ) : museums.length === 0 ? (
                                 <Box sx={{ textAlign: 'center', py: 8 }}>
                                     <Typography sx={{ color: '#8B6914' }}>No museums found</Typography>
-                                    <Button onClick={handleOpenCreateMuseumDialog} sx={{ mt: 2, color: '#FF9800' }}>Create first museum</Button>
+                                    <Button onClick={handleOpenCreateMuseumDialog} sx={{ mt: 2, color: '#8B5E3C' }}>Create first museum</Button>
                                 </Box>
                             ) : (
                                 <Grid container spacing={3}>
@@ -949,24 +954,24 @@ const AdminDashboardPage = () => {
                                             <Card sx={{
                                                 borderRadius: '16px',
                                                 background: '#FFF8F0',
-                                                border: '1px solid #D4A574',
+                                                border: '1px solid #A0784C',
                                                 '&:hover': {
                                                     transform: 'translateY(-4px)',
                                                     transition: '0.3s',
-                                                    boxShadow: '0 8px 25px rgba(255, 152, 0, 0.15)'
+                                                    boxShadow: '0 8px 25px rgba(139, 94, 60, 0.15)'
                                                 }
                                             }}>
                                                 <CardContent>
                                                     <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 2 }}>
-                                                        <Avatar sx={{ bgcolor: alpha('#FF9800', 0.15), width: 48, height: 48 }}>
-                                                            <MuseumIcon sx={{ color: '#FF9800' }} />
+                                                        <Avatar sx={{ bgcolor: alpha('#8B5E3C', 0.15), width: 48, height: 48 }}>
+                                                            <MuseumIcon sx={{ color: '#8B5E3C' }} />
                                                         </Avatar>
                                                         <Box>
-                                                            <IconButton onClick={() => handleOpenEditMuseumDialog(museum)} sx={{ color: '#FF9800' }}><EditIcon /></IconButton>
+                                                            <IconButton onClick={() => handleOpenEditMuseumDialog(museum)} sx={{ color: '#8B5E3C' }}><EditIcon /></IconButton>
                                                             <IconButton onClick={() => handleDeleteMuseum(museum.id)} sx={{ color: '#f44336' }}><DeleteIcon /></IconButton>
                                                         </Box>
                                                     </Box>
-                                                    <Typography variant="h6" sx={{ fontWeight: 700, color: '#3D2A1A', mb: 1 }}>{museum.name}</Typography>
+                                                    <Typography variant="h6" sx={{ fontWeight: 700, color: '#4A2A1A', mb: 1 }}>{museum.name}</Typography>
                                                     <Typography variant="body2" sx={{ color: '#8B6914' }}>ID: {museum.id}</Typography>
                                                 </CardContent>
                                             </Card>
@@ -981,8 +986,8 @@ const AdminDashboardPage = () => {
                                         page={museumsPage + 1}
                                         onChange={(e, p) => setMuseumsPage(p - 1)}
                                         sx={{
-                                            '& .MuiPaginationItem-root': { color: '#3D2A1A', fontWeight: 500 },
-                                            '& .Mui-selected': { bgcolor: '#FF9800', color: 'white', '&:hover': { bgcolor: '#FF9800' } }
+                                            '& .MuiPaginationItem-root': { color: '#4A2A1A', fontWeight: 500 },
+                                            '& .Mui-selected': { bgcolor: '#8B5E3C', color: 'white', '&:hover': { bgcolor: '#8B5E3C' } }
                                         }}
                                     />
                                 </Box>
@@ -993,10 +998,10 @@ const AdminDashboardPage = () => {
 
                 {/* Event Dialog */}
                 <Dialog open={eventDialogOpen} onClose={handleCloseEventDialog} maxWidth="md" fullWidth PaperProps={{ sx: { borderRadius: '20px', backgroundColor: '#FFF8F0' } }}>
-                    <DialogTitle sx={{ borderBottom: '1px solid #D4A574' }}>
+                    <DialogTitle sx={{ borderBottom: '1px solid #A0784C' }}>
                         <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
-                            {editingEvent ? <EditIcon sx={{ color: '#FF9800' }} /> : <AddIcon sx={{ color: '#FF9800' }} />}
-                            <Typography variant="h5" sx={{ fontWeight: 700, color: '#3D2A1A' }}>{editingEvent ? 'Edit Event' : 'Create Event'}</Typography>
+                            {editingEvent ? <EditIcon sx={{ color: '#8B5E3C' }} /> : <AddIcon sx={{ color: '#8B5E3C' }} />}
+                            <Typography variant="h5" sx={{ fontWeight: 700, color: '#4A2A1A' }}>{editingEvent ? 'Edit Event' : 'Create Event'}</Typography>
                         </Box>
                         <IconButton onClick={handleCloseEventDialog} sx={{ position: 'absolute', right: 16, top: 16, color: '#8B6914' }}><CloseIcon /></IconButton>
                     </DialogTitle>
@@ -1048,10 +1053,10 @@ const AdminDashboardPage = () => {
 
                             <Grid container spacing={2}>
                                 <Grid item xs={12} sm={6}>
-                                    <FlatTextField fullWidth type="number" label="Guide Price (AMD)" name="guidePrice" value={eventFormData.guidePrice} onChange={handleEventInputChange} required InputProps={{ startAdornment: <InputAdornment position="start" sx={{ color: '#FF9800' }}>֏</InputAdornment> }} />
+                                    <FlatTextField fullWidth type="number" label="Guide Price (AMD)" name="guidePrice" value={eventFormData.guidePrice} onChange={handleEventInputChange} required InputProps={{ startAdornment: <InputAdornment position="start" sx={{ color: '#8B5E3C' }}>֏</InputAdornment> }} />
                                 </Grid>
                                 <Grid item xs={12} sm={6}>
-                                    <FlatTextField fullWidth type="number" label="Ticket Price (AMD)" name="ticketPrice" value={eventFormData.ticketPrice} onChange={handleEventInputChange} required InputProps={{ startAdornment: <InputAdornment position="start" sx={{ color: '#4CAF50' }}>֏</InputAdornment> }} />
+                                    <FlatTextField fullWidth type="number" label="Ticket Price (AMD)" name="ticketPrice" value={eventFormData.ticketPrice} onChange={handleEventInputChange} required InputProps={{ startAdornment: <InputAdornment position="start" sx={{ color: '#6B8E23' }}>֏</InputAdornment> }} />
                                 </Grid>
                             </Grid>
 
@@ -1081,7 +1086,7 @@ const AdminDashboardPage = () => {
 
                             {/* Contact Information - Single Phone Number */}
                             <Box>
-                                <Typography variant="subtitle1" sx={{ fontWeight: 700, color: '#3D2A1A', mb: 2 }}>Contact Information</Typography>
+                                <Typography variant="subtitle1" sx={{ fontWeight: 700, color: '#4A2A1A', mb: 2 }}>Contact Information</Typography>
                                 <FlatTextField
                                     fullWidth
                                     type="email"
@@ -1102,7 +1107,7 @@ const AdminDashboardPage = () => {
 
                             {/* Images Section */}
                             <Box>
-                                <Typography variant="subtitle1" sx={{ fontWeight: 700, color: '#3D2A1A', mb: 2 }}>Images</Typography>
+                                <Typography variant="subtitle1" sx={{ fontWeight: 700, color: '#4A2A1A', mb: 2 }}>Images</Typography>
                                 <OutlinedButton component="label" startIcon={<UploadIcon />} fullWidth sx={{ py: 1.5, backgroundColor: '#FFF8F0' }}>
                                     Choose Images
                                     <input type="file" multiple accept="image/*" onChange={handleImageSelect} hidden />
@@ -1142,7 +1147,7 @@ const AdminDashboardPage = () => {
                             </Box>
                         </Box>
                     </DialogContent>
-                    <DialogActions sx={{ p: 3, borderTop: '1px solid #D4A574' }}>
+                    <DialogActions sx={{ p: 3, borderTop: '1px solid #A0784C' }}>
                         <OutlinedButton onClick={handleCloseEventDialog}>Cancel</OutlinedButton>
                         <GradientButton onClick={handleSubmitEvent} disabled={loading}>
                             {loading ? <CircularProgress size={24} /> : (editingEvent ? 'Update' : 'Create')}
@@ -1152,17 +1157,17 @@ const AdminDashboardPage = () => {
 
                 {/* Museum Dialog */}
                 <Dialog open={museumDialogOpen} onClose={handleCloseMuseumDialog} maxWidth="sm" fullWidth PaperProps={{ sx: { borderRadius: '20px', backgroundColor: '#FFF8F0' } }}>
-                    <DialogTitle sx={{ borderBottom: '1px solid #D4A574' }}>
+                    <DialogTitle sx={{ borderBottom: '1px solid #A0784C' }}>
                         <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
-                            {editingMuseum ? <EditIcon sx={{ color: '#FF9800' }} /> : <AddIcon sx={{ color: '#FF9800' }} />}
-                            <Typography variant="h5" sx={{ fontWeight: 700, color: '#3D2A1A' }}>{editingMuseum ? 'Edit Museum' : 'Create Museum'}</Typography>
+                            {editingMuseum ? <EditIcon sx={{ color: '#8B5E3C' }} /> : <AddIcon sx={{ color: '#8B5E3C' }} />}
+                            <Typography variant="h5" sx={{ fontWeight: 700, color: '#4A2A1A' }}>{editingMuseum ? 'Edit Museum' : 'Create Museum'}</Typography>
                         </Box>
                         <IconButton onClick={handleCloseMuseumDialog} sx={{ position: 'absolute', right: 16, top: 16, color: '#8B6914' }}><CloseIcon /></IconButton>
                     </DialogTitle>
                     <DialogContent sx={{ p: 3 }}>
                         <FlatTextField fullWidth label="Museum Name" name="name" value={museumFormData.name} onChange={handleMuseumInputChange} required sx={{ mt: 1 }} />
                     </DialogContent>
-                    <DialogActions sx={{ p: 3, borderTop: '1px solid #D4A574' }}>
+                    <DialogActions sx={{ p: 3, borderTop: '1px solid #A0784C' }}>
                         <OutlinedButton onClick={handleCloseMuseumDialog}>Cancel</OutlinedButton>
                         <GradientButton onClick={handleSubmitMuseum} disabled={loading}>
                             {loading ? <CircularProgress size={24} /> : (editingMuseum ? 'Update' : 'Create')}
@@ -1171,7 +1176,7 @@ const AdminDashboardPage = () => {
                 </Dialog>
 
                 <Snackbar open={snackbar.open} autoHideDuration={4000} onClose={() => setSnackbar({ ...snackbar, open: false })} anchorOrigin={{ vertical: 'bottom', horizontal: 'center' }}>
-                    <Alert severity={snackbar.severity} sx={{ backgroundColor: '#FFF8F0', color: '#3D2A1A' }}>{snackbar.message}</Alert>
+                    <Alert severity={snackbar.severity} sx={{ backgroundColor: '#FFF8F0', color: '#4A2A1A' }}>{snackbar.message}</Alert>
                 </Snackbar>
             </Box>
         </LocalizationProvider>

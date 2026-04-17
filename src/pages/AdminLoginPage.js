@@ -1,3 +1,5 @@
+// src/pages/AdminLoginPage.js
+
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import {
@@ -44,7 +46,7 @@ const AdminLoginPage = () => {
             ...prev,
             [name]: value
         }));
-        setError(''); // Clear error when user starts typing
+        setError('');
     };
 
     const validateForm = () => {
@@ -62,7 +64,6 @@ const AdminLoginPage = () => {
     const handleSubmit = async (e) => {
         e.preventDefault();
 
-        // Clear previous error
         setError('');
 
         if (!validateForm()) {
@@ -75,23 +76,18 @@ const AdminLoginPage = () => {
             const result = await login(formData.email, formData.password);
 
             if (result.success) {
-                // Check if user has admin role
                 const token = localStorage.getItem('token');
                 if (token) {
                     try {
-                        // Decode token to check role
                         const payload = JSON.parse(atob(token.split('.')[1]));
                         const roles = payload.roles || [];
 
                         if (roles.includes('ADMIN')) {
-                            // Success - redirect to admin dashboard
                             navigate('/admin/dashboard');
                         } else {
-                            // Not an admin - show error and clear token
                             setError('Access denied. Admin privileges required.');
                             localStorage.removeItem('token');
                             localStorage.removeItem('user');
-                            // Clear password field but keep email
                             setFormData(prev => ({ ...prev, password: '' }));
                         }
                     } catch (decodeError) {
@@ -106,9 +102,7 @@ const AdminLoginPage = () => {
                     setFormData(prev => ({ ...prev, password: '' }));
                 }
             } else {
-                // Login failed - show error message
                 setError(result.message || 'Invalid email or password');
-                // Clear only password field, keep email for convenience
                 setFormData(prev => ({ ...prev, password: '' }));
             }
         } catch (err) {
@@ -123,14 +117,13 @@ const AdminLoginPage = () => {
     return (
         <Box sx={{
             minHeight: '100vh',
-            background: 'linear-gradient(135deg, #0A0A0A 0%, #1A1A1A 100%)',
+            background: 'linear-gradient(135deg, #5C3A1E 0%, #3D2514 100%)',
             display: 'flex',
             alignItems: 'center',
             justifyContent: 'center',
             position: 'relative',
             overflow: 'hidden'
         }}>
-            {/* Animated Background */}
             <Box sx={{
                 position: 'absolute',
                 top: 0,
@@ -138,9 +131,9 @@ const AdminLoginPage = () => {
                 width: '100%',
                 height: '100%',
                 background: `
-                    radial-gradient(circle at 20% 50%, rgba(255, 152, 0, 0.15) 0%, transparent 50%),
-                    radial-gradient(circle at 80% 80%, rgba(76, 175, 80, 0.1) 0%, transparent 50%),
-                    #0A0A0A
+                    radial-gradient(circle at 20% 50%, rgba(139, 94, 60, 0.25) 0%, transparent 50%),
+                    radial-gradient(circle at 80% 80%, rgba(107, 58, 42, 0.2) 0%, transparent 50%),
+                    #3D2514
                 `
             }} />
 
@@ -159,21 +152,20 @@ const AdminLoginPage = () => {
             <Container maxWidth="sm" sx={{ position: 'relative', zIndex: 1 }}>
                 <Fade in={true} timeout={500}>
                     <Paper elevation={0} sx={{
-                        background: alpha('#121212', 0.95),
+                        background: alpha('#2A1A0E', 0.95),
                         backdropFilter: 'blur(10px)',
                         borderRadius: '24px',
-                        border: error ? `1px solid ${alpha('#f44336', 0.5)}` : `1px solid ${alpha('#FF9800', 0.3)}`,
+                        border: error ? `1px solid ${alpha('#f44336', 0.5)}` : `1px solid ${alpha('#8B5E3C', 0.5)}`,
                         padding: { xs: '30px 20px', sm: '40px 40px' },
                         boxShadow: `0 20px 60px ${alpha('#000000', 0.5)}`,
                         transition: 'border 0.3s ease'
                     }}>
-                        {/* Admin Icon */}
                         <Box sx={{ textAlign: 'center', mb: 3 }}>
                             <Box sx={{
                                 width: '80px',
                                 height: '80px',
                                 borderRadius: '20px',
-                                background: 'linear-gradient(135deg, #FF9800 0%, #FF5722 100%)',
+                                background: 'linear-gradient(135deg, #8B5E3C 0%, #6B3A2A 100%)',
                                 display: 'flex',
                                 alignItems: 'center',
                                 justifyContent: 'center',
@@ -185,7 +177,7 @@ const AdminLoginPage = () => {
                             <Typography variant="h4" sx={{
                                 mt: 2,
                                 fontWeight: 700,
-                                background: 'linear-gradient(135deg, #FF9800, #FF5722)',
+                                background: 'linear-gradient(135deg, #D4A574, #8B5E3C)',
                                 WebkitBackgroundClip: 'text',
                                 WebkitTextFillColor: 'transparent'
                             }}>
@@ -196,7 +188,6 @@ const AdminLoginPage = () => {
                             </Typography>
                         </Box>
 
-                        {/* Security Badge */}
                         <Box sx={{
                             display: 'flex',
                             alignItems: 'center',
@@ -204,18 +195,17 @@ const AdminLoginPage = () => {
                             gap: 1,
                             mb: 4,
                             p: 1,
-                            bgcolor: alpha('#FF9800', 0.1),
+                            bgcolor: alpha('#8B5E3C', 0.15),
                             borderRadius: '30px',
                             width: 'fit-content',
                             mx: 'auto'
                         }}>
-                            <SecurityIcon sx={{ fontSize: 16, color: '#FF9800' }} />
-                            <Typography variant="caption" sx={{ color: '#FF9800' }}>
+                            <SecurityIcon sx={{ fontSize: 16, color: '#D4A574' }} />
+                            <Typography variant="caption" sx={{ color: '#D4A574' }}>
                                 Restricted Access
                             </Typography>
                         </Box>
 
-                        {/* Error Alert - Shows but doesn't close the page */}
                         {error && (
                             <Fade in={!!error}>
                                 <Alert
@@ -235,7 +225,6 @@ const AdminLoginPage = () => {
                             </Fade>
                         )}
 
-                        {/* Login Form */}
                         <Box component="form" onSubmit={handleSubmit}>
                             <TextField
                                 fullWidth
@@ -251,21 +240,21 @@ const AdminLoginPage = () => {
                                 sx={{
                                     mb: 3,
                                     '& .MuiOutlinedInput-root': {
-                                        background: alpha('#1A1A1A', 0.8),
+                                        background: alpha('#1A0F08', 0.8),
                                         color: '#FFFFFF',
                                         borderRadius: '12px',
                                         '&:hover .MuiOutlinedInput-notchedOutline': {
-                                            borderColor: error ? '#f44336' : '#FF9800',
+                                            borderColor: error ? '#f44336' : '#8B5E3C',
                                         },
                                         '&.Mui-focused .MuiOutlinedInput-notchedOutline': {
-                                            borderColor: error ? '#f44336' : '#FF9800',
+                                            borderColor: error ? '#f44336' : '#D4A574',
                                             borderWidth: '2px'
                                         }
                                     },
                                     '& .MuiInputLabel-root': {
                                         color: error ? '#f44336' : alpha('#FFFFFF', 0.7),
                                         '&.Mui-focused': {
-                                            color: error ? '#f44336' : '#FF9800'
+                                            color: error ? '#f44336' : '#D4A574'
                                         }
                                     }
                                 }}
@@ -294,21 +283,21 @@ const AdminLoginPage = () => {
                                 sx={{
                                     mb: 3,
                                     '& .MuiOutlinedInput-root': {
-                                        background: alpha('#1A1A1A', 0.8),
+                                        background: alpha('#1A0F08', 0.8),
                                         color: '#FFFFFF',
                                         borderRadius: '12px',
                                         '&:hover .MuiOutlinedInput-notchedOutline': {
-                                            borderColor: error ? '#f44336' : '#FF9800',
+                                            borderColor: error ? '#f44336' : '#8B5E3C',
                                         },
                                         '&.Mui-focused .MuiOutlinedInput-notchedOutline': {
-                                            borderColor: error ? '#f44336' : '#FF9800',
+                                            borderColor: error ? '#f44336' : '#D4A574',
                                             borderWidth: '2px'
                                         }
                                     },
                                     '& .MuiInputLabel-root': {
                                         color: error ? '#f44336' : alpha('#FFFFFF', 0.7),
                                         '&.Mui-focused': {
-                                            color: error ? '#f44336' : '#FF9800'
+                                            color: error ? '#f44336' : '#D4A574'
                                         }
                                     }
                                 }}
@@ -323,7 +312,7 @@ const AdminLoginPage = () => {
                                     py: 1.5,
                                     background: error
                                         ? 'linear-gradient(135deg, #f44336 0%, #d32f2f 100%)'
-                                        : 'linear-gradient(135deg, #FF9800 0%, #FF5722 100%)',
+                                        : 'linear-gradient(135deg, #8B5E3C 0%, #6B3A2A 100%)',
                                     borderRadius: '12px',
                                     fontSize: '16px',
                                     fontWeight: 600,
@@ -333,44 +322,12 @@ const AdminLoginPage = () => {
                                         transform: 'translateY(-2px)',
                                         boxShadow: error
                                             ? '0 8px 25px rgba(244, 67, 54, 0.4)'
-                                            : '0 8px 25px rgba(255, 152, 0, 0.4)'
+                                            : '0 8px 25px rgba(139, 94, 60, 0.4)'
                                     }
                                 }}
                             >
                                 {loading ? <CircularProgress size={24} sx={{ color: '#FFFFFF' }} /> : 'Login as Admin'}
                             </Button>
-
-                            {/* Back to Home */}
-                            <Button
-                                fullWidth
-                                variant="text"
-                                onClick={() => navigate('/')}
-                                sx={{
-                                    mt: 2,
-                                    color: alpha('#FFFFFF', 0.6),
-                                    textTransform: 'none',
-                                    '&:hover': {
-                                        color: '#FFFFFF',
-                                        background: alpha('#FFFFFF', 0.1)
-                                    }
-                                }}
-                            >
-                                ← Back to Home
-                            </Button>
-                        </Box>
-
-                        {/* Help Text */}
-                        <Box sx={{ mt: 3, textAlign: 'center' }}>
-                            <Typography variant="caption" sx={{ color: alpha('#FFFFFF', 0.3) }}>
-                                Contact system administrator if you have issues logging in
-                            </Typography>
-                        </Box>
-
-                        {/* Footer */}
-                        <Box sx={{ mt: 3, textAlign: 'center' }}>
-                            <Typography variant="caption" sx={{ color: alpha('#FFFFFF', 0.2) }}>
-                                This area is restricted to authorized personnel only
-                            </Typography>
                         </Box>
                     </Paper>
                 </Fade>

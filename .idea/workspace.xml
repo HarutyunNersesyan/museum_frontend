@@ -5,10 +5,7 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="52f9de53-701b-4b52-b101-40303d7b40ec" name="Changes" comment="">
-      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/App.js" beforeDir="false" afterPath="$PROJECT_DIR$/src/App.js" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/pages/EventsPage.js" beforeDir="false" afterPath="$PROJECT_DIR$/src/pages/EventsPage.js" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/pages/ProfilePage.js" beforeDir="false" afterPath="$PROJECT_DIR$/src/pages/ProfilePage.js" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/pages/AdminLoginPage.js" beforeDir="false" afterPath="$PROJECT_DIR$/src/pages/AdminLoginPage.js" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -176,14 +173,7 @@
       <workItem from="1776261153149" duration="19681000" />
       <workItem from="1776285995951" duration="2177000" />
       <workItem from="1776335731965" duration="5509000" />
-      <workItem from="1776434229756" duration="4068000" />
-    </task>
-    <task id="LOCAL-00020" summary="Created EncodePage.js for encoding texts.">
-      <created>1768035959511</created>
-      <option name="number" value="00020" />
-      <option name="presentableId" value="LOCAL-00020" />
-      <option name="project" value="LOCAL" />
-      <updated>1768035959511</updated>
+      <workItem from="1776434229756" duration="4659000" />
     </task>
     <task id="LOCAL-00021" summary="Created EncodePage.js for encoding texts.">
       <created>1768332250639</created>
@@ -521,7 +511,14 @@
       <option name="project" value="LOCAL" />
       <updated>1776341718041</updated>
     </task>
-    <option name="localTasksCounter" value="69" />
+    <task id="LOCAL-00069" summary="Bugs fix.">
+      <created>1776438400133</created>
+      <option name="number" value="00069" />
+      <option name="presentableId" value="LOCAL-00069" />
+      <option name="project" value="LOCAL" />
+      <updated>1776438400134</updated>
+    </task>
+    <option name="localTasksCounter" value="70" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
