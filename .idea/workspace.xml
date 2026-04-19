@@ -4,9 +4,7 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="52f9de53-701b-4b52-b101-40303d7b40ec" name="Changes" comment="">
-      <change beforePath="$PROJECT_DIR$/src/pages/EventsPage.js" beforeDir="false" afterPath="$PROJECT_DIR$/src/pages/EventsPage.js" afterDir="false" />
-    </list>
+    <list default="true" id="52f9de53-701b-4b52-b101-40303d7b40ec" name="Changes" comment="" />
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
     <option name="HIGHLIGHT_NON_ACTIVE_CHANGELIST" value="false" />
@@ -175,14 +173,7 @@
       <workItem from="1776335731965" duration="5509000" />
       <workItem from="1776434229756" duration="8374000" />
       <workItem from="1776443685480" duration="22000" />
-      <workItem from="1776605687450" duration="6369000" />
-    </task>
-    <task id="LOCAL-00029" summary="Bugs fixe.">
-      <created>1775399940698</created>
-      <option name="number" value="00029" />
-      <option name="presentableId" value="LOCAL-00029" />
-      <option name="project" value="LOCAL" />
-      <updated>1775399940698</updated>
+      <workItem from="1776605687450" duration="6772000" />
     </task>
     <task id="LOCAL-00030" summary="Bugs fixe.">
       <created>1775404809863</created>
@@ -520,7 +511,14 @@
       <option name="project" value="LOCAL" />
       <updated>1776611686921</updated>
     </task>
-    <option name="localTasksCounter" value="78" />
+    <task id="LOCAL-00078" summary="Bugs fix.">
+      <created>1776612318686</created>
+      <option name="number" value="00078" />
+      <option name="presentableId" value="LOCAL-00078" />
+      <option name="project" value="LOCAL" />
+      <updated>1776612318686</updated>
+    </task>
+    <option name="localTasksCounter" value="79" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
