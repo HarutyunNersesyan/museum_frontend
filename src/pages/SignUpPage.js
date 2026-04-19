@@ -104,48 +104,48 @@ const SignUpPage = ({ isModal = false, onClose, onSwitchToLogin, onSuccess }) =>
 
     const validateForm = () => {
         if (!formData.userName.trim()) {
-            setError('Username is required');
+            setError('Օգտանունը պարտադիր է');
             return false;
         }
         if (formData.userName.length < 3) {
-            setError('Username must be at least 3 characters');
+            setError('Օգտանունը պետք է պարունակի առնվազն 3 նիշ');
             return false;
         }
         if (formData.userName.length > 20) {
-            setError('Username must be less than 20 characters');
+            setError('Օգտանունը պետք է լինի 20 նիշից պակաս');
             return false;
         }
         if (!formData.email) {
-            setError('Email is required');
+            setError('Էլ.փոստը պարտադիր է');
             return false;
         }
         const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
         if (!emailRegex.test(formData.email)) {
-            setError('Please enter a valid email address');
+            setError('Խնդրում ենք մուտքագրել վավեր էլ.փոստի հասցե');
             return false;
         }
         if (!formData.email.endsWith('@gmail.com')) {
-            setError('Please use a Gmail address (example@gmail.com)');
+            setError('Խնդրում ենք օգտագործել Gmail հասցե (օրինակ@gmail.com)');
             return false;
         }
         if (!formData.password) {
-            setError('Password is required');
+            setError('Գաղտնաբառը պարտադիր է');
             return false;
         }
         if (formData.password.length < 6) {
-            setError('Password must be at least 6 characters');
+            setError('Գաղտնաբառը պետք է պարունակի առնվազն 6 նիշ');
             return false;
         }
         if (!formData.repeatPassword) {
-            setError('Please confirm your password');
+            setError('Խնդրում ենք հաստատել ձեր գաղտնաբառը');
             return false;
         }
         if (formData.password !== formData.repeatPassword) {
-            setError('Passwords do not match');
+            setError('Գաղտնաբառերը չեն համընկնում');
             return false;
         }
         if (!acceptTerms) {
-            setError('Please accept the terms and conditions');
+            setError('Խնդրում ենք ընդունել կանոնները և պայմանները');
             return false;
         }
         return true;
@@ -161,7 +161,7 @@ const SignUpPage = ({ isModal = false, onClose, onSwitchToLogin, onSuccess }) =>
         try {
             const result = await signup(formData);
             if (result.success) {
-                setSuccess('Account created! Please check your email for verification code.');
+                setSuccess('Հաշիվը ստեղծված է: Խնդրում ենք ստուգել ձեր էլ.փոստը հաստատման կոդի համար:');
                 if (onSuccess) {
                     onSuccess(formData.email);
                 } else if (isModal && onClose) {
@@ -177,18 +177,18 @@ const SignUpPage = ({ isModal = false, onClose, onSwitchToLogin, onSuccess }) =>
                     });
                 }
             } else {
-                setError(result.message || 'Something went wrong. Please try again.');
+                setError(result.message || 'Ինչ-որ բան այն չէ: Խնդրում ենք կրկին փորձել:');
             }
         } catch (err) {
-            console.error('Submit error:', err);
+            console.error('Ուղարկման սխալ:', err);
             if (err.response && err.response.status === 409) {
-                setError('Please use English letters only');
+                setError('Խնդրում ենք օգտագործել միայն անգլերեն տառեր');
             } else if (err.message && err.message.includes('409')) {
-                setError('Please use English letters only');
+                setError('Խնդրում ենք օգտագործել միայն անգլերեն տառեր');
             } else if (err.status === 409) {
-                setError('Please use English letters only');
+                setError('Խնդրում ենք օգտագործել միայն անգլերեն տառեր');
             } else {
-                setError('Something went wrong. Please try again.');
+                setError('Ինչ-որ բան այն չէ: Խնդրում ենք կրկին փորձել:');
             }
         } finally {
             setLoading(false);
@@ -234,7 +234,7 @@ const SignUpPage = ({ isModal = false, onClose, onSwitchToLogin, onSuccess }) =>
                     overflow: 'hidden',
                     position: 'relative'
                 }}>
-                    {/* Close Button - Only show in modal mode */}
+                    {/* Փակման կոճակ - Ցուցադրվում է միայն մոդալ ռեժիմում */}
                     {isModal && onClose && (
                         <IconButton
                             onClick={onClose}
@@ -283,7 +283,7 @@ const SignUpPage = ({ isModal = false, onClose, onSwitchToLogin, onSuccess }) =>
                                 WebkitTextFillColor: 'transparent',
                                 letterSpacing: '-0.5px'
                             }}>
-                                Museum
+                                Թանգարան
                             </Typography>
                         </Box>
                         <Typography variant="h4" sx={{
@@ -292,7 +292,7 @@ const SignUpPage = ({ isModal = false, onClose, onSwitchToLogin, onSuccess }) =>
                             color: '#3E2723',
                             mb: 1
                         }}>
-                            Create Account
+                            Ստեղծել Հաշիվ
                         </Typography>
                         <Box sx={{
                             width: 50,
@@ -343,8 +343,8 @@ const SignUpPage = ({ isModal = false, onClose, onSwitchToLogin, onSuccess }) =>
                             name="userName"
                             value={formData.userName}
                             onChange={handleInputChange}
-                            placeholder="Enter your username (3-20 characters)"
-                            label="Username"
+                            placeholder="Մուտքագրեք ձեր օգտանունը (3-20 նիշ)"
+                            label="Օգտանուն"
                             variant="outlined"
                             sx={{
                                 mb: 2.5,
@@ -379,8 +379,8 @@ const SignUpPage = ({ isModal = false, onClose, onSwitchToLogin, onSuccess }) =>
                             name="email"
                             value={formData.email}
                             onChange={handleInputChange}
-                            placeholder="example@gmail.com"
-                            label="Email"
+                            placeholder="օրինակ@gmail.com"
+                            label="Էլ.փոստ"
                             variant="outlined"
                             sx={{
                                 mb: 2.5,
@@ -415,8 +415,8 @@ const SignUpPage = ({ isModal = false, onClose, onSwitchToLogin, onSuccess }) =>
                             name="password"
                             value={formData.password}
                             onChange={handleInputChange}
-                            placeholder="Minimum 6 characters"
-                            label="Password"
+                            placeholder="Առնվազն 6 նիշ"
+                            label="Գաղտնաբառ"
                             variant="outlined"
                             sx={{
                                 mb: 2.5,
@@ -463,7 +463,7 @@ const SignUpPage = ({ isModal = false, onClose, onSwitchToLogin, onSuccess }) =>
                             mb: 2,
                             ml: 1
                         }}>
-                            Password must be at least 6 characters long
+                            Գաղտնաբառը պետք է պարունակի առնվազն 6 նիշ
                         </Typography>
 
                         <TextField
@@ -472,8 +472,8 @@ const SignUpPage = ({ isModal = false, onClose, onSwitchToLogin, onSuccess }) =>
                             name="repeatPassword"
                             value={formData.repeatPassword}
                             onChange={handleInputChange}
-                            placeholder="Confirm your password"
-                            label="Confirm Password"
+                            placeholder="Հաստատեք ձեր գաղտնաբառը"
+                            label="Հաստատել Գաղտնաբառը"
                             variant="outlined"
                             sx={{
                                 mb: 2.5,
@@ -530,7 +530,7 @@ const SignUpPage = ({ isModal = false, onClose, onSwitchToLogin, onSuccess }) =>
                             }
                             label={
                                 <Typography sx={{ color: '#6B4C3A', fontSize: '12px', fontWeight: 500 }}>
-                                    I agree to the{' '}
+                                    Ես համաձայն եմ{' '}
                                     <Button
                                         component="span"
                                         sx={{
@@ -544,9 +544,9 @@ const SignUpPage = ({ isModal = false, onClose, onSwitchToLogin, onSuccess }) =>
                                             '&:hover': { bgcolor: 'transparent', textDecoration: 'underline' }
                                         }}
                                     >
-                                        Terms of Service
+                                        Ծառայության Կանոններին
                                     </Button>{' '}
-                                    and{' '}
+                                    և{' '}
                                     <Button
                                         component="span"
                                         sx={{
@@ -560,7 +560,7 @@ const SignUpPage = ({ isModal = false, onClose, onSwitchToLogin, onSuccess }) =>
                                             '&:hover': { bgcolor: 'transparent', textDecoration: 'underline' }
                                         }}
                                     >
-                                        Privacy Policy
+                                        Գաղտնիության Քաղաքականությանը
                                     </Button>
                                 </Typography>
                             }
@@ -587,7 +587,7 @@ const SignUpPage = ({ isModal = false, onClose, onSwitchToLogin, onSuccess }) =>
                                 transition: 'all 0.3s'
                             }}
                         >
-                            {loading ? <CircularProgress size={24} sx={{ color: 'white' }} /> : 'Create Account'}
+                            {loading ? <CircularProgress size={24} sx={{ color: 'white' }} /> : 'Ստեղծել Հաշիվ'}
                         </Button>
 
                         <Box sx={{
@@ -597,7 +597,7 @@ const SignUpPage = ({ isModal = false, onClose, onSwitchToLogin, onSuccess }) =>
                             borderTop: '1px solid rgba(0,0,0,0.06)'
                         }}>
                             <Typography sx={{ color: '#6B4C3A', fontSize: '14px' }}>
-                                Already have an account?{' '}
+                                Արդեն հաշիվ ունե՞ք:{' '}
                                 <Button
                                     onClick={handleSignInClick}
                                     sx={{
@@ -608,7 +608,7 @@ const SignUpPage = ({ isModal = false, onClose, onSwitchToLogin, onSuccess }) =>
                                         '&:hover': { bgcolor: alpha('#A0522D', 0.05) }
                                     }}
                                 >
-                                    Sign In
+                                    Մուտք գործել
                                 </Button>
                             </Typography>
                         </Box>

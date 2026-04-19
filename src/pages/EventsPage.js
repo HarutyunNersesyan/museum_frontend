@@ -65,7 +65,7 @@ import { useAuth } from '../context/AuthContext';
 import eventAPI from '../services/eventAPI';
 import { alpha, styled } from '@mui/material/styles';
 
-// Warm brown color palette
+// Ջերմ շագանակագույն գունային համակարգ
 const colors = {
     primary: '#C4A484',
     primaryDark: '#A0522D',
@@ -134,73 +134,73 @@ const DetailText = styled(Box)(({ theme }) => ({
     }
 }));
 
-// Event Categories
+// Միջոցառումների կատեգորիաներ
 const EVENT_CATEGORIES = [
-    { value: 'ART', label: '🎨 Art' },
-    { value: 'HISTORY', label: '📜 History' },
-    { value: 'SCIENCE', label: '🔬 Science' },
-    { value: 'NATURAL_HISTORY', label: '🌿 Natural History' },
-    { value: 'TECHNOLOGY', label: '💻 Technology' },
-    { value: 'MILITARY', label: '⚔️ Military' },
-    { value: 'ARCHAEOLOGY', label: '🏺 Archaeology' },
-    { value: 'CULTURAL', label: '🎭 Cultural' },
-    { value: 'MARITIME', label: '⚓ Maritime' },
-    { value: 'SPACE', label: '🚀 Space' },
-    { value: 'TRANSPORT', label: '🚗 Transport' },
-    { value: 'RELIGIOUS', label: '⛪ Religious' },
-    { value: 'ETHNOGRAPHIC', label: '👥 Ethnographic' },
-    { value: 'OPEN_AIR', label: '🌳 Open Air' }
+    { value: 'ART', label: '🎨 Արվեստ' },
+    { value: 'HISTORY', label: '📜 Պատմություն' },
+    { value: 'SCIENCE', label: '🔬 Գիտություն' },
+    { value: 'NATURAL_HISTORY', label: '🌿 Բնական Պատմություն' },
+    { value: 'TECHNOLOGY', label: '💻 Տեխնոլոգիա' },
+    { value: 'MILITARY', label: '⚔️ Ռազմական' },
+    { value: 'ARCHAEOLOGY', label: '🏺 Հնագիտություն' },
+    { value: 'CULTURAL', label: '🎭 Մշակութային' },
+    { value: 'MARITIME', label: '⚓ Ծովային' },
+    { value: 'SPACE', label: '🚀 Տիեզերք' },
+    { value: 'TRANSPORT', label: '🚗 Տրանսպորտ' },
+    { value: 'RELIGIOUS', label: '⛪ Կրոնական' },
+    { value: 'ETHNOGRAPHIC', label: '👥 Ազգագրական' },
+    { value: 'OPEN_AIR', label: '🌳 Բաց Երկնքի Տակ' }
 ];
 
-// Armenian Museums List
+// Հայկական թանգարանների ցանկ
 const ARMENIAN_MUSEUMS = [
-    { value: 'History Museum of Armenia', label: '🏛️ History Museum of Armenia' },
-    { value: 'Matenadaran', label: '📜 Matenadaran' },
-    { value: 'Cafesjian Center for the Arts', label: '🎨 Cafesjian Center for the Arts' },
-    { value: 'Erebuni Fortress & Museum', label: '🏺 Erebuni Fortress & Museum' },
-    { value: 'Armenian Genocide Museum', label: '🕯️ Armenian Genocide Museum' },
-    { value: 'Dilijan Local Lore Museum', label: '🌲 Dilijan Local Lore Museum' },
-    { value: 'Megerian Carpet Museum', label: '🪢 Megerian Carpet Museum' },
-    { value: 'Sergey Parajanov Museum', label: '🎬 Sergey Parajanov Museum' },
-    { value: 'Khor Virap Museum', label: '⛪ Khor Virap Museum' },
-    { value: 'Gyumri Museum of Architecture', label: '🏛️ Gyumri Museum of Architecture' }
+    { value: 'History Museum of Armenia', label: '🏛️ Հայաստանի Պատմության Թանգարան' },
+    { value: 'Matenadaran', label: '📜 Մատենադարան' },
+    { value: 'Cafesjian Center for the Arts', label: '🎨 Գաֆեսճյան Արվեստի Կենտրոն' },
+    { value: 'Erebuni Fortress & Museum', label: '🏺 Էրեբունի Ամրոց և Թանգարան' },
+    { value: 'Armenian Genocide Museum', label: '🕯️ Հայոց Ցեղասպանության Թանգարան' },
+    { value: 'Dilijan Local Lore Museum', label: '🌲 Դիլիջանի Երկրագիտական Թանգարան' },
+    { value: 'Megerian Carpet Museum', label: '🪢 Մեգերյան Կարպետի Թանգարան' },
+    { value: 'Sergey Parajanov Museum', label: '🎬 Սերգեյ Փարաջանովի Թանգարան' },
+    { value: 'Khor Virap Museum', label: '⛪ Խոր Վիրապի Թանգարան' },
+    { value: 'Gyumri Museum of Architecture', label: '🏛️ Գյումրու Ճարտարապետության Թանգարան' }
 ];
 
-// Locations
+// Վայրեր
 const ARMENIAN_LOCATIONS = [
-    { value: 'YEREVAN', label: 'Yerevan' },
-    { value: 'GYUMRI', label: 'Gyumri' },
-    { value: 'VANADZOR', label: 'Vanadzor' },
-    { value: 'VAGHARSHAPAT', label: 'Vagharshapat (Ejmiatsin)' },
-    { value: 'ABOVYAN', label: 'Abovyan' },
-    { value: 'KAPAN', label: 'Kapan' },
-    { value: 'HRAZDAN', label: 'Hrazdan' },
-    { value: 'ARMAVIR', label: 'Armavir' },
-    { value: 'ARTASHAT', label: 'Artashat' },
-    { value: 'IJEVAN', label: 'Ijevan' },
-    { value: 'GAVAR', label: 'Gavar' },
-    { value: 'GORIS', label: 'Goris' },
-    { value: 'CHARENTSAVAN', label: 'Charentsavan' },
-    { value: 'ARARAT', label: 'Ararat' },
-    { value: 'MASIS', label: 'Masis' },
-    { value: 'SEVAN', label: 'Sevan' },
-    { value: 'ASHTARAK', label: 'Ashtarak' },
-    { value: 'DILIJAN', label: 'Dilijan' },
-    { value: 'SISIAN', label: 'Sisian' },
-    { value: 'ALAVERDI', label: 'Alaverdi' },
-    { value: 'STEPANAVAN', label: 'Stepanavan' },
-    { value: 'MARTUNI', label: 'Martuni' },
-    { value: 'VARDENIS', label: 'Vardenis' },
-    { value: 'YEGHVARD', label: 'Yeghvard' },
-    { value: 'METSAMOR', label: 'Metsamor' },
-    { value: 'BERD', label: 'Berd' },
-    { value: 'TASHIR', label: 'Tashir' },
-    { value: 'APARAN', label: 'Aparan' },
-    { value: 'VAYK', label: 'Vayk' },
-    { value: 'JERMUK', label: 'Jermuk' }
+    { value: 'YEREVAN', label: 'Երևան' },
+    { value: 'GYUMRI', label: 'Գյումրի' },
+    { value: 'VANADZOR', label: 'Վանաձոր' },
+    { value: 'VAGHARSHAPAT', label: 'Վաղարշապատ (Էջմիածին)' },
+    { value: 'ABOVYAN', label: 'Աբովյան' },
+    { value: 'KAPAN', label: 'Կապան' },
+    { value: 'HRAZDAN', label: 'Հրազդան' },
+    { value: 'ARMAVIR', label: 'Արմավիր' },
+    { value: 'ARTASHAT', label: 'Արտաշատ' },
+    { value: 'IJEVAN', label: 'Իջևան' },
+    { value: 'GAVAR', label: 'Գավառ' },
+    { value: 'GORIS', label: 'Գորիս' },
+    { value: 'CHARENTSAVAN', label: 'Չարենցավան' },
+    { value: 'ARARAT', label: 'Արարատ' },
+    { value: 'MASIS', label: 'Մասիս' },
+    { value: 'SEVAN', label: 'Սևան' },
+    { value: 'ASHTARAK', label: 'Աշտարակ' },
+    { value: 'DILIJAN', label: 'Դիլիջան' },
+    { value: 'SISIAN', label: 'Սիսիան' },
+    { value: 'ALAVERDI', label: 'Ալավերդի' },
+    { value: 'STEPANAVAN', label: 'Ստեփանավան' },
+    { value: 'MARTUNI', label: 'Մարտունի' },
+    { value: 'VARDENIS', label: 'Վարդենիս' },
+    { value: 'YEGHVARD', label: 'Եղվարդ' },
+    { value: 'METSAMOR', label: 'Մեծամոր' },
+    { value: 'BERD', label: 'Բերդ' },
+    { value: 'TASHIR', label: 'Տաշիր' },
+    { value: 'APARAN', label: 'Ապարան' },
+    { value: 'VAYK', label: 'Վայք' },
+    { value: 'JERMUK', label: 'Ջերմուկ' }
 ];
 
-// Helper function to format event date
+// Օժանդակ ֆունկցիա միջոցառման ամսաթիվը ձևաչափելու համար
 const formatEventDate = (eventDate) => {
     if (!eventDate) return null;
 
@@ -237,7 +237,7 @@ const formatEventDate = (eventDate) => {
 
         return null;
     } catch (error) {
-        console.error('Error formatting date:', error);
+        console.error('Ամսաթվի ձևաչափման սխալ:', error);
         return null;
     }
 };
@@ -273,12 +273,12 @@ const EventsPage = () => {
     const [selectedMuseum, setSelectedMuseum] = useState('');
     const [showFilters, setShowFilters] = useState(false);
 
-    // Price filter states
+    // Գնային ֆիլտրի վիճակներ
     const [minTicketPrice, setMinTicketPrice] = useState('');
     const [maxTicketPrice, setMaxTicketPrice] = useState('');
     const [ticketPriceRange, setTicketPriceRange] = useState([0, 1000000]);
 
-    // Flag to track if search has been performed
+    // Դրոշակ՝ հետևելու համար, թե արդյոք որոնում է կատարվել
     const [hasSearched, setHasSearched] = useState(false);
 
     useEffect(() => {
@@ -315,11 +315,11 @@ const EventsPage = () => {
             setTicketPriceRange([parseInt(minPriceFromUrl), parseInt(maxPriceFromUrl)]);
         }
 
-        // Load events only on initial mount (without filters)
+        // Բեռնել միջոցառումները միայն սկզբնական բեռնման ժամանակ (առանց ֆիլտրերի)
         loadEvents();
     }, []);
 
-    // Separate useEffect for page and sort changes only (not for filter changes)
+    // Առանձին useEffect էջի և տեսակավորման փոփոխությունների համար (ոչ ֆիլտրերի փոփոխությունների)
     useEffect(() => {
         if (hasSearched) {
             loadEvents();
@@ -332,7 +332,7 @@ const EventsPage = () => {
             const response = await eventAPI.getAllEvents(page, 10, sortBy, sortDirection);
             let filteredEvents = response.data.content || [];
 
-            // Apply filters only if search has been performed
+            // Կիրառել ֆիլտրեր միայն եթե որոնում է կատարվել
             if (hasSearched) {
                 if (searchQuery) {
                     filteredEvents = filteredEvents.filter(event =>
@@ -375,8 +375,8 @@ const EventsPage = () => {
             });
             setActiveImageIndex(newIndices);
         } catch (error) {
-            console.error('Error loading events:', error);
-            setSnackbar({ open: true, message: 'Failed to load events', severity: 'error' });
+            console.error('Միջոցառումների բեռնման սխալ:', error);
+            setSnackbar({ open: true, message: 'Միջոցառումների բեռնումը ձախողվեց', severity: 'error' });
         } finally {
             setLoading(false);
         }
@@ -468,7 +468,7 @@ const EventsPage = () => {
             }}>
                 <GlobalStyles styles={scrollbarStyles} />
 
-                {/* Header */}
+                {/* Վերնագիր */}
                 <Box sx={{
                     position: 'sticky',
                     top: 0,
@@ -485,7 +485,7 @@ const EventsPage = () => {
                             justifyContent: 'space-between',
                             height: 70,
                         }}>
-                            {/* Logo - Left side */}
+                            {/* Լոգո - ձախ կողմ */}
                             <Box onClick={handleHomeClick} sx={{ display: 'flex', alignItems: 'center', gap: 1.5, cursor: 'pointer' }}>
                                 <Box sx={{
                                     width: 38,
@@ -504,13 +504,13 @@ const EventsPage = () => {
                                     WebkitBackgroundClip: 'text',
                                     WebkitTextFillColor: 'transparent'
                                 }}>
-                                    Museum
+                                    Թանգարան
                                 </Typography>
                             </Box>
 
-                            {/* Right side - Navigation and User Menu */}
+                            {/* Աջ կողմ - Նավիգացիա և Օգտատիրոջ մենյու */}
                             <Box sx={{ display: 'flex', alignItems: 'center', gap: 4 }}>
-                                {/* Navigation Links - Museums button REMOVED */}
+                                {/* Նավիգացիոն հղումներ */}
                                 <Box sx={{ display: { xs: 'none', md: 'flex' }, gap: 2 }}>
                                     <Button
                                         startIcon={<EventIcon />}
@@ -523,11 +523,11 @@ const EventsPage = () => {
                                             fontSize: '0.9rem'
                                         }}
                                     >
-                                        Events
+                                        Միջոցառումներ
                                     </Button>
                                 </Box>
 
-                                {/* User Menu */}
+                                {/* Օգտատիրոջ մենյու */}
                                 <Box sx={{ display: 'flex', alignItems: 'center', gap: 2 }}>
                                     {user ? (
                                         <>
@@ -537,16 +537,16 @@ const EventsPage = () => {
                                                 </Avatar>
                                             </IconButton>
                                             <Menu anchorEl={anchorEl} open={Boolean(anchorEl)} onClose={handleMenuClose} PaperProps={{ sx: { bgcolor: '#FFFDF7', borderRadius: '16px', minWidth: 200 } }}>
-                                                <MenuItem onClick={handleProfile}><PersonIcon sx={{ mr: 2, color: colors.primary }} />Profile</MenuItem>
-                                                {isAdmin && <MenuItem onClick={handleAdminPanel}><AdminIcon sx={{ mr: 2, color: colors.primaryDark }} />Admin Panel</MenuItem>}
+                                                <MenuItem onClick={handleProfile}><PersonIcon sx={{ mr: 2, color: colors.primary }} />Անձնական էջ</MenuItem>
+                                                {isAdmin && <MenuItem onClick={handleAdminPanel}><AdminIcon sx={{ mr: 2, color: colors.primaryDark }} />Ադմինիստրատորի վահանակ</MenuItem>}
                                                 <Divider />
-                                                <MenuItem onClick={handleLogout}><LogoutIcon sx={{ mr: 2, color: colors.error }} />Logout</MenuItem>
+                                                <MenuItem onClick={handleLogout}><LogoutIcon sx={{ mr: 2, color: colors.error }} />Դուրս գալ</MenuItem>
                                             </Menu>
                                         </>
                                     ) : (
                                         <>
-                                            <Button onClick={() => navigate('/login')} sx={{ fontWeight: 500, color: colors.textLight }}>Sign In</Button>
-                                            <Button variant="contained" onClick={() => navigate('/signup')} sx={{ fontWeight: 600, borderRadius: '12px', background: colors.gradient, '&:hover': { transform: 'translateY(-2px)' } }}>Sign Up</Button>
+                                            <Button onClick={() => navigate('/login')} sx={{ fontWeight: 500, color: colors.textLight }}>Մուտք</Button>
+                                            <Button variant="contained" onClick={() => navigate('/signup')} sx={{ fontWeight: 600, borderRadius: '12px', background: colors.gradient, '&:hover': { transform: 'translateY(-2px)' } }}>Գրանցվել</Button>
                                         </>
                                     )}
                                 </Box>
@@ -555,9 +555,9 @@ const EventsPage = () => {
                     </Container>
                 </Box>
 
-                {/* Main Content */}
+                {/* Հիմնական բովանդակություն */}
                 <Box sx={{ py: 4, px: { xs: 2, sm: 3, md: 4, lg: 6 } }}>
-                    {/* Search and Filters */}
+                    {/* Որոնում և Ֆիլտրեր */}
                     <Paper elevation={0} sx={{
                         background: alpha('#FFFDF7', 0.95),
                         borderRadius: '20px',
@@ -570,7 +570,7 @@ const EventsPage = () => {
                             <Grid item xs={12} md={3}>
                                 <TextField
                                     fullWidth
-                                    placeholder="Search events by name or description..."
+                                    placeholder="Որոնել միջոցառումներ ըստ անվան կամ նկարագրության..."
                                     value={searchQuery}
                                     onChange={(e) => setSearchQuery(e.target.value)}
                                     onKeyPress={(e) => e.key === 'Enter' && handleSearch()}
@@ -590,11 +590,11 @@ const EventsPage = () => {
                             </Grid>
                             <Grid item xs={12} md={2}>
                                 <FormControl fullWidth>
-                                    <InputLabel sx={{ color: colors.textLight }}>Category</InputLabel>
+                                    <InputLabel sx={{ color: colors.textLight }}>Կատեգորիա</InputLabel>
                                     <Select
                                         value={selectedCategory}
                                         onChange={(e) => setSelectedCategory(e.target.value)}
-                                        label="Category"
+                                        label="Կատեգորիա"
                                         sx={{
                                             borderRadius: '40px',
                                             bgcolor: '#FAFAFA',
@@ -606,7 +606,7 @@ const EventsPage = () => {
                                             return category ? category.label : selected;
                                         }}
                                     >
-                                        <MenuItem value=""><em>All Categories</em></MenuItem>
+                                        <MenuItem value=""><em>Բոլոր Կատեգորիաները</em></MenuItem>
                                         {EVENT_CATEGORIES.map((cat) => (
                                             <MenuItem key={cat.value} value={cat.value}>{cat.label}</MenuItem>
                                         ))}
@@ -615,11 +615,11 @@ const EventsPage = () => {
                             </Grid>
                             <Grid item xs={12} md={2}>
                                 <FormControl fullWidth>
-                                    <InputLabel sx={{ color: colors.textLight }}>Location</InputLabel>
+                                    <InputLabel sx={{ color: colors.textLight }}>Վայր</InputLabel>
                                     <Select
                                         value={selectedLocation}
                                         onChange={(e) => setSelectedLocation(e.target.value)}
-                                        label="Location"
+                                        label="Վայր"
                                         sx={{
                                             borderRadius: '40px',
                                             bgcolor: '#FAFAFA',
@@ -631,7 +631,7 @@ const EventsPage = () => {
                                             return location ? location.label : selected;
                                         }}
                                     >
-                                        <MenuItem value=""><em>All Locations</em></MenuItem>
+                                        <MenuItem value=""><em>Բոլոր Վայրերը</em></MenuItem>
                                         {ARMENIAN_LOCATIONS.map((loc) => (
                                             <MenuItem key={loc.value} value={loc.value}>{loc.label}</MenuItem>
                                         ))}
@@ -640,11 +640,11 @@ const EventsPage = () => {
                             </Grid>
                             <Grid item xs={12} md={3}>
                                 <FormControl fullWidth>
-                                    <InputLabel sx={{ color: colors.textLight }}>Museum</InputLabel>
+                                    <InputLabel sx={{ color: colors.textLight }}>Թանգարան</InputLabel>
                                     <Select
                                         value={selectedMuseum}
                                         onChange={(e) => setSelectedMuseum(e.target.value)}
-                                        label="Museum"
+                                        label="Թանգարան"
                                         sx={{
                                             borderRadius: '40px',
                                             bgcolor: '#FAFAFA',
@@ -656,7 +656,7 @@ const EventsPage = () => {
                                             return museum ? museum.label : selected;
                                         }}
                                     >
-                                        <MenuItem value=""><em>All Museums</em></MenuItem>
+                                        <MenuItem value=""><em>Բոլոր Թանգարանները</em></MenuItem>
                                         {ARMENIAN_MUSEUMS.map((museum) => (
                                             <MenuItem key={museum.value} value={museum.value}>{museum.label}</MenuItem>
                                         ))}
@@ -681,9 +681,9 @@ const EventsPage = () => {
                                             }
                                         }}
                                     >
-                                        Search
+                                        Որոնել
                                     </Button>
-                                    <Tooltip title="Filters">
+                                    <Tooltip title="Ֆիլտրեր">
                                         <IconButton onClick={() => setShowFilters(!showFilters)} sx={{ height: '56px', width: '56px', border: `1px solid ${colors.border}`, borderRadius: '40px', bgcolor: '#FAFAFA', color: showFilters ? colors.primary : colors.textLight }}>
                                             <FilterIcon />
                                         </IconButton>
@@ -694,9 +694,9 @@ const EventsPage = () => {
 
                         <Collapse in={showFilters}>
                             <Box sx={{ mt: 3, pt: 3, borderTop: `1px solid ${colors.border}` }}>
-                                {/* Ticket Price Filter Section */}
+                                {/* Տոմսի գնի ֆիլտրի բաժին */}
                                 <Typography variant="subtitle1" sx={{ fontWeight: 600, mb: 2, color: colors.text }}>
-                                    💰 Ticket Price Range (AMD)
+                                    💰 Տոմսի Գնի Միջակայք (֏)
                                 </Typography>
 
                                 <Box sx={{ px: 2, mb: 3 }}>
@@ -710,12 +710,12 @@ const EventsPage = () => {
                                         borderRadius: '12px'
                                     }}>
                                         <Box sx={{ textAlign: 'center', flex: 1 }}>
-                                            <Typography variant="caption" sx={{ color: colors.textLight }}>Min Price</Typography>
+                                            <Typography variant="caption" sx={{ color: colors.textLight }}>Նվազագույն Գին</Typography>
                                             <Typography variant="h6" sx={{ fontWeight: 700, color: colors.primary }}>{ticketPriceRange[0].toLocaleString()} ֏</Typography>
                                         </Box>
                                         <Box sx={{ width: 30, height: 2, background: colors.gradient }} />
                                         <Box sx={{ textAlign: 'center', flex: 1 }}>
-                                            <Typography variant="caption" sx={{ color: colors.textLight }}>Max Price</Typography>
+                                            <Typography variant="caption" sx={{ color: colors.textLight }}>Առավելագույն Գին</Typography>
                                             <Typography variant="h6" sx={{ fontWeight: 700, color: colors.primary }}>{ticketPriceRange[1].toLocaleString()} ֏</Typography>
                                         </Box>
                                     </Box>
@@ -751,10 +751,10 @@ const EventsPage = () => {
                                         }}
                                     />
 
-                                    {/* Quick price buttons */}
+                                    {/* Արագ գնային կոճակներ */}
                                     <Box sx={{ display: 'flex', gap: 1, mt: 3, flexWrap: 'wrap' }}>
                                         {[
-                                            { label: 'Under 10k', min: 0, max: 10000 },
+                                            { label: '10k-ից ցածր', min: 0, max: 10000 },
                                             { label: '10k - 50k', min: 10000, max: 50000 },
                                             { label: '50k - 100k', min: 50000, max: 100000 },
                                             { label: '100k - 300k', min: 100000, max: 300000 },
@@ -788,26 +788,26 @@ const EventsPage = () => {
                                     </Box>
                                 </Box>
 
-                                {/* Sorting Controls */}
+                                {/* Տեսակավորման կառավարում */}
                                 <Box sx={{ display: 'flex', gap: 2, alignItems: 'center', flexWrap: 'wrap', mt: 2 }}>
                                     <FormControl size="small" sx={{ minWidth: 150 }}>
-                                        <InputLabel sx={{ color: colors.textLight }}>Sort By</InputLabel>
-                                        <Select value={sortBy} onChange={handleSortChange} label="Sort By" sx={{ '& .MuiOutlinedInput-notchedOutline': { borderColor: colors.border } }}>
-                                            <MenuItem value="eventDate">Event Date</MenuItem>
-                                            <MenuItem value="guidePrice">Guide Price</MenuItem>
-                                            <MenuItem value="ticketPrice">Ticket Price</MenuItem>
-                                            <MenuItem value="name">Name</MenuItem>
+                                        <InputLabel sx={{ color: colors.textLight }}>Տեսակավորել Ըստ</InputLabel>
+                                        <Select value={sortBy} onChange={handleSortChange} label="Տեսակավորել Ըստ" sx={{ '& .MuiOutlinedInput-notchedOutline': { borderColor: colors.border } }}>
+                                            <MenuItem value="eventDate">Միջոցառման Ամսաթիվ</MenuItem>
+                                            <MenuItem value="guidePrice">Ուղեցույցի Գին</MenuItem>
+                                            <MenuItem value="ticketPrice">Տոմսի Գին</MenuItem>
+                                            <MenuItem value="name">Անվանում</MenuItem>
                                         </Select>
                                     </FormControl>
                                     <Button onClick={handleSortDirectionToggle} variant="outlined" size="small" sx={{ borderRadius: '20px', borderColor: colors.border, color: colors.text, '&:hover': { borderColor: colors.primary, color: colors.primary } }}>
-                                        {sortDirection === 'asc' ? '↑ Ascending' : '↓ Descending'}
+                                        {sortDirection === 'asc' ? '↑ Աճման' : '↓ Նվազման'}
                                     </Button>
                                 </Box>
 
                                 {activeFiltersCount > 0 && (
                                     <Box sx={{ display: 'flex', justifyContent: 'flex-end', mt: 2 }}>
                                         <Button startIcon={<ClearIcon />} onClick={handleClearFilters} sx={{ color: colors.primary }}>
-                                            Clear All ({activeFiltersCount})
+                                            Մաքրել Բոլորը ({activeFiltersCount})
                                         </Button>
                                     </Box>
                                 )}
@@ -815,20 +815,20 @@ const EventsPage = () => {
                         </Collapse>
                     </Paper>
 
-                    {/* Results Count */}
+                    {/* Արդյունքների քանակ */}
                     {!loading && events.length > 0 && hasSearched && (
                         <Box sx={{ mb: 3 }}>
-                            <Typography sx={{ color: colors.textLight }}>Found <strong style={{ color: colors.primary }}>{totalElements}</strong> events</Typography>
+                            <Typography sx={{ color: colors.textLight }}>Գտնվել է <strong style={{ color: colors.primary }}>{totalElements}</strong> միջոցառում</Typography>
                         </Box>
                     )}
 
                     {!loading && events.length > 0 && !hasSearched && (
                         <Box sx={{ mb: 3 }}>
-                            <Typography sx={{ color: colors.textLight }}>Showing <strong style={{ color: colors.primary }}>{events.length}</strong> events - Use filters and click Search to refine results</Typography>
+                            <Typography sx={{ color: colors.textLight }}>Ցուցադրվում է <strong style={{ color: colors.primary }}>{events.length}</strong> միջոցառում - Օգտագործեք ֆիլտրերը և սեղմեք Որոնել արդյունքները ճշգրտելու համար</Typography>
                         </Box>
                     )}
 
-                    {/* Events List */}
+                    {/* Միջոցառումների ցանկ */}
                     {loading ? (
                         <Box sx={{ display: 'flex', flexDirection: 'column', gap: 4 }}>
                             {[1, 2, 3].map(i => (
@@ -848,8 +848,12 @@ const EventsPage = () => {
                         </Box>
                     ) : events.length === 0 ? (
                         <Box sx={{ textAlign: 'center', py: 8 }}>
-                            <Typography variant="h6" sx={{ color: colors.textLight }}>No events found</Typography>
-                            <Button onClick={handleClearFilters} sx={{ mt: 2, color: colors.primary }}>Clear filters</Button>
+                            <Typography variant="h6" sx={{ color: colors.textLight }}>
+                                Միջոցառումներ չեն գտնվել
+                            </Typography>
+                            <Button onClick={handleClearFilters} sx={{ mt: 2, color: colors.primary }}>
+                                Մաքրել ֆիլտրերը
+                            </Button>
                         </Box>
                     ) : (
                         <Box sx={{ display: 'flex', flexDirection: 'column', gap: 0 }}>
@@ -865,7 +869,7 @@ const EventsPage = () => {
                                             borderBottom: index < events.length - 1 ? `1px solid ${colors.border}` : 'none'
                                         }}>
                                             <Grid container spacing={3}>
-                                                {/* Image Carousel */}
+                                                {/* Նկարների Carousel */}
                                                 <Grid item xs={12} md={5}>
                                                     <Box sx={{
                                                         position: 'relative',
@@ -897,13 +901,13 @@ const EventsPage = () => {
                                                         ) : (
                                                             <Box sx={{ textAlign: 'center' }}>
                                                                 <ImageIcon sx={{ fontSize: 60, color: alpha(colors.primary, 0.3) }} />
-                                                                <Typography variant="body2" sx={{ color: colors.textLight, mt: 1 }}>No images</Typography>
+                                                                <Typography variant="body2" sx={{ color: colors.textLight, mt: 1 }}>Նկարներ չկան</Typography>
                                                             </Box>
                                                         )}
                                                     </Box>
                                                 </Grid>
 
-                                                {/* Event Details */}
+                                                {/* Միջոցառման մանրամասներ */}
                                                 <Grid item xs={12} md={7}>
                                                     <Typography variant="h5" sx={{ fontWeight: 700, color: colors.text, mb: 2 }}>
                                                         {event.name}
@@ -918,13 +922,13 @@ const EventsPage = () => {
                                                         {event.description}
                                                     </Typography>
 
-                                                    {/* Price Section */}
+                                                    {/* Գնային բաժին */}
                                                     <Grid container spacing={2} sx={{ mb: 3 }}>
                                                         <Grid item xs={12} sm={6}>
                                                             <DetailItem>
                                                                 <DetailIcon><PriceIcon sx={{ fontSize: 20 }} /></DetailIcon>
                                                                 <DetailText>
-                                                                    <div className="label">Guide Price</div>
+                                                                    <div className="label">Ուղեցույցի Գին</div>
                                                                     <div className="value" style={{ color: colors.primary }}>{formatPriceAMD(event.guidePrice)}</div>
                                                                 </DetailText>
                                                             </DetailItem>
@@ -933,20 +937,20 @@ const EventsPage = () => {
                                                             <DetailItem>
                                                                 <DetailIcon><TicketIcon sx={{ fontSize: 20 }} /></DetailIcon>
                                                                 <DetailText>
-                                                                    <div className="label">Ticket Price</div>
+                                                                    <div className="label">Տոմսի Գին</div>
                                                                     <div className="value" style={{ color: colors.success }}>{formatPriceAMD(event.ticketPrice)}</div>
                                                                 </DetailText>
                                                             </DetailItem>
                                                         </Grid>
                                                     </Grid>
 
-                                                    {/* Event Details Grid */}
+                                                    {/* Միջոցառման մանրամասների ցանց */}
                                                     <Grid container spacing={2} sx={{ mb: 3 }}>
                                                         <Grid item xs={12} sm={6}>
                                                             <DetailItem>
                                                                 <DetailIcon><CategoryIcon sx={{ fontSize: 20 }} /></DetailIcon>
                                                                 <DetailText>
-                                                                    <div className="label">Category</div>
+                                                                    <div className="label">Կատեգորիա</div>
                                                                     <div className="value">{getCategoryDisplayName(event.eventCategory)}</div>
                                                                 </DetailText>
                                                             </DetailItem>
@@ -955,7 +959,7 @@ const EventsPage = () => {
                                                             <DetailItem>
                                                                 <DetailIcon><LocationIcon sx={{ fontSize: 20 }} /></DetailIcon>
                                                                 <DetailText>
-                                                                    <div className="label">Location</div>
+                                                                    <div className="label">Վայր</div>
                                                                     <div className="value">{event.location}</div>
                                                                 </DetailText>
                                                             </DetailItem>
@@ -964,7 +968,7 @@ const EventsPage = () => {
                                                             <DetailItem>
                                                                 <DetailIcon><MuseumIcon sx={{ fontSize: 20 }} /></DetailIcon>
                                                                 <DetailText>
-                                                                    <div className="label">Museum</div>
+                                                                    <div className="label">Թանգարան</div>
                                                                     <div className="value">{event.museumName || '-'}</div>
                                                                 </DetailText>
                                                             </DetailItem>
@@ -973,8 +977,8 @@ const EventsPage = () => {
                                                             <DetailItem>
                                                                 <DetailIcon><CalendarIcon sx={{ fontSize: 20 }} /></DetailIcon>
                                                                 <DetailText>
-                                                                    <div className="label">Event Date</div>
-                                                                    <div className="value">{eventDate || 'Date not set'}</div>
+                                                                    <div className="label">Միջոցառման Ամսաթիվ</div>
+                                                                    <div className="value">{eventDate || 'Ամսաթիվ նշված չէ'}</div>
                                                                 </DetailText>
                                                             </DetailItem>
                                                         </Grid>
@@ -983,8 +987,8 @@ const EventsPage = () => {
                                                                 <DetailItem>
                                                                     <DetailIcon><AccessTimeIcon sx={{ fontSize: 20 }} /></DetailIcon>
                                                                     <DetailText>
-                                                                        <div className="label">Duration</div>
-                                                                        <div className="value">{event.duration} {event.duration === 1 ? 'hour' : 'hours'}</div>
+                                                                        <div className="label">Տևողություն</div>
+                                                                        <div className="value">{event.duration} {event.duration === 1 ? 'ժամ' : 'ժամ'}</div>
                                                                     </DetailText>
                                                                 </DetailItem>
                                                             </Grid>
@@ -994,7 +998,7 @@ const EventsPage = () => {
                                                                 <DetailItem>
                                                                     <DetailIcon><StarIcon sx={{ fontSize: 20 }} /></DetailIcon>
                                                                     <DetailText>
-                                                                        <div className="label">Event Type</div>
+                                                                        <div className="label">Միջոցառման Տեսակ</div>
                                                                         <div className="value">{event.eventType}</div>
                                                                     </DetailText>
                                                                 </DetailItem>
@@ -1002,11 +1006,11 @@ const EventsPage = () => {
                                                         )}
                                                     </Grid>
 
-                                                    {/* Contact Information */}
+                                                    {/* Կոնտակտային տվյալներ */}
                                                     {(event.contactEmail || event.phoneNumber) && (
                                                         <Box sx={{ mt: 2, p: 2, bgcolor: alpha(colors.primary, 0.04), borderRadius: '16px', border: `1px solid ${alpha(colors.primary, 0.15)}` }}>
                                                             <Typography variant="subtitle2" sx={{ fontWeight: 700, color: colors.text, mb: 1.5, display: 'flex', alignItems: 'center', gap: 1 }}>
-                                                                📞 Contact Information
+                                                                📞 Կոնտակտային Տվյալներ
                                                             </Typography>
                                                             {event.contactEmail && (
                                                                 <DetailItem sx={{ mb: 1 }}>
@@ -1039,7 +1043,7 @@ const EventsPage = () => {
                         </Box>
                     )}
 
-                    {/* Pagination */}
+                    {/* Էջատում */}
                     {totalPages > 1 && hasSearched && (
                         <Box sx={{ display: 'flex', justifyContent: 'center', mt: 5 }}>
                             <Pagination

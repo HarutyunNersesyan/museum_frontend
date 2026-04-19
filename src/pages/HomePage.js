@@ -46,13 +46,13 @@ import LoginPage from './LoginPage';
 import SignUpPage from './SignUpPage';
 import VerifyCodePage from './VerifyCodePage';
 
-// Custom animations
+// Հատուկ անիմացիաներ
 const pulse = keyframes`
     0%, 100% { opacity: 0.4; transform: scale(1); }
     50% { opacity: 0.7; transform: scale(1.05); }
 `;
 
-// Warm brown color palette
+// Ջերմ շագանակագույն գունային համակարգ
 const colors = {
     primary: '#C4A484',
     primaryDark: '#A0522D',
@@ -67,17 +67,17 @@ const colors = {
     error: '#f44336'
 };
 
-// Armenian Museums Data - All descriptions under 250 characters
+// Հայկական թանգարանների տվյալներ - Բոլոր նկարագրությունները 250 նիշից կարճ
 const ARMENIAN_MUSEUMS = [
     {
         id: 1,
         name: 'History Museum of Armenia',
         nameArm: 'Հայաստանի Պատմության Թանգարան',
-        location: 'Yerevan',
-        address: '4 Republic Square, Yerevan',
-        description: 'The History Museum of Armenia houses one of the richest collections of Armenian cultural heritage, with over 400,000 artifacts spanning archaeology, numismatics, ethnography, and modern history.',
+        location: 'Երևան',
+        address: 'Հանրապետության Հրապարակ 4, Երևան',
+        description: 'Հայաստանի պատմության թանգարանը պահպանում է հայկական մշակութային ժառանգության ամենահարուստ հավաքածուներից մեկը՝ ավելի քան 400,000 հնագիտական, դրամագիտական, ազգագրական և նորագույն պատմության նմուշներով:',
         image: 'http://localhost:8080/uploads/1.jpg',
-        hours: 'Tue-Sun: 11:00-18:00',
+        hours: 'Երք-Կիր: 11:00-18:00',
         phone: '+374 10 520-690',
         rating: 4.8,
 
@@ -86,11 +86,11 @@ const ARMENIAN_MUSEUMS = [
         id: 2,
         name: 'Matenadaran',
         nameArm: 'Մատենադարան',
-        location: 'Yerevan',
-        address: '53 Mesrop Mashtots Ave, Yerevan',
-        description: 'The Mesrop Mashtots Institute of Ancient Manuscripts, known as Matenadaran, is a repository of over 23,000 ancient manuscripts and a leading research institute of Armenian written heritage.',
+        location: 'Երևան',
+        address: 'Մեսրոպ Մաշտոցի Պողոտա 53, Երևան',
+        description: 'Մեսրոպ Մաշտոցի անվան հին ձեռագրերի ինստիտուտը՝ Մատենադարանը, պահպանում է ավելի քան 23,000 հին ձեռագրեր և հանդիսանում է հայ գրավոր ժառանգության առաջատար հետազոտական կենտրոն:',
         image: 'http://localhost:8080/uploads/2.jpg',
-        hours: 'Tue-Sun: 10:00-17:00',
+        hours: 'Երք-Կիր: 10:00-17:00',
         phone: '+374 10 513-000',
         rating: 4.9,
 
@@ -99,11 +99,11 @@ const ARMENIAN_MUSEUMS = [
         id: 3,
         name: 'Cafesjian Center for the Arts',
         nameArm: 'Գաֆէսճեանի արուեստի կենտրոն',
-        location: 'Yerevan',
-        address: '3 Tamanyan St, Yerevan',
-        description: 'The Cafesjian Center for the Arts (CCA) is a contemporary art museum in the heart of Yerevan, featuring a diverse collection of modern and contemporary art from around the world.',
+        location: 'Երևան',
+        address: 'Թամանյան Փողոց 3, Երևան',
+        description: 'Գաֆեսճյան արվեստի կենտրոնը ժամանակակից արվեստի թանգարան է Երևանի սրտում, որտեղ ներկայացված են աշխարհի տարբեր երկրների ժամանակակից և նորագույն արվեստի բազմազան հավաքածուներ:',
         image: 'http://localhost:8080/uploads/3.jpg',
-        hours: 'Tue-Sun: 11:00-20:00',
+        hours: 'Երք-Կիր: 11:00-20:00',
         phone: '+374 10 541-932',
         rating: 4.7,
 
@@ -112,11 +112,11 @@ const ARMENIAN_MUSEUMS = [
         id: 4,
         name: 'Erebuni Fortress & Museum',
         nameArm: 'Էրեբունի ամրոց և թանգարան',
-        location: 'Yerevan',
-        address: '38 Erebuni St, Yerevan',
-        description: 'Erebuni Museum was established in 1968 to celebrate Yerevan\'s 2750th anniversary. The fortress was founded in 782 BC by King Argishti I of Urartu and showcases Urartian artifacts.',
+        location: 'Երևան',
+        address: 'Էրեբունի Փողոց 38, Երևան',
+        description: 'Էրեբունի թանգարանը հիմնադրվել է 1968 թվականին՝ Երևանի 2750-ամյակի տոնակատարության կապակցությամբ: Ամրոցը հիմնադրվել է մ.թ.ա. 782 թվականին Ուրարտուի թագավոր Արգիշտի Ա-ի կողմից:',
         image: 'http://localhost:8080/uploads/4.jpg',
-        hours: 'Tue-Sun: 10:30-17:30',
+        hours: 'Երք-Կիր: 10:30-17:30',
         phone: '+374 10 461-393',
         rating: 4.6,
 
@@ -125,11 +125,11 @@ const ARMENIAN_MUSEUMS = [
         id: 5,
         name: 'Armenian Genocide Museum',
         nameArm: 'Հայոց Ցեղասպանության Թանգարան',
-        location: 'Yerevan',
-        address: '8 Tsitsernakaberd Hwy, Yerevan',
-        description: 'The Armenian Genocide Museum-Institute is dedicated to preserving the memory of the Armenian Genocide of 1915. The museum features photographs, documents, and personal testimonies.',
+        location: 'Երևան',
+        address: 'Ծիծեռնակաբերդի Խճուղի 8, Երևան',
+        description: 'Հայոց ցեղասպանության թանգարան-ինստիտուտը նվիրված է 1915 թվականի Հայոց ցեղասպանության հիշատակի պահպանմանը: Թանգարանում ներկայացված են լուսանկարներ, փաստաթղթեր և անձնական վկայություններ:',
         image: 'http://localhost:8080/uploads/5.jpg',
-        hours: 'Mon-Sun: 11:00-16:00',
+        hours: 'Երկ-Կիր: 11:00-16:00',
         phone: '+374 10 390-980',
         rating: 4.9,
     },
@@ -137,11 +137,11 @@ const ARMENIAN_MUSEUMS = [
         id: 6,
         name: 'Dilijan Local Lore Museum',
         nameArm: 'Դիլիջանի Երկրագիտական Թանգարան',
-        location: 'Dilijan',
-        address: '6 Myasnikyan St, Dilijan',
-        description: 'The Dilijan Local Lore Museum showcases the natural history, ethnography, and cultural heritage of the Dilijan region, including unique exhibits about local flora and fauna.',
+        location: 'Դիլիջան',
+        address: 'Մյասնիկյան Փողոց 6, Դիլիջան',
+        description: 'Դիլիջանի երկրագիտական թանգարանը ներկայացնում է Դիլիջանի տարածաշրջանի բնական պատմությունը, ազգագրությունը և մշակութային ժառանգությունը:',
         image: 'http://localhost:8080/uploads/6.jpg',
-        hours: 'Tue-Sun: 10:00-18:00',
+        hours: 'Երք-Կիր: 10:00-18:00',
         phone: '+374 268 2-42-07',
         rating: 4.5,
     },
@@ -149,11 +149,11 @@ const ARMENIAN_MUSEUMS = [
         id: 7,
         name: 'Gyumri Museum of Architecture',
         nameArm: 'Գյումրու Ճարտարապետության Թանգարան',
-        location: 'Gyumri',
-        address: '20 Haghtanaki St, Gyumri',
-        description: 'The Museum of National Architecture and Urban Life of Gyumri is housed in a historic 19th-century mansion, showcasing traditional Armenian architecture and daily life.',
+        location: 'Գյումրի',
+        address: 'Հաղթանակի Փողոց 20, Գյումրի',
+        description: 'Գյումրու ազգային ճարտարապետության և քաղաքային կենցաղի թանգարանը տեղավորված է պատմական 19-րդ դարի առանձնատանը՝ ցուցադրելով հայկական ավանդական ճարտարապետությունը և առօրյա կյանքը:',
         image: 'http://localhost:8080/uploads/7.jpg',
-        hours: 'Tue-Sun: 11:00-17:00',
+        hours: 'Երք-Կիր: 11:00-17:00',
         phone: '+374 312 5-16-57',
         rating: 4.6,
     },
@@ -161,11 +161,11 @@ const ARMENIAN_MUSEUMS = [
         id: 8,
         name: 'Khor Virap Museum',
         nameArm: 'Խոր Վիրապի Թանգարան',
-        location: 'Ararat',
-        address: 'Near Khor Virap Monastery',
-        description: 'The Khor Virap Museum tells the story of the historic Khor Virap monastery, where St. Gregory the Illuminator was imprisoned for 13 years before converting Armenia to Christianity.',
+        location: 'Արարատ',
+        address: 'Խոր Վիրապի մոտ',
+        description: 'Խոր Վիրապի թանգարանը պատմում է պատմական Խոր Վիրապ վանքի մասին, որտեղ Սուրբ Գրիգոր Լուսավորիչը բանտարկվել է 13 տարի՝ նախքան Հայաստանը քրիստոնեություն ընդունելը:',
         image: 'http://localhost:8080/uploads/8.jpg',
-        hours: 'Tue-Sun: 10:00-18:00',
+        hours: 'Երք-Կիր: 10:00-18:00',
         phone: '+374 10 000-000',
         rating: 4.7,
     },
@@ -173,11 +173,11 @@ const ARMENIAN_MUSEUMS = [
         id: 9,
         name: 'Sergey Parajanov Museum',
         nameArm: 'Սերգեյ Փարաջանովի Թանգարան',
-        location: 'Yerevan',
-        address: '15-17 Dzoragyugh St, Yerevan',
-        description: 'The Sergey Parajanov Museum is dedicated to the legendary Armenian film director and artist. The museum displays over 1,400 works including collages, drawings, and installations.',
+        location: 'Երևան',
+        address: 'Ձորագյուղ Փողոց 15-17, Երևան',
+        description: 'Սերգեյ Փարաջանովի թանգարանը նվիրված է լեգենդար հայ կինոռեժիսորին և նկարչին: Թանգարանում ցուցադրվում է ավելի քան 1400 աշխատանք՝ կոլաժներ, նկարներ և ինստալյացիաներ:',
         image: 'http://localhost:8080/uploads/9.jpg',
-        hours: 'Tue-Sun: 11:00-17:00',
+        hours: 'Երք-Կիր: 11:00-17:00',
         phone: '+374 10 538-773',
         rating: 4.8,
     },
@@ -185,24 +185,24 @@ const ARMENIAN_MUSEUMS = [
         id: 10,
         name: 'Megerian Carpet Museum',
         nameArm: 'Մեգերյան Կարպետի Թանգարան',
-        location: 'Yerevan',
-        address: '9 Madoyan St, Yerevan',
-        description: 'The Megerian Carpet Museum showcases the rich tradition of Armenian carpet weaving. Visitors can see antique carpets, watch master weavers at work, and learn about this ancient craft.',
+        location: 'Երևան',
+        address: 'Մադոյան Փողոց 9, Երևան',
+        description: 'Մեգերյան կարպետի թանգարանը ցուցադրում է հայկական գորգագործության հարուստ ավանդույթները: Այցելուները կարող են տեսնել հնաոճ գորգեր, դիտել վարպետ ջուլհակների աշխատանքը և սովորել այս հնագույն արհեստի մասին:',
         image: 'http://localhost:8080/uploads/10.jpg',
-        hours: 'Mon-Sat: 10:00-18:00',
+        hours: 'Երկ-Շաբ: 10:00-18:00',
         phone: '+374 10 000-000',
         rating: 4.6,
     }
 ];
 
-// Scrollbar styles
+// Ոլորման սանդղակի ոճեր
 const scrollbarStyles = {
     '*::-webkit-scrollbar': { width: '10px', height: '10px' },
     '*::-webkit-scrollbar-track': { background: '#E8D5B7', borderRadius: '10px' },
     '*::-webkit-scrollbar-thumb': { background: '#C4A484', borderRadius: '10px', '&:hover': { background: '#A0522D' } },
 };
 
-// Image component
+// Նկարի կոմպոնենտ
 const MuseumImage = ({ src, alt }) => {
     const [imageLoaded, setImageLoaded] = useState(false);
     const [imageError, setImageError] = useState(false);
@@ -252,7 +252,7 @@ const MuseumImage = ({ src, alt }) => {
                 <Box sx={{ textAlign: 'center', p: 2 }}>
                     <MuseumIcon sx={{ fontSize: 48, color: alphaMUI(colors.primary, 0.3), mb: 1 }} />
                     <Typography variant="caption" sx={{ color: colors.textLight, display: 'block' }}>
-                        Image not available
+                        Նկարը հասանելի չէ
                     </Typography>
                 </Box>
             )}
@@ -380,7 +380,7 @@ function HomePage() {
         }}>
             <GlobalStyles styles={scrollbarStyles} />
 
-            {/* Animated Background */}
+            {/* Անիմացիոն ֆոն */}
             <Box sx={{
                 position: 'fixed',
                 top: 0,
@@ -395,7 +395,7 @@ function HomePage() {
                 transition: 'background 0.3s ease-out'
             }} />
 
-            {/* Floating decorative circles */}
+            {/* Լողացող դեկորատիվ շրջանակներ */}
             <Box sx={{
                 position: 'fixed',
                 top: 0,
@@ -421,7 +421,7 @@ function HomePage() {
                 ))}
             </Box>
 
-            {/* Header */}
+            {/* Վերնագիր */}
             <Box sx={{
                 position: 'sticky',
                 top: 0,
@@ -433,7 +433,7 @@ function HomePage() {
             }}>
                 <Container maxWidth="xl">
                     <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', height: 70 }}>
-                        {/* Logo */}
+                        {/* Լոգո */}
                         <Box onClick={() => navigate('/')} sx={{ display: 'flex', alignItems: 'center', gap: 1.5, cursor: 'pointer' }}>
                             <Box sx={{
                                 width: 38, height: 38, borderRadius: '12px', background: colors.gradient,
@@ -445,11 +445,11 @@ function HomePage() {
                                 fontWeight: 800, background: colors.gradient,
                                 WebkitBackgroundClip: 'text', WebkitTextFillColor: 'transparent'
                             }}>
-                                Museum
+                                Թանգարան
                             </Typography>
                         </Box>
 
-                        {/* Navigation */}
+                        {/* Նավիգացիա */}
                         <Box sx={{ display: 'flex', alignItems: 'center', gap: 4 }}>
                             <Box sx={{ display: { xs: 'none', md: 'flex' }, gap: 2 }}>
                                 <Button
@@ -462,11 +462,11 @@ function HomePage() {
                                         fontSize: '0.9rem'
                                     }}
                                 >
-                                    Events
+                                    Միջոցառումներ
                                 </Button>
                             </Box>
 
-                            {/* User Menu */}
+                            {/* Օգտատիրոջ մենյու */}
                             <Box sx={{ display: 'flex', alignItems: 'center', gap: 2 }}>
                                 {user ? (
                                     <>
@@ -476,21 +476,21 @@ function HomePage() {
                                             </Avatar>
                                         </IconButton>
                                         <Menu anchorEl={anchorEl} open={Boolean(anchorEl)} onClose={handleMenuClose} PaperProps={{ sx: { bgcolor: '#FFFDF7', borderRadius: '16px', minWidth: 200 } }}>
-                                            <MenuItem onClick={handleProfile}><PersonIcon sx={{ mr: 2, color: colors.primary }} />Profile</MenuItem>
-                                            {isAdmin && <MenuItem onClick={handleAdminPanel}><AdminPanelSettingsIcon sx={{ mr: 2, color: colors.primaryDark }} />Admin Panel</MenuItem>}
+                                            <MenuItem onClick={handleProfile}><PersonIcon sx={{ mr: 2, color: colors.primary }} />Անձնական էջ</MenuItem>
+                                            {isAdmin && <MenuItem onClick={handleAdminPanel}><AdminPanelSettingsIcon sx={{ mr: 2, color: colors.primaryDark }} />Ադմինիստրատորի վահանակ</MenuItem>}
                                             <Divider />
-                                            <MenuItem onClick={handleLogout}><LogoutIcon sx={{ mr: 2, color: colors.error }} />Logout</MenuItem>
+                                            <MenuItem onClick={handleLogout}><LogoutIcon sx={{ mr: 2, color: colors.error }} />Դուրս գալ</MenuItem>
                                         </Menu>
                                     </>
                                 ) : (
                                     <>
-                                        <Button onClick={handleLoginModalOpen} sx={{ fontWeight: 500, color: colors.textLight }}>Sign In</Button>
+                                        <Button onClick={handleLoginModalOpen} sx={{ fontWeight: 500, color: colors.textLight }}>Մուտք</Button>
                                         <Button
                                             variant="contained"
                                             onClick={handleSignupModalOpen}
                                             sx={{ fontWeight: 600, borderRadius: '12px', background: colors.gradient }}
                                         >
-                                            Sign Up
+                                            Գրանցվել
                                         </Button>
                                     </>
                                 )}
@@ -500,7 +500,7 @@ function HomePage() {
                 </Container>
             </Box>
 
-            {/* Hero Section */}
+            {/* Գլխավոր բաժին */}
             <Box sx={{ position: 'relative', zIndex: 3, py: { xs: 4, md: 6 } }}>
                 <Container maxWidth="lg" sx={{ mb: 5 }}>
                     <Fade in timeout={1000}>
@@ -511,19 +511,19 @@ function HomePage() {
                                 color: colors.text,
                                 mb: 2
                             }}>
-                                Discover Armenia's <span style={{ color: colors.primary }}>Cultural Heritage</span>
+                                Բացահայտեք Հայաստանի <span style={{ color: colors.primary }}>Մշակութային Ժառանգությունը</span>
                             </Typography>
                             <Typography variant="h5" sx={{
                                 color: colors.textLight,
                                 fontSize: { xs: '1rem', md: '1.25rem' }
                             }}>
-                                Explore the finest museums and cultural events across Armenia
+                                Ուսումնասիրեք լավագույն թանգարանները և մշակութային միջոցառումները ողջ Հայաստանում
                             </Typography>
                         </Box>
                     </Fade>
                 </Container>
 
-                {/* Museums Grid */}
+                {/* Թանգարանների ցանց */}
                 <Container maxWidth={false} sx={{ px: { xs: 2, sm: 3, md: 4, lg: 6 } }}>
                     <Grid container spacing={3}>
                         {paginatedMuseums.map((museum, index) => (
@@ -566,7 +566,7 @@ function HomePage() {
                                             </Box>
                                             {museum.featured && (
                                                 <Chip
-                                                    label="Featured"
+                                                    label="Առաջարկվող"
                                                     size="small"
                                                     sx={{
                                                         position: 'absolute',
@@ -651,16 +651,16 @@ function HomePage() {
                 </Container>
             </Box>
 
-            {/* Footer */}
+            {/* Ստորագիր */}
             <Box sx={{ py: 3, textAlign: 'center', background: '#FFFFFF', borderTop: `1px solid ${colors.border}` }}>
                 <Container maxWidth="lg">
                     <Typography variant="body2" sx={{ color: colors.textLight, fontSize: '0.8rem' }}>
-                        © 2026 Museum Events. All rights reserved.
+                        © 2026 Թանգարանային Միջոցառումներ. Բոլոր իրավունքները պաշտպանված են:
                     </Typography>
                 </Container>
             </Box>
 
-            {/* Login Modal */}
+            {/* Մուտքի Մոդալ */}
             <Modal
                 open={loginModalOpen}
                 onClose={handleLoginModalClose}
@@ -687,7 +687,7 @@ function HomePage() {
                 </Box>
             </Modal>
 
-            {/* SignUp Modal */}
+            {/* Գրանցման Մոդալ */}
             <Modal
                 open={signupModalOpen}
                 onClose={handleSignupModalClose}
@@ -715,7 +715,7 @@ function HomePage() {
                 </Box>
             </Modal>
 
-            {/* VerifyCode Modal */}
+            {/* Հաստատման կոդի Մոդալ */}
             <Modal
                 open={verifyModalOpen}
                 onClose={handleVerifyModalClose}

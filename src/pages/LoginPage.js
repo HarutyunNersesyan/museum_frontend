@@ -98,11 +98,11 @@ const LoginPage = ({ isModal = false, onClose, onSwitchToSignup }) => {
 
     const validateForm = () => {
         if (!formData.email) {
-            setError('Email is required');
+            setError('Էլ.փոստը պարտադիր է');
             return false;
         }
         if (!formData.password) {
-            setError('Password is required');
+            setError('Գաղտնաբառը պարտադիր է');
             return false;
         }
         return true;
@@ -118,17 +118,17 @@ const LoginPage = ({ isModal = false, onClose, onSwitchToSignup }) => {
         try {
             const result = await login(formData.email, formData.password);
             if (result.success) {
-                setSuccess('Login successful! Redirecting...');
+                setSuccess('Մուտքը հաջողվեց։ Վերահղում...');
                 if (isModal && onClose) onClose();
                 setTimeout(() => {
                     navigate('/', { replace: true });
                 }, 1500);
             } else {
-                setError(result.message || 'Invalid email or password');
+                setError(result.message || 'Սխալ էլ.փոստ կամ գաղտնաբառ');
             }
         } catch (err) {
-            console.error('Login error:', err);
-            setError('Something went wrong. Please try again.');
+            console.error('Մուտքի սխալ:', err);
+            setError('Ինչ-որ բան այն չէ։ Խնդրում ենք կրկին փորձել։');
         } finally {
             setLoading(false);
         }
@@ -150,13 +150,13 @@ const LoginPage = ({ isModal = false, onClose, onSwitchToSignup }) => {
 
     const handleForgotPasswordSubmit = async () => {
         if (!forgotPasswordEmail) {
-            setForgotPasswordError('Please enter your email');
+            setForgotPasswordError('Խնդրում ենք մուտքագրել ձեր էլ.փոստը');
             return;
         }
 
         const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
         if (!emailRegex.test(forgotPasswordEmail)) {
-            setForgotPasswordError('Please enter a valid email address');
+            setForgotPasswordError('Խնդրում ենք մուտքագրել վավեր էլ.փոստի հասցե');
             return;
         }
 
@@ -171,23 +171,23 @@ const LoginPage = ({ isModal = false, onClose, onSwitchToSignup }) => {
                 { headers: { 'Content-Type': 'application/json' } }
             );
 
-            setForgotPasswordMessage('New password has been sent to your email');
+            setForgotPasswordMessage('Նոր գաղտնաբառը ուղարկվել է ձեր էլ.փոստին');
             setTimeout(() => {
                 handleForgotPasswordClose();
-                setSuccess('New password has been sent to your email');
+                setSuccess('Նոր գաղտնաբառը ուղարկվել է ձեր էլ.փոստին');
             }, 3000);
         } catch (error) {
             if (error.response) {
                 const status = error.response.status;
                 if (status === 404) {
-                    setForgotPasswordError('User not found with this email. Please check your email or sign up.');
+                    setForgotPasswordError('Այս էլ.փոստով օգտատեր չի գտնվել։ Ստուգեք ձեր էլ.փոստը կամ գրանցվեք։');
                 } else if (status === 403) {
-                    setForgotPasswordError('Email is not verified. Please verify your email first.');
+                    setForgotPasswordError('Էլ.փոստը հաստատված չէ։ Խնդրում ենք նախ հաստատել ձեր էլ.փոստը։');
                 } else {
-                    setForgotPasswordError(error.response.data || 'An error occurred');
+                    setForgotPasswordError(error.response.data || 'Սխալ է տեղի ունեցել');
                 }
             } else {
-                setForgotPasswordError('Cannot connect to server. Please check your internet connection.');
+                setForgotPasswordError('Չի հաջողվում կապվել սերվերի հետ։ Ստուգեք ձեր ինտերնետ կապը։');
             }
         } finally {
             setForgotPasswordLoading(false);
@@ -246,7 +246,7 @@ const LoginPage = ({ isModal = false, onClose, onSwitchToSignup }) => {
                     overflow: 'hidden',
                     position: 'relative'
                 }}>
-                    {/* Close Button - Only show in modal mode */}
+                    {/* Փակման կոճակ - Ցուցադրվում է միայն մոդալ ռեժիմում */}
                     {isModal && onClose && (
                         <IconButton
                             onClick={onClose}
@@ -295,7 +295,7 @@ const LoginPage = ({ isModal = false, onClose, onSwitchToSignup }) => {
                                 WebkitTextFillColor: 'transparent',
                                 letterSpacing: '-0.5px'
                             }}>
-                                Museum
+                                Թանգարան
                             </Typography>
                         </Box>
                         <Typography variant="h4" sx={{
@@ -304,7 +304,7 @@ const LoginPage = ({ isModal = false, onClose, onSwitchToSignup }) => {
                             color: '#3E2723',
                             mb: 1
                         }}>
-                            Sign In
+                            Մուտք գործել
                         </Typography>
                         <Box sx={{
                             width: 50,
@@ -355,8 +355,8 @@ const LoginPage = ({ isModal = false, onClose, onSwitchToSignup }) => {
                             name="email"
                             value={formData.email}
                             onChange={handleInputChange}
-                            placeholder="Enter your email"
-                            label="Email"
+                            placeholder="Մուտքագրեք ձեր էլ.փոստը"
+                            label="Էլ.փոստ"
                             variant="outlined"
                             sx={{
                                 mb: 3,
@@ -391,8 +391,8 @@ const LoginPage = ({ isModal = false, onClose, onSwitchToSignup }) => {
                             name="password"
                             value={formData.password}
                             onChange={handleInputChange}
-                            placeholder="Enter your password"
-                            label="Password"
+                            placeholder="Մուտքագրեք ձեր գաղտնաբառը"
+                            label="Գաղտնաբառ"
                             variant="outlined"
                             sx={{
                                 mb: 2,
@@ -457,7 +457,7 @@ const LoginPage = ({ isModal = false, onClose, onSwitchToSignup }) => {
                                 }
                                 label={
                                     <Typography sx={{ color: '#6B4C3A', fontSize: '13px', fontWeight: 500 }}>
-                                        Remember me
+                                        Հիշել ինձ
                                     </Typography>
                                 }
                             />
@@ -471,7 +471,7 @@ const LoginPage = ({ isModal = false, onClose, onSwitchToSignup }) => {
                                     '&:hover': { bgcolor: alpha('#A0522D', 0.05) }
                                 }}
                             >
-                                Forgot Password?
+                                Մոռացե՞լ եք գաղտնաբառը:
                             </Button>
                         </Box>
 
@@ -495,7 +495,7 @@ const LoginPage = ({ isModal = false, onClose, onSwitchToSignup }) => {
                                 transition: 'all 0.3s'
                             }}
                         >
-                            {loading ? <CircularProgress size={24} sx={{ color: 'white' }} /> : 'Sign In'}
+                            {loading ? <CircularProgress size={24} sx={{ color: 'white' }} /> : 'Մուտք գործել'}
                         </Button>
 
                         <Box sx={{
@@ -505,7 +505,7 @@ const LoginPage = ({ isModal = false, onClose, onSwitchToSignup }) => {
                             borderTop: '1px solid rgba(0,0,0,0.06)'
                         }}>
                             <Typography sx={{ color: '#6B4C3A', fontSize: '14px' }}>
-                                Don't have an account?{' '}
+                                Դեռ հաշիվ չունե՞ք:{' '}
                                 <Button
                                     onClick={handleSignUpClick}
                                     sx={{
@@ -516,7 +516,7 @@ const LoginPage = ({ isModal = false, onClose, onSwitchToSignup }) => {
                                         '&:hover': { bgcolor: alpha('#A0522D', 0.05) }
                                     }}
                                 >
-                                    Sign Up
+                                    Գրանցվել
                                 </Button>
                             </Typography>
                         </Box>
@@ -544,7 +544,7 @@ const LoginPage = ({ isModal = false, onClose, onSwitchToSignup }) => {
                     fontFamily: "'Inter', sans-serif",
                     pb: 1
                 }}>
-                    Forgot Password?
+                    Մոռացե՞լ եք գաղտնաբառը:
                 </DialogTitle>
                 <DialogContent>
                     <DialogContentText sx={{
@@ -553,7 +553,7 @@ const LoginPage = ({ isModal = false, onClose, onSwitchToSignup }) => {
                         fontFamily: "'Inter', sans-serif",
                         mb: 3
                     }}>
-                        Enter your email address and we'll send you a new password.
+                        Մուտքագրեք ձեր էլ.փոստի հասցեն, և մենք ձեզ կուղարկենք նոր գաղտնաբառ:
                     </DialogContentText>
 
                     {forgotPasswordError && (
@@ -581,8 +581,8 @@ const LoginPage = ({ isModal = false, onClose, onSwitchToSignup }) => {
                         type="email"
                         value={forgotPasswordEmail}
                         onChange={(e) => setForgotPasswordEmail(e.target.value)}
-                        placeholder="Enter your email"
-                        label="Email Address"
+                        placeholder="Մուտքագրեք ձեր էլ.փոստը"
+                        label="Էլ.փոստի հասցե"
                         variant="outlined"
                         disabled={forgotPasswordLoading || !!forgotPasswordMessage}
                         sx={{
@@ -615,7 +615,7 @@ const LoginPage = ({ isModal = false, onClose, onSwitchToSignup }) => {
                             '&:hover': { bgcolor: alpha('#8A8A8A', 0.05) }
                         }}
                     >
-                        Cancel
+                        Չեղարկել
                     </Button>
                     <Button
                         onClick={handleForgotPasswordSubmit}
@@ -633,7 +633,7 @@ const LoginPage = ({ isModal = false, onClose, onSwitchToSignup }) => {
                             }
                         }}
                     >
-                        {forgotPasswordLoading ? <CircularProgress size={20} sx={{ color: 'white' }} /> : 'Send Reset Email'}
+                        {forgotPasswordLoading ? <CircularProgress size={20} sx={{ color: 'white' }} /> : 'Ուղարկել վերականգնման նամակը'}
                     </Button>
                 </DialogActions>
             </Dialog>
