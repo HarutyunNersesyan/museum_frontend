@@ -72,7 +72,6 @@ import { alpha, styled } from '@mui/material/styles';
 import { adminMuseumAPI, adminEventAPI, adminStatsAPI } from '../services/adminAPI';
 import { isAdmin } from '../utils/jwtUtils';
 
-// Սահմանել dayjs-ի locale-ը հայերեն
 dayjs.locale('hy-am');
 
 // Գրադիենտ Կոճակ
@@ -89,7 +88,6 @@ const GradientButton = styled(Button)(({ theme }) => ({
     }
 }));
 
-// Եզրագծով Կոճակ
 const OutlinedButton = styled(Button)(({ theme }) => ({
     borderRadius: '12px',
     padding: '10px 24px',
@@ -103,7 +101,6 @@ const OutlinedButton = styled(Button)(({ theme }) => ({
     }
 }));
 
-// Վիճակագրության Քարտ
 const StatCard = styled(Paper)(({ theme }) => ({
     background: '#FFF8F0',
     borderRadius: '20px',
@@ -116,7 +113,6 @@ const StatCard = styled(Paper)(({ theme }) => ({
     }
 }));
 
-// Հարթ Տեքստային Դաշտ
 const FlatTextField = styled(TextField)(({ theme }) => ({
     '& .MuiOutlinedInput-root': {
         backgroundColor: '#FFF8F0',
@@ -138,7 +134,6 @@ const FlatTextField = styled(TextField)(({ theme }) => ({
     }
 }));
 
-// Հարթ Ընտրիչ
 const FlatSelect = styled(Select)(({ theme }) => ({
     backgroundColor: '#FFF8F0',
     borderRadius: '8px',
@@ -199,42 +194,11 @@ const DetailText = styled(Box)(({ theme }) => ({
     }
 }));
 
-// Հայաստանի քաղաքներ
-const ARMENIAN_CITIES = [
-    'Երևան',
-    'Գյումրի',
-    'Վանաձոր',
-    'Վաղարշապատ',
-    'Աբովյան',
-    'Կապան',
-    'Հրազդան',
-    'Արմավիր',
-    'Արտաշատ',
-    'Իջևան',
-    'Գավառ',
-    'Գորիս',
-    'Չարենցավան',
-    'Արարատ',
-    'Մասիս',
-    'Սևան',
-    'Աշտարակ',
-    'Դիլիջան',
-    'Սիսիան',
-    'Ալավերդի',
-    'Ստեփանավան',
-    'Մարտունի',
-    'Վարդենիս',
-    'Եղվարդ',
-    'Մեծամոր',
-    'Բերդ',
-    'Տաշիր',
-    'Ապարան',
-    'Վայք',
-    'Ջերմուկ'
-];
+// ========== ԹԱՐԳՄԱՆՈՒԹՅԱՆ MAP-ԵՐ ==========
+// Անգլերեն <-> Հայերեն
 
-// Միջոցառումների կատեգորիաներ - անգլերենից հայերեն թարգմանության map
-const categoryTranslationMap = {
+// Կատեգորիաներ - անգլերենից հայերեն
+const categoryToArmenian = {
     'ART': 'Արվեստ',
     'HISTORY': 'Պատմություն',
     'SCIENCE': 'Գիտություն',
@@ -248,40 +212,29 @@ const categoryTranslationMap = {
     'TRANSPORT': 'Տրանսպորտ',
     'RELIGIOUS': 'Կրոնական',
     'ETHNOGRAPHIC': 'Ազգագրական',
-    'OPEN_AIR': 'Բաց Երկնքի Տակ',
-    // Հայերեն արժեքների համար (եթե արդեն հայերեն է)
-    'Արվեստ': 'Արվեստ',
-    'Պատմություն': 'Պատմություն',
-    'Գիտություն': 'Գիտություն',
-    'Բնական Պատմություն': 'Բնական Պատմություն',
-    'Տեխնոլոգիա': 'Տեխնոլոգիա',
-    'Ռազմական': 'Ռազմական',
-    'Հնագիտություն': 'Հնագիտություն',
-    'Մշակութային': 'Մշակութային',
-    'Ծովային': 'Ծովային',
-    'Տիեզերք': 'Տիեզերք',
-    'Տրանսպորտ': 'Տրանսպորտ',
-    'Կրոնական': 'Կրոնական',
-    'Ազգագրական': 'Ազգագրական',
-    'Բաց Երկնքի Տակ': 'Բաց Երկնքի Տակ'
+    'OPEN_AIR': 'Բաց Երկնքի Տակ'
 };
 
-// Թանգարանների անունների թարգմանության map
-const museumTranslationMap = {
-    'History Museum of Armenia': 'Հայաստանի Պատմության Թանգարան',
-    'Matenadaran': 'Մատենադարան',
-    'Cafesjian Center for the Arts': 'Գաֆէսճեանի արուեստի կենտրոն',
-    'Erebuni Fortress & Museum': 'Էրեբունի ամրոց և թանգարան',
-    'Armenian Genocide Museum': 'Հայոց Ցեղասպանության Թանգարան',
-    'Dilijan Local Lore Museum': 'Դիլիջանի Երկրագիտական Թանգարան',
-    'Gyumri Museum of Architecture': 'Գյումրու Ճարտարապետության Թանգարան',
-    'Khor Virap Museum': 'Խոր Վիրապի Թանգարան',
-    'Sergey Parajanov Museum': 'Սերգեյ Փարաջանովի Թանգարան',
-    'Megerian Carpet Museum': 'Մեգերյան Կարպետի Թանգարան'
+// Կատեգորիաներ - հայերենից անգլերեն
+const armenianToCategory = {
+    'Արվեստ': 'ART',
+    'Պատմություն': 'HISTORY',
+    'Գիտություն': 'SCIENCE',
+    'Բնական Պատմություն': 'NATURAL_HISTORY',
+    'Տեխնոլոգիա': 'TECHNOLOGY',
+    'Ռազմական': 'MILITARY',
+    'Հնագիտություն': 'ARCHAEOLOGY',
+    'Մշակութային': 'CULTURAL',
+    'Ծովային': 'MARITIME',
+    'Տիեզերք': 'SPACE',
+    'Տրանսպորտ': 'TRANSPORT',
+    'Կրոնական': 'RELIGIOUS',
+    'Ազգագրական': 'ETHNOGRAPHIC',
+    'Բաց Երկնքի Տակ': 'OPEN_AIR'
 };
 
-// Քաղաքի translation map (եթե անգլերեն է եկել)
-const cityTranslationMap = {
+// Քաղաքներ - անգլերենից հայերեն
+const cityToArmenian = {
     'YEREVAN': 'Երևան',
     'GYUMRI': 'Գյումրի',
     'VANADZOR': 'Վանաձոր',
@@ -314,44 +267,65 @@ const cityTranslationMap = {
     'JERMUK': 'Ջերմուկ'
 };
 
-// Կատեգորիաների ցանկ Select-ի համար
-const eventCategoriesList = [
-    'Արվեստ',
-    'Պատմություն',
-    'Գիտություն',
-    'Բնական Պատմություն',
-    'Տեխնոլոգիա',
-    'Ռազմական',
-    'Հնագիտություն',
-    'Մշակութային',
-    'Ծովային',
-    'Տիեզերք',
-    'Տրանսպորտ',
-    'Կրոնական',
-    'Ազգագրական',
-    'Բաց Երկնքի Տակ'
-];
-
-// Միջոցառումների տեսակներ
-const eventTypesList = ['Շրջիկ'];
-
-// Օգնական ֆունկցիա կատեգորիան թարգմանելու համար
-const translateCategory = (category) => {
-    if (!category) return '';
-    return categoryTranslationMap[category] || category;
+// Քաղաքներ - հայերենից անգլերեն
+const armenianToCity = {
+    'Երևան': 'YEREVAN',
+    'Գյումրի': 'GYUMRI',
+    'Վանաձոր': 'VANADZOR',
+    'Վաղարշապատ': 'VAGHARSHAPAT',
+    'Աբովյան': 'ABOVYAN',
+    'Կապան': 'KAPAN',
+    'Հրազդան': 'HRAZDAN',
+    'Արմավիր': 'ARMAVIR',
+    'Արտաշատ': 'ARTASHAT',
+    'Իջևան': 'IJEVAN',
+    'Գավառ': 'GAVAR',
+    'Գորիս': 'GORIS',
+    'Չարենցավան': 'CHARENTSAVAN',
+    'Արարատ': 'ARARAT',
+    'Մասիս': 'MASIS',
+    'Սևան': 'SEVAN',
+    'Աշտարակ': 'ASHTARAK',
+    'Դիլիջան': 'DILIJAN',
+    'Սիսիան': 'SISIAN',
+    'Ալավերդի': 'ALAVERDI',
+    'Ստեփանավան': 'STEPANAVAN',
+    'Մարտունի': 'MARTUNI',
+    'Վարդենիս': 'VARDENIS',
+    'Եղվարդ': 'YEGHVARD',
+    'Մեծամոր': 'METSAMOR',
+    'Բերդ': 'BERD',
+    'Տաշիր': 'TASHIR',
+    'Ապարան': 'APARAN',
+    'Վայք': 'VAYK',
+    'Ջերմուկ': 'JERMUK'
 };
 
-// Օգնական ֆունկցիա քաղաքը թարգմանելու համար
-const translateCity = (city) => {
-    if (!city) return '';
-    return cityTranslationMap[city] || city;
+// Թանգարանների անուններ - անգլերենից հայերեն
+const museumToArmenian = {
+    'History Museum of Armenia': 'Հայաստանի Պատմության Թանգարան',
+    'Matenadaran': 'Մատենադարան',
+    'Cafesjian Center for the Arts': 'Գաֆէսճեանի արուեստի կենտրոն',
+    'Erebuni Fortress & Museum': 'Էրեբունի ամրոց և թանգարան',
+    'Armenian Genocide Museum': 'Հայոց Ցեղասպանության Թանգարան',
+    'Dilijan Local Lore Museum': 'Դիլիջանի Երկրագիտական Թանգարան',
+    'Gyumri Museum of Architecture': 'Գյումրու Ճարտարապետության Թանգարան',
+    'Khor Virap Museum': 'Խոր Վիրապի Թանգարան',
+    'Sergey Parajanov Museum': 'Սերգեյ Փարաջանովի Թանգարան',
+    'Megerian Carpet Museum': 'Մեգերյան Կարպետի Թանգարան'
 };
 
-// Օգնական ֆունկցիա թանգարանի անունը թարգմանելու համար
-const translateMuseumName = (museumName) => {
-    if (!museumName) return '';
-    return museumTranslationMap[museumName] || museumName;
-};
+// ========== ՕԳՆԱԿԱՆ ՖՈՒՆԿՑԻԱՆԵՐ ==========
+const translateCategoryToArmenian = (engValue) => categoryToArmenian[engValue] || engValue;
+const translateCategoryToEnglish = (armValue) => armenianToCategory[armValue] || armValue;
+const translateCityToArmenian = (engValue) => cityToArmenian[engValue] || engValue;
+const translateCityToEnglish = (armValue) => armenianToCity[armValue] || armValue;
+const translateMuseumToArmenian = (engValue) => museumToArmenian[engValue] || engValue;
+
+// ========== UI-ՈՒՄ ՕԳՏԱԳՈՐԾՎՈՂ ՑԱՆԿԵՐ (ՀԱՅԵՐԵՆ) ==========
+const ARMENIAN_CITIES_DISPLAY = Object.values(cityToArmenian);
+const EVENT_CATEGORIES_DISPLAY = Object.values(categoryToArmenian);
+const EVENT_TYPES_DISPLAY = ['Շրջիկ'];
 
 const parseEventDate = (dateValue) => {
     if (!dateValue) return dayjs();
@@ -406,6 +380,7 @@ const AdminDashboardPage = () => {
     const [contactEmail, setContactEmail] = useState('');
     const [museumsList, setMuseumsList] = useState([]);
 
+    // Form data - UI-ում օգտագործվում են հայերեն արժեքներ
     const [eventFormData, setEventFormData] = useState({
         name: '',
         description: '',
@@ -453,7 +428,13 @@ const AdminDashboardPage = () => {
         try {
             const response = await adminEventAPI.getAllEvents(eventsPage, 10);
             const eventsData = response.data.content || [];
-            setEvents(eventsData);
+            // UI-ի համար թարգմանում ենք կատեգորիան և քաղաքը հայերենի
+            const translatedEvents = eventsData.map(event => ({
+                ...event,
+                displayCategory: translateCategoryToArmenian(event.eventCategory),
+                displayLocation: translateCityToArmenian(event.location)
+            }));
+            setEvents(translatedEvents);
             setEventsTotalPages(response.data.totalPages || 0);
             const newIndices = {};
             eventsData.forEach(event => {
@@ -469,10 +450,10 @@ const AdminDashboardPage = () => {
         try {
             const response = await adminMuseumAPI.getAllMuseums(museumsPage, 10);
             const museumsData = response.data.content || [];
-            // Թարգմանել թանգարանների անունները ցուցադրման համար
+            // UI-ի համար թարգմանում ենք թանգարանների անունները հայերենի
             const translatedMuseums = museumsData.map(museum => ({
                 ...museum,
-                displayName: translateMuseumName(museum.name)
+                displayName: translateMuseumToArmenian(museum.name)
             }));
             setMuseums(translatedMuseums);
             setMuseumsTotalPages(response.data.totalPages || 0);
@@ -497,10 +478,10 @@ const AdminDashboardPage = () => {
         try {
             const response = await adminMuseumAPI.getAllMuseums(0, 100);
             const museumsData = response.data.content || [];
-            // Թարգմանել թանգարանների անունները dropdown-ի համար
+            // Dropdown-ի համար թարգմանում ենք թանգարանների անունները հայերենի
             const translatedMuseums = museumsData.map(museum => ({
                 ...museum,
-                name: translateMuseumName(museum.name)
+                name: translateMuseumToArmenian(museum.name)
             }));
             setMuseumsList(translatedMuseums);
         } catch (error) {
@@ -532,15 +513,16 @@ const AdminDashboardPage = () => {
 
     const handleOpenEditEventDialog = (event) => {
         setEditingEvent(event);
+        // Խմբագրման ձևում ցույց ենք տալիս հայերեն արժեքները
         setEventFormData({
             name: event.name,
             description: event.description,
-            eventCategory: translateCategory(event.eventCategory),
+            eventCategory: translateCategoryToArmenian(event.eventCategory),
             eventType: event.eventType === 'MOBILE' ? 'Շրջիկ' : (event.eventType || 'Շրջիկ'),
             eventDate: parseEventDate(event.eventDate),
             guidePrice: event.guidePrice?.toString() || '',
             ticketPrice: event.ticketPrice?.toString() || '',
-            location: translateCity(event.location),
+            location: translateCityToArmenian(event.location),
             duration: event.duration?.toString() || '',
             museumId: event.museumId
         });
@@ -570,7 +552,6 @@ const AdminDashboardPage = () => {
 
     const handleOpenEditMuseumDialog = (museum) => {
         setEditingMuseum(museum);
-        // Ցույց տալ բնօրինակ անունը խմբագրման ժամանակ
         setMuseumFormData({ name: museum.name });
         setMuseumDialogOpen(true);
     };
@@ -629,15 +610,16 @@ const AdminDashboardPage = () => {
                 formattedDate = dayjs().format('YYYY-MM-DDTHH:mm:ss');
             }
 
+            // Հայերեն արժեքները թարգմանում ենք անգլերենի՝ backend-ին ուղարկելու համար
             const submitData = {
                 name: eventFormData.name,
                 description: eventFormData.description,
-                eventCategory: eventFormData.eventCategory,
+                eventCategory: translateCategoryToEnglish(eventFormData.eventCategory),
                 eventType: eventFormData.eventType === 'Շրջիկ' ? 'MOBILE' : eventFormData.eventType,
                 eventDate: formattedDate,
                 guidePrice: parseInt(eventFormData.guidePrice),
                 ticketPrice: parseInt(eventFormData.ticketPrice),
-                location: eventFormData.location,
+                location: translateCityToEnglish(eventFormData.location),
                 duration: eventFormData.duration ? parseInt(eventFormData.duration) : null,
                 museumId: parseInt(eventFormData.museumId),
                 phoneNumber: phoneNumber || null,
@@ -859,10 +841,7 @@ const AdminDashboardPage = () => {
                                         const images = event.imageUrls || [];
                                         const currentIndex = activeImageIndex[event.id] || 0;
                                         const museum = museumsList.find(m => m.id === event.museumId);
-                                        // Թարգմանել կատեգորիան, քաղաքը և թանգարանի անունը ցուցադրման համար
-                                        const displayCategory = translateCategory(event.eventCategory);
-                                        const displayLocation = translateCity(event.location);
-                                        const displayMuseumName = museum?.name || translateMuseumName(event.museumName) || '-';
+                                        const displayMuseumName = museum?.name || translateMuseumToArmenian(event.museumName) || '-';
 
                                         return (
                                             <Grow in={true} key={event.id}>
@@ -947,7 +926,7 @@ const AdminDashboardPage = () => {
                                                                             </DetailIcon>
                                                                             <DetailText>
                                                                                 <div className="label">Կատեգորիա</div>
-                                                                                <div className="value">{displayCategory}</div>
+                                                                                <div className="value">{event.displayCategory}</div>
                                                                             </DetailText>
                                                                         </DetailItem>
                                                                     </Grid>
@@ -958,7 +937,7 @@ const AdminDashboardPage = () => {
                                                                             </DetailIcon>
                                                                             <DetailText>
                                                                                 <div className="label">Վայր</div>
-                                                                                <div className="value">{displayLocation}</div>
+                                                                                <div className="value">{event.displayLocation}</div>
                                                                             </DetailText>
                                                                         </DetailItem>
                                                                     </Grid>
@@ -1090,7 +1069,7 @@ const AdminDashboardPage = () => {
                                                             <IconButton onClick={() => handleDeleteMuseum(museum.id)} sx={{ color: '#f44336' }}><DeleteIcon /></IconButton>
                                                         </Box>
                                                     </Box>
-                                                    <Typography variant="h6" sx={{ fontWeight: 700, color: '#4A2A1A', mb: 1 }}>{museum.displayName || museum.name}</Typography>
+                                                    <Typography variant="h6" sx={{ fontWeight: 700, color: '#4A2A1A', mb: 1 }}>{museum.displayName}</Typography>
                                                     <Typography variant="body2" sx={{ color: '#8B6914' }}>ID: {museum.id}</Typography>
                                                 </CardContent>
                                             </Card>
@@ -1140,7 +1119,7 @@ const AdminDashboardPage = () => {
                                             label="Կատեգորիա"
                                         >
                                             <MenuItem value="">Ընտրել Կատեգորիան</MenuItem>
-                                            {eventCategoriesList.map(cat => (
+                                            {EVENT_CATEGORIES_DISPLAY.map(cat => (
                                                 <MenuItem key={cat} value={cat}>{cat}</MenuItem>
                                             ))}
                                         </FlatSelect>
@@ -1155,7 +1134,7 @@ const AdminDashboardPage = () => {
                                             onChange={handleEventInputChange}
                                             label="Տեսակ"
                                         >
-                                            {eventTypesList.map(type => (
+                                            {EVENT_TYPES_DISPLAY.map(type => (
                                                 <MenuItem key={type} value={type}>{type}</MenuItem>
                                             ))}
                                         </FlatSelect>
@@ -1190,7 +1169,7 @@ const AdminDashboardPage = () => {
                                             label="Քաղաք"
                                         >
                                             <MenuItem value="">Ընտրել Քաղաքը</MenuItem>
-                                            {ARMENIAN_CITIES.map(city => (
+                                            {ARMENIAN_CITIES_DISPLAY.map(city => (
                                                 <MenuItem key={city} value={city}>{city}</MenuItem>
                                             ))}
                                         </FlatSelect>
