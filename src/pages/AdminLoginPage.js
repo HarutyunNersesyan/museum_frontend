@@ -55,11 +55,11 @@ const AdminLoginPage = () => {
 
     const validateForm = () => {
         if (!formData.email) {
-            setError('Email is required');
+            setError('Էլ.փոստը պարտադիր է');
             return false;
         }
         if (!formData.password) {
-            setError('Password is required');
+            setError('Գաղտնաբառը պարտադիր է');
             return false;
         }
         return true;
@@ -89,29 +89,29 @@ const AdminLoginPage = () => {
                         if (roles.includes('ADMIN')) {
                             navigate('/admin/dashboard');
                         } else {
-                            setError('Access denied. Admin privileges required.');
+                            setError('Մուտքը մերժվեց: Պահանջվում են ադմինիստրատորի իրավունքներ:');
                             localStorage.removeItem('token');
                             localStorage.removeItem('user');
                             setFormData(prev => ({ ...prev, password: '' }));
                         }
                     } catch (decodeError) {
-                        console.error('Token decode error:', decodeError);
-                        setError('Authentication error. Please try again.');
+                        console.error('Token-ի վերծանման սխալ:', decodeError);
+                        setError('Նույնականացման սխալ: Խնդրում ենք կրկին փորձել:');
                         localStorage.removeItem('token');
                         localStorage.removeItem('user');
                         setFormData(prev => ({ ...prev, password: '' }));
                     }
                 } else {
-                    setError('Authentication failed. Please try again.');
+                    setError('Նույնականացումը ձախողվեց: Խնդրում ենք կրկին փորձել:');
                     setFormData(prev => ({ ...prev, password: '' }));
                 }
             } else {
-                setError(result.message || 'Invalid email or password');
+                setError(result.message || 'Սխալ էլ.փոստ կամ գաղտնաբառ');
                 setFormData(prev => ({ ...prev, password: '' }));
             }
         } catch (err) {
-            console.error('Login error:', err);
-            setError('Something went wrong. Please check your connection and try again.');
+            console.error('Մուտքի սխալ:', err);
+            setError('Ինչ-որ բան այն չէ: Խնդրում ենք ստուգել ձեր կապը և կրկին փորձել:');
             setFormData(prev => ({ ...prev, password: '' }));
         } finally {
             setLoading(false);
@@ -128,7 +128,7 @@ const AdminLoginPage = () => {
             position: 'relative',
             overflow: 'hidden'
         }}>
-            {/* Animated Background */}
+            {/* Անիմացիոն Ֆոն */}
             <Box sx={{
                 position: 'absolute',
                 top: 0,
@@ -143,7 +143,7 @@ const AdminLoginPage = () => {
                 `
             }} />
 
-            {/* Floating animated elements */}
+            {/* Լողացող անիմացիոն տարրեր */}
             <Box sx={{ position: 'absolute', top: '10%', left: '5%', opacity: 0.1, animation: 'float 8s infinite ease-in-out' }}>
                 <MuseumIcon sx={{ fontSize: 120, color: '#D4A574' }} />
             </Box>
@@ -204,7 +204,7 @@ const AdminLoginPage = () => {
                     boxShadow: `0 25px 50px ${alpha('#000000', 0.5)}`
                 }}>
 
-                    {/* Left Side - Hero Image & Content */}
+                    {/* Ձախ կողմ - Hero Image & Բովանդակություն */}
                     <Box sx={{
                         flex: 1.2,
                         background: 'linear-gradient(135deg, #8B5E3C 0%, #6B3A2A 100%)',
@@ -215,7 +215,7 @@ const AdminLoginPage = () => {
                         position: 'relative',
                         overflow: 'hidden'
                     }}>
-                        {/* Decorative pattern overlay */}
+                        {/* Դեկորատիվ նախշի ծածկույթ */}
                         <Box sx={{
                             position: 'absolute',
                             top: 0,
@@ -253,7 +253,7 @@ const AdminLoginPage = () => {
                                 fontSize: { xs: '2rem', md: '2.5rem' },
                                 textShadow: '0 2px 10px rgba(0,0,0,0.2)'
                             }}>
-                                Welcome Back
+                                Բարի Վերադարձ
                             </Typography>
 
                             <Typography variant="h6" sx={{
@@ -262,11 +262,11 @@ const AdminLoginPage = () => {
                                 fontWeight: 500,
                                 lineHeight: 1.5
                             }}>
-                                Sign in to manage your museums,<br />
-                                events, and content from one dashboard.
+                                Մուտք գործեք՝ ձեր թանգարանները,<br />
+                                միջոցառումները և բովանդակությունը մեկ վահանակից կառավարելու համար:
                             </Typography>
 
-                            {/* Feature List */}
+                            {/* Հնարավորությունների Ցանկ */}
                             <Box sx={{ mt: 4, space: 2 }}>
                                 <Box sx={{ display: 'flex', alignItems: 'center', gap: 2, mb: 2 }}>
                                     <Box sx={{
@@ -281,7 +281,7 @@ const AdminLoginPage = () => {
                                         <MuseumIcon sx={{ fontSize: 20, color: '#FFFFFF' }} />
                                     </Box>
                                     <Typography variant="body1" sx={{ color: alpha('#FFFFFF', 0.85) }}>
-                                        Manage Museums & Exhibitions
+                                        Կառավարել Թանգարաններն ու Ցուցահանդեսները
                                     </Typography>
                                 </Box>
                                 <Box sx={{ display: 'flex', alignItems: 'center', gap: 2, mb: 2 }}>
@@ -297,7 +297,7 @@ const AdminLoginPage = () => {
                                         <EventIcon sx={{ fontSize: 20, color: '#FFFFFF' }} />
                                     </Box>
                                     <Typography variant="body1" sx={{ color: alpha('#FFFFFF', 0.85) }}>
-                                        Create & Schedule Events
+                                        Ստեղծել և Պլանավորել Միջոցառումներ
                                     </Typography>
                                 </Box>
                                 <Box sx={{ display: 'flex', alignItems: 'center', gap: 2, mb: 2 }}>
@@ -313,7 +313,7 @@ const AdminLoginPage = () => {
                                         <PeopleIcon sx={{ fontSize: 20, color: '#FFFFFF' }} />
                                     </Box>
                                     <Typography variant="body1" sx={{ color: alpha('#FFFFFF', 0.85) }}>
-                                        Track Visitor Engagement
+                                        Հետևել Այցելուների Ներգրավվածությանը
                                     </Typography>
                                 </Box>
                                 <Box sx={{ display: 'flex', alignItems: 'center', gap: 2 }}>
@@ -329,12 +329,12 @@ const AdminLoginPage = () => {
                                         <StarIcon sx={{ fontSize: 20, color: '#FFFFFF' }} />
                                     </Box>
                                     <Typography variant="body1" sx={{ color: alpha('#FFFFFF', 0.85) }}>
-                                        Analytics & Insights
+                                        Վերլուծություններ և Պատկերացումներ
                                     </Typography>
                                 </Box>
                             </Box>
 
-                            {/* Stats */}
+                            {/* Վիճակագրություն */}
                             <Box sx={{
                                 display: 'flex',
                                 gap: 4,
@@ -344,21 +344,21 @@ const AdminLoginPage = () => {
                             }}>
                                 <Box>
                                     <Typography variant="h4" sx={{ fontWeight: 700, color: '#FFFFFF' }}>10+</Typography>
-                                    <Typography variant="caption" sx={{ color: alpha('#FFFFFF', 0.7) }}>Museums</Typography>
+                                    <Typography variant="caption" sx={{ color: alpha('#FFFFFF', 0.7) }}>Թանգարաններ</Typography>
                                 </Box>
                                 <Box>
                                     <Typography variant="h4" sx={{ fontWeight: 700, color: '#FFFFFF' }}>200+</Typography>
-                                    <Typography variant="caption" sx={{ color: alpha('#FFFFFF', 0.7) }}>Events</Typography>
+                                    <Typography variant="caption" sx={{ color: alpha('#FFFFFF', 0.7) }}>Միջոցառումներ</Typography>
                                 </Box>
                                 <Box>
                                     <Typography variant="h4" sx={{ fontWeight: 700, color: '#FFFFFF' }}>10K+</Typography>
-                                    <Typography variant="caption" sx={{ color: alpha('#FFFFFF', 0.7) }}>Visitors</Typography>
+                                    <Typography variant="caption" sx={{ color: alpha('#FFFFFF', 0.7) }}>Այցելուներ</Typography>
                                 </Box>
                             </Box>
                         </Box>
                     </Box>
 
-                    {/* Right Side - Sign In Form */}
+                    {/* Աջ կողմ - Մուտքի Ձևաթուղթ */}
                     <Box sx={{
                         flex: 0.9,
                         p: { xs: 4, sm: 5, md: 6 },
@@ -367,7 +367,7 @@ const AdminLoginPage = () => {
                         justifyContent: 'center',
                         animation: 'slideInRight 0.6s ease-out'
                     }}>
-                        {/* Security Badge */}
+                        {/* Անվտանգության Կրծքանշան */}
                         <Box sx={{
                             display: 'flex',
                             alignItems: 'center',
@@ -382,28 +382,28 @@ const AdminLoginPage = () => {
                         }}>
                             <SecurityIcon sx={{ fontSize: 16, color: '#D4A574' }} />
                             <Typography variant="caption" sx={{ color: '#D4A574', fontWeight: 500 }}>
-                                Restricted Access
+                                Սահմանափակ Մուտք
                             </Typography>
                         </Box>
 
-                        {/* Form Title */}
+                        {/* Ձևաթղթի Վերնագիր */}
                         <Typography variant="h4" sx={{
                             fontWeight: 700,
                             color: '#FFFFFF',
                             textAlign: 'center',
                             mb: 1
                         }}>
-                            Admin Sign In
+                            Ադմինիստրատորի Մուտք
                         </Typography>
                         <Typography variant="body2" sx={{
                             color: alpha('#FFFFFF', 0.6),
                             textAlign: 'center',
                             mb: 4
                         }}>
-                            Enter your credentials to access the admin panel
+                            Մուտքագրեք ձեր հավատարմագրերը ադմինիստրատորի վահանակ մուտք գործելու համար
                         </Typography>
 
-                        {/* Error Alert */}
+                        {/* Սխալի Ծանուցում */}
                         {error && (
                             <Fade in={!!error}>
                                 <Alert
@@ -424,13 +424,13 @@ const AdminLoginPage = () => {
                             </Fade>
                         )}
 
-                        {/* Login Form */}
+                        {/* Մուտքի Ձևաթուղթ */}
                         <Box component="form" onSubmit={handleSubmit}>
                             <TextField
                                 fullWidth
                                 type="email"
                                 name="email"
-                                label="Email Address"
+                                label="Էլ.փոստի Հասցե"
                                 value={formData.email}
                                 onChange={handleInputChange}
                                 placeholder="admin@museum.am"
@@ -473,10 +473,10 @@ const AdminLoginPage = () => {
                                 fullWidth
                                 type={showPassword ? 'text' : 'password'}
                                 name="password"
-                                label="Password"
+                                label="Գաղտնաբառ"
                                 value={formData.password}
                                 onChange={handleInputChange}
-                                placeholder="Enter your password"
+                                placeholder="Մուտքագրեք ձեր գաղտնաբառը"
                                 required
                                 variant="outlined"
                                 InputProps={{
@@ -555,15 +555,15 @@ const AdminLoginPage = () => {
                                 {loading ? (
                                     <CircularProgress size={24} sx={{ color: '#FFFFFF' }} />
                                 ) : (
-                                    'Sign In as Admin'
+                                    'Մուտք Գործել որպես Ադմինիստրատոր'
                                 )}
                             </Button>
                         </Box>
 
-                        {/* Footer Note */}
+                        {/* Ստորին Ծանոթագրություն */}
                         <Box sx={{ mt: 4, textAlign: 'center' }}>
                             <Typography variant="caption" sx={{ color: alpha('#FFFFFF', 0.3) }}>
-                                Protected by industry-standard security
+                                Պաշտպանված է արդյունաբերական ստանդարտ անվտանգությամբ
                             </Typography>
                         </Box>
                     </Box>

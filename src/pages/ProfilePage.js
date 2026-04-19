@@ -62,7 +62,7 @@ import LoginPage from './LoginPage';
 import SignUpPage from './SignUpPage';
 import VerifyCodePage from './VerifyCodePage';
 
-// Custom animations
+// Հատուկ անիմացիաներ
 const pulse = keyframes`
     0%, 100% { opacity: 0.4; transform: scale(1); }
     50% { opacity: 0.7; transform: scale(1.05); }
@@ -73,7 +73,7 @@ const slideIn = keyframes`
     to { opacity: 1; transform: translateY(0); }
 `;
 
-// Warm brown color palette (same as HomePage)
+// Ջերմ շագանակագույն գունային համակարգ (նույնը, ինչ HomePage-ում)
 const colors = {
     primary: '#C4A484',
     primaryDark: '#A0522D',
@@ -88,7 +88,7 @@ const colors = {
     error: '#f44336'
 };
 
-// Scrollbar styles
+// Ոլորման սանդղակի ոճեր
 const scrollbarStyles = {
     '*::-webkit-scrollbar': { width: '8px', height: '8px' },
     '*::-webkit-scrollbar-track': { background: '#E8D5B7', borderRadius: '10px' },
@@ -238,31 +238,31 @@ const ProfilePage = () => {
 
     const validateForm = () => {
         if (!formData.oldPassword) {
-            setError('Current password is required');
+            setError('Ընթացիկ գաղտնաբառը պարտադիր է');
             return false;
         }
         if (!formData.newPassword) {
-            setError('New password is required');
+            setError('Նոր գաղտնաբառը պարտադիր է');
             return false;
         }
         if (formData.newPassword.length < 8) {
-            setError('Password must be at least 8 characters long');
+            setError('Գաղտնաբառը պետք է պարունակի առնվազն 8 նիշ');
             return false;
         }
         if (passwordStrength.score < 4) {
-            setError('Password must contain uppercase, lowercase, number, and special character');
+            setError('Գաղտնաբառը պետք է պարունակի մեծատառ, փոքրատառ, թիվ և հատուկ նիշ');
             return false;
         }
         if (!formData.confirmPassword) {
-            setError('Please confirm your new password');
+            setError('Խնդրում ենք հաստատել ձեր նոր գաղտնաբառը');
             return false;
         }
         if (formData.newPassword !== formData.confirmPassword) {
-            setError('New passwords do not match');
+            setError('Նոր գաղտնաբառերը չեն համընկնում');
             return false;
         }
         if (formData.oldPassword === formData.newPassword) {
-            setError('New password cannot be the same as current password');
+            setError('Նոր գաղտնաբառը չի կարող նույնը լինել, ինչ ընթացիկը');
             return false;
         }
         return true;
@@ -294,17 +294,17 @@ const ProfilePage = () => {
 
             if (!response.ok) {
                 const errorData = await response.text();
-                throw new Error(errorData || 'Failed to change password');
+                throw new Error(errorData || 'Գաղտնաբառի փոփոխությունը ձախողվեց');
             }
 
-            setSuccess('Password changed successfully!');
-            setSnackbar({ open: true, message: 'Password updated successfully!', severity: 'success' });
+            setSuccess('Գաղտնաբառը հաջողությամբ փոխվեց!');
+            setSnackbar({ open: true, message: 'Գաղտնաբառը հաջողությամբ թարմացվեց!', severity: 'success' });
             setFormData({ oldPassword: '', newPassword: '', confirmPassword: '' });
         } catch (err) {
             let errorMessage = err.message;
-            if (errorMessage.includes('Invalid old password')) errorMessage = 'Current password is incorrect';
-            else if (errorMessage.includes('new password cannot be the same')) errorMessage = 'New password cannot be the same as current password';
-            else if (errorMessage.includes('Email must be verified')) errorMessage = 'Your email must be verified to change password';
+            if (errorMessage.includes('Invalid old password')) errorMessage = 'Ընթացիկ գաղտնաբառը սխալ է';
+            else if (errorMessage.includes('new password cannot be the same')) errorMessage = 'Նոր գաղտնաբառը չի կարող նույնը լինել, ինչ ընթացիկը';
+            else if (errorMessage.includes('Email must be verified')) errorMessage = 'Գաղտնաբառը փոխելու համար ձեր էլ.փոստը պետք է հաստատված լինի';
 
             setError(errorMessage);
             setSnackbar({ open: true, message: errorMessage, severity: 'error' });
@@ -330,9 +330,9 @@ const ProfilePage = () => {
 
     const getPasswordStrengthText = () => {
         const score = passwordStrength.score;
-        if (score <= 2) return 'Weak';
-        if (score === 3) return 'Medium';
-        return 'Strong';
+        if (score <= 2) return 'Թույլ';
+        if (score === 3) return 'Միջին';
+        return 'Ուժեղ';
     };
 
     if (!user) {
@@ -347,7 +347,7 @@ const ProfilePage = () => {
         <Box sx={{ minHeight: '100vh', background: 'linear-gradient(135deg, #FFF8F0 0%, #F5EDE3 100%)', position: 'relative', overflowX: 'hidden' }}>
             <GlobalStyles styles={scrollbarStyles} />
 
-            {/* Animated Background */}
+            {/* Անիմացիոն ֆոն */}
             <Box sx={{
                 position: 'fixed', top: 0, left: 0, width: '100%', height: '100%', zIndex: 0,
                 background: `
@@ -357,7 +357,7 @@ const ProfilePage = () => {
                 transition: 'background 0.3s ease-out'
             }} />
 
-            {/* Floating circles */}
+            {/* Լողացող շրջանակներ */}
             <Box sx={{ position: 'fixed', top: 0, left: 0, right: 0, bottom: 0, zIndex: 1, pointerEvents: 'none', overflow: 'hidden' }}>
                 {[...Array(8)].map((_, idx) => (
                     <Box key={`bg-circle-${idx}`} sx={{
@@ -374,7 +374,7 @@ const ProfilePage = () => {
                 ))}
             </Box>
 
-            {/* Header */}
+            {/* Վերնագիր */}
             <Box sx={{
                 position: 'sticky', top: 0, zIndex: 100, backgroundColor: alphaMUI('#FFFDF7', 0.95),
                 backdropFilter: 'blur(10px)', borderBottom: `1px solid ${colors.border}`
@@ -386,25 +386,25 @@ const ProfilePage = () => {
                                 <MuseumIcon sx={{ color: 'white', fontSize: 22 }} />
                             </Box>
                             <Typography variant="h6" sx={{ fontWeight: 800, background: colors.gradient, WebkitBackgroundClip: 'text', WebkitTextFillColor: 'transparent' }}>
-                                Museum
+                                Թանգարան
                             </Typography>
                         </Box>
 
                         <Box sx={{ display: 'flex', alignItems: 'center', gap: 4 }}>
                             <Button startIcon={<EventIcon />} onClick={handleEventsClick} sx={{ fontWeight: 500, color: colors.textLight, '&:hover': { color: colors.primary } }}>
-                                Events
+                                Միջոցառումներ
                             </Button>
 
                             <Box sx={{ display: 'flex', alignItems: 'center', gap: 2 }}>
-                                <Chip label={`Welcome, ${user.userName}`} size="small" sx={{ display: { xs: 'none', sm: 'flex' }, bgcolor: alphaMUI(colors.primary, 0.1), color: colors.primary }} />
+                                <Chip label={`Բարի գալուստ, ${user.userName}`} size="small" sx={{ display: { xs: 'none', sm: 'flex' }, bgcolor: alphaMUI(colors.primary, 0.1), color: colors.primary }} />
                                 <IconButton onClick={handleMenuOpen} sx={{ background: colors.gradient, width: 38, height: 38 }}>
                                     <Avatar sx={{ width: 38, height: 38, bgcolor: 'transparent', color: 'white' }}>{userInitial || <AccountCircleIcon />}</Avatar>
                                 </IconButton>
                                 <Menu anchorEl={anchorEl} open={Boolean(anchorEl)} onClose={handleMenuClose} PaperProps={{ sx: { bgcolor: '#FFFDF7', border: `1px solid ${colors.border}`, borderRadius: '16px' } }}>
-                                    <MenuItem onClick={handleProfile}><PersonIcon sx={{ mr: 2, color: colors.primary }} />Profile</MenuItem>
-                                    {isAdmin && <MenuItem onClick={handleAdminPanel}><AdminPanelSettingsIcon sx={{ mr: 2, color: colors.primaryDark }} />Admin Panel</MenuItem>}
+                                    <MenuItem onClick={handleProfile}><PersonIcon sx={{ mr: 2, color: colors.primary }} />Անձնական էջ</MenuItem>
+                                    {isAdmin && <MenuItem onClick={handleAdminPanel}><AdminPanelSettingsIcon sx={{ mr: 2, color: colors.primaryDark }} />Ադմինիստրատորի վահանակ</MenuItem>}
                                     <Divider />
-                                    <MenuItem onClick={handleLogout}><LogoutIcon sx={{ mr: 2, color: colors.error }} />Logout</MenuItem>
+                                    <MenuItem onClick={handleLogout}><LogoutIcon sx={{ mr: 2, color: colors.error }} />Դուրս գալ</MenuItem>
                                 </Menu>
                             </Box>
                         </Box>
@@ -412,10 +412,10 @@ const ProfilePage = () => {
                 </Container>
             </Box>
 
-            {/* Main Content - NEW LAYOUT with Sidebar Arrow */}
+            {/* Հիմնական Բովանդակություն - ՆՈՐ ԴԱՍԱՎՈՐՈՒՄ կողային սլաքով */}
             <Container maxWidth="lg" sx={{ position: 'relative', zIndex: 3, py: 4 }}>
                 <Box sx={{ animation: `${slideIn} 0.5s ease-out` }}>
-                    {/* Page Title with Back Arrow */}
+                    {/* Էջի Վերնագիր հետ սլաքով */}
                     <Box sx={{ display: 'flex', alignItems: 'center', gap: 2, mb: 4 }}>
                         <IconButton
                             onClick={handleHomeClick}
@@ -429,16 +429,16 @@ const ProfilePage = () => {
                         </IconButton>
                         <Box>
                             <Typography variant="h4" sx={{ fontWeight: 700, color: colors.text }}>
-                                My Profile
+                                Իմ Պրոֆիլը
                             </Typography>
                             <Typography variant="body1" sx={{ color: colors.textLight }}>
-                                Manage your account settings and security preferences
+                                Կառավարեք ձեր հաշվի կարգավորումները և անվտանգության նախապատվությունները
                             </Typography>
                         </Box>
                     </Box>
 
                     <Grid container spacing={4}>
-                        {/* Sidebar - Profile Menu */}
+                        {/* Կողային վահանակ - Պրոֆիլի Մենյու */}
                         <Grid item xs={12} md={4}>
                             <Card sx={{
                                 background: alphaMUI('#FFFDF7', 0.95),
@@ -448,7 +448,7 @@ const ProfilePage = () => {
                                 position: 'sticky',
                                 top: 90
                             }}>
-                                {/* Profile Summary */}
+                                {/* Պրոֆիլի Ամփոփում */}
                                 <Box sx={{ textAlign: 'center', p: 3, borderBottom: `1px solid ${colors.border}` }}>
                                     <Avatar sx={{
                                         width: 100, height: 100, margin: '0 auto', mb: 2,
@@ -457,7 +457,7 @@ const ProfilePage = () => {
                                         {user?.userName?.charAt(0).toUpperCase() || 'U'}
                                     </Avatar>
                                     <Typography variant="h6" sx={{ fontWeight: 600, color: colors.text }}>
-                                        {user?.userName || 'User'}
+                                        {user?.userName || 'Օգտատեր'}
                                     </Typography>
                                     <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 0.5, mt: 0.5 }}>
                                         <EmailIcon sx={{ color: colors.textLight, fontSize: 14 }} />
@@ -467,13 +467,13 @@ const ProfilePage = () => {
                                     </Box>
                                     <Chip
                                         icon={<VerifiedUserIcon sx={{ fontSize: 14 }} />}
-                                        label="Verified Account"
+                                        label="Հաստատված Հաշիվ"
                                         size="small"
                                         sx={{ mt: 1.5, bgcolor: alphaMUI('#4CAF50', 0.1), color: '#4CAF50' }}
                                     />
                                 </Box>
 
-                                {/* Menu Items */}
+                                {/* Մենյուի Տարրեր */}
                                 <Stack sx={{ p: 1 }}>
                                     <Button
                                         fullWidth
@@ -489,7 +489,7 @@ const ProfilePage = () => {
                                             '&:hover': { bgcolor: alphaMUI(colors.primary, 0.08) }
                                         }}
                                     >
-                                        Profile Information
+                                        Պրոֆիլի Տվյալներ
                                     </Button>
                                     <Button
                                         fullWidth
@@ -504,16 +504,16 @@ const ProfilePage = () => {
                                             '&:hover': { bgcolor: alphaMUI(colors.primary, 0.08) }
                                         }}
                                     >
-                                        Security & Password
+                                        Անվտանգություն և Գաղտնաբառ
                                     </Button>
                                 </Stack>
                             </Card>
                         </Grid>
 
-                        {/* Main Content Area */}
+                        {/* Հիմնական Բովանդակության Տարածք */}
                         <Grid item xs={12} md={8}>
                             {activeTab === 'profile' ? (
-                                // Profile Information Tab
+                                // Պրոֆիլի Տվյալների Ներդիր
                                 <Card sx={{
                                     background: alphaMUI('#FFFDF7', 0.95),
                                     borderRadius: '20px',
@@ -522,27 +522,27 @@ const ProfilePage = () => {
                                 }}>
                                     <Box sx={{ p: 3, borderBottom: `1px solid ${colors.border}`, bgcolor: alphaMUI(colors.surface, 0.5) }}>
                                         <Typography variant="h6" sx={{ fontWeight: 600, color: colors.text }}>
-                                            Profile Information
+                                            Պրոֆիլի Տվյալներ
                                         </Typography>
                                         <Typography variant="body2" sx={{ color: colors.textLight }}>
-                                            Your personal information
+                                            Ձեր անձնական տվյալները
                                         </Typography>
                                     </Box>
                                     <Box sx={{ p: 3 }}>
                                         <Stack spacing={3}>
                                             <Box>
                                                 <Typography variant="subtitle2" sx={{ color: colors.text, mb: 1, fontWeight: 600 }}>
-                                                    Username
+                                                    Օգտանուն
                                                 </Typography>
                                                 <Paper sx={{ p: 2, bgcolor: alphaMUI(colors.background, 0.5), borderRadius: '12px' }}>
                                                     <Typography variant="body1" sx={{ color: colors.text }}>
-                                                        {user?.userName || 'User'}
+                                                        {user?.userName || 'Օգտատեր'}
                                                     </Typography>
                                                 </Paper>
                                             </Box>
                                             <Box>
                                                 <Typography variant="subtitle2" sx={{ color: colors.text, mb: 1, fontWeight: 600 }}>
-                                                    Email Address
+                                                    Էլ.փոստի Հասցե
                                                 </Typography>
                                                 <Paper sx={{ p: 2, bgcolor: alphaMUI(colors.background, 0.5), borderRadius: '12px' }}>
                                                     <Typography variant="body1" sx={{ color: colors.text }}>
@@ -552,11 +552,11 @@ const ProfilePage = () => {
                                             </Box>
                                             <Box>
                                                 <Typography variant="subtitle2" sx={{ color: colors.text, mb: 1, fontWeight: 600 }}>
-                                                    Account Type
+                                                    Հաշվի Տեսակ
                                                 </Typography>
                                                 <Paper sx={{ p: 2, bgcolor: alphaMUI(colors.background, 0.5), borderRadius: '12px' }}>
                                                     <Chip
-                                                        label={isAdmin ? "Administrator" : "Regular User"}
+                                                        label={isAdmin ? "Ադմինիստրատոր" : "Սովորական Օգտատեր"}
                                                         sx={{
                                                             bgcolor: isAdmin ? alphaMUI(colors.primary, 0.1) : alphaMUI('#4CAF50', 0.1),
                                                             color: isAdmin ? colors.primary : '#4CAF50'
@@ -575,14 +575,14 @@ const ProfilePage = () => {
                                                         '&:hover': { borderColor: colors.primary, bgcolor: alphaMUI(colors.primary, 0.05) }
                                                     }}
                                                 >
-                                                    Change Password
+                                                    Փոխել Գաղտնաբառը
                                                 </Button>
                                             </Box>
                                         </Stack>
                                     </Box>
                                 </Card>
                             ) : (
-                                // Security & Password Tab
+                                // Անվտանգություն և Գաղտնաբառ Ներդիր
                                 <Card sx={{
                                     background: alphaMUI('#FFFDF7', 0.95),
                                     borderRadius: '20px',
@@ -592,10 +592,10 @@ const ProfilePage = () => {
                                     <Box sx={{ p: 3, borderBottom: `1px solid ${colors.border}`, bgcolor: alphaMUI(colors.surface, 0.5) }}>
                                         <Typography variant="h6" sx={{ fontWeight: 600, color: colors.text, display: 'flex', alignItems: 'center', gap: 1 }}>
                                             <VpnKeyIcon sx={{ color: colors.primary }} />
-                                            Change Password
+                                            Փոխել Գաղտնաբառը
                                         </Typography>
                                         <Typography variant="body2" sx={{ color: colors.textLight }}>
-                                            Update your password to keep your account secure
+                                            Թարմացրեք ձեր գաղտնաբառը ձեր հաշիվը անվտանգ պահելու համար
                                         </Typography>
                                     </Box>
 
@@ -611,11 +611,11 @@ const ProfilePage = () => {
                                             </Alert>
                                         )}
 
-                                        {/* Security Info Banner */}
+                                        {/* Անվտանգության Տեղեկատվական Վահանակ */}
                                         <Paper sx={{ p: 2, mb: 3, bgcolor: alphaMUI(colors.primary, 0.05), borderRadius: '12px', display: 'flex', alignItems: 'center', gap: 1.5 }}>
                                             <ShieldIcon sx={{ color: colors.primary }} />
                                             <Typography variant="caption" sx={{ color: colors.textLight }}>
-                                                Password must be at least 8 characters with uppercase, lowercase, number, and special character
+                                                Գաղտնաբառը պետք է պարունակի առնվազն 8 նիշ՝ մեծատառ, փոքրատառ, թիվ և հատուկ նիշ
                                             </Typography>
                                         </Paper>
 
@@ -625,7 +625,7 @@ const ProfilePage = () => {
                                                     fullWidth
                                                     type={showOldPassword ? 'text' : 'password'}
                                                     name="oldPassword"
-                                                    label="Current Password"
+                                                    label="Ընթացիկ Գաղտնաբառ"
                                                     value={formData.oldPassword}
                                                     onChange={handleInputChange}
                                                     required
@@ -645,7 +645,7 @@ const ProfilePage = () => {
                                                     fullWidth
                                                     type={showNewPassword ? 'text' : 'password'}
                                                     name="newPassword"
-                                                    label="New Password"
+                                                    label="Նոր Գաղտնաբառ"
                                                     value={formData.newPassword}
                                                     onChange={handleInputChange}
                                                     required
@@ -664,18 +664,18 @@ const ProfilePage = () => {
                                                 {formData.newPassword && (
                                                     <Box>
                                                         <Box sx={{ display: 'flex', justifyContent: 'space-between', mb: 1 }}>
-                                                            <Typography variant="caption" sx={{ color: colors.textLight }}>Password Strength:</Typography>
+                                                            <Typography variant="caption" sx={{ color: colors.textLight }}>Գաղտնաբառի Ուժը.</Typography>
                                                             <Typography variant="caption" sx={{ color: getPasswordStrengthColor(), fontWeight: 600 }}>{getPasswordStrengthText()}</Typography>
                                                         </Box>
                                                         <Box sx={{ width: '100%', height: '4px', bgcolor: colors.border, borderRadius: '2px', overflow: 'hidden' }}>
                                                             <Box sx={{ width: `${(passwordStrength.score / 5) * 100}%`, height: '100%', background: getPasswordStrengthColor(), transition: 'width 0.3s' }} />
                                                         </Box>
                                                         <Box sx={{ display: 'flex', flexWrap: 'wrap', gap: 1, mt: 1.5 }}>
-                                                            <Chip label="8+ chars" size="small" sx={{ bgcolor: passwordStrength.hasMinLength ? alphaMUI('#4CAF50', 0.1) : alphaMUI(colors.error, 0.1), color: passwordStrength.hasMinLength ? '#4CAF50' : colors.error, fontSize: '10px', height: '22px' }} />
-                                                            <Chip label="Uppercase" size="small" sx={{ bgcolor: passwordStrength.hasUpperCase ? alphaMUI('#4CAF50', 0.1) : alphaMUI(colors.error, 0.1), color: passwordStrength.hasUpperCase ? '#4CAF50' : colors.error, fontSize: '10px', height: '22px' }} />
-                                                            <Chip label="Lowercase" size="small" sx={{ bgcolor: passwordStrength.hasLowerCase ? alphaMUI('#4CAF50', 0.1) : alphaMUI(colors.error, 0.1), color: passwordStrength.hasLowerCase ? '#4CAF50' : colors.error, fontSize: '10px', height: '22px' }} />
-                                                            <Chip label="Number" size="small" sx={{ bgcolor: passwordStrength.hasNumber ? alphaMUI('#4CAF50', 0.1) : alphaMUI(colors.error, 0.1), color: passwordStrength.hasNumber ? '#4CAF50' : colors.error, fontSize: '10px', height: '22px' }} />
-                                                            <Chip label="Special char" size="small" sx={{ bgcolor: passwordStrength.hasSpecialChar ? alphaMUI('#4CAF50', 0.1) : alphaMUI(colors.error, 0.1), color: passwordStrength.hasSpecialChar ? '#4CAF50' : colors.error, fontSize: '10px', height: '22px' }} />
+                                                            <Chip label="8+ նիշ" size="small" sx={{ bgcolor: passwordStrength.hasMinLength ? alphaMUI('#4CAF50', 0.1) : alphaMUI(colors.error, 0.1), color: passwordStrength.hasMinLength ? '#4CAF50' : colors.error, fontSize: '10px', height: '22px' }} />
+                                                            <Chip label="Մեծատառ" size="small" sx={{ bgcolor: passwordStrength.hasUpperCase ? alphaMUI('#4CAF50', 0.1) : alphaMUI(colors.error, 0.1), color: passwordStrength.hasUpperCase ? '#4CAF50' : colors.error, fontSize: '10px', height: '22px' }} />
+                                                            <Chip label="Փոքրատառ" size="small" sx={{ bgcolor: passwordStrength.hasLowerCase ? alphaMUI('#4CAF50', 0.1) : alphaMUI(colors.error, 0.1), color: passwordStrength.hasLowerCase ? '#4CAF50' : colors.error, fontSize: '10px', height: '22px' }} />
+                                                            <Chip label="Թիվ" size="small" sx={{ bgcolor: passwordStrength.hasNumber ? alphaMUI('#4CAF50', 0.1) : alphaMUI(colors.error, 0.1), color: passwordStrength.hasNumber ? '#4CAF50' : colors.error, fontSize: '10px', height: '22px' }} />
+                                                            <Chip label="Հատուկ նիշ" size="small" sx={{ bgcolor: passwordStrength.hasSpecialChar ? alphaMUI('#4CAF50', 0.1) : alphaMUI(colors.error, 0.1), color: passwordStrength.hasSpecialChar ? '#4CAF50' : colors.error, fontSize: '10px', height: '22px' }} />
                                                         </Box>
                                                     </Box>
                                                 )}
@@ -684,7 +684,7 @@ const ProfilePage = () => {
                                                     fullWidth
                                                     type={showConfirmPassword ? 'text' : 'password'}
                                                     name="confirmPassword"
-                                                    label="Confirm New Password"
+                                                    label="Հաստատել Նոր Գաղտնաբառը"
                                                     value={formData.confirmPassword}
                                                     onChange={handleInputChange}
                                                     required
@@ -708,7 +708,7 @@ const ProfilePage = () => {
                                                         startIcon={<CancelIcon />}
                                                         sx={{ borderRadius: '30px', textTransform: 'none', px: 4 }}
                                                     >
-                                                        Cancel
+                                                        Չեղարկել
                                                     </Button>
                                                     <Button
                                                         type="submit"
@@ -723,7 +723,7 @@ const ProfilePage = () => {
                                                             '&:hover': { transform: 'translateY(-1px)' }
                                                         }}
                                                     >
-                                                        {loading ? 'Updating...' : 'Update Password'}
+                                                        {loading ? 'Թարմացվում է...' : 'Թարմացնել Գաղտնաբառը'}
                                                     </Button>
                                                 </Box>
                                             </Stack>
@@ -736,11 +736,11 @@ const ProfilePage = () => {
                 </Box>
             </Container>
 
-            {/* Footer */}
+            {/* Ստորագիր */}
             <Box sx={{ py: 3, textAlign: 'center', background: '#FFFFFF', borderTop: `1px solid ${colors.border}`, mt: 4 }}>
                 <Container maxWidth="lg">
                     <Typography variant="body2" sx={{ color: colors.textLight, fontSize: '0.8rem' }}>
-                        © 2026 Museum Events. All rights reserved.
+                        © 2026 Թանգարանային Միջոցառումներ. Բոլոր իրավունքները պաշտպանված են:
                     </Typography>
                 </Container>
             </Box>
@@ -752,7 +752,7 @@ const ProfilePage = () => {
                 </Alert>
             </Snackbar>
 
-            {/* Modals */}
+            {/* Մոդալներ */}
             <Modal open={loginModalOpen} onClose={handleLoginModalClose} sx={{ display: 'flex', alignItems: 'center', justifyContent: 'center', backdropFilter: 'blur(8px)' }}>
                 <Box sx={{ width: '90%', maxWidth: 500, maxHeight: '90vh', bgcolor: 'transparent', outline: 'none' }}>
                     <LoginPage isModal={true} onClose={handleLoginModalClose} onSwitchToSignup={handleSwitchToSignup} />

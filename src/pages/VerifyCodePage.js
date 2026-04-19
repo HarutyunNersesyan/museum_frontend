@@ -92,7 +92,7 @@ const VerifyCodePage = ({ isModal = false, onClose, onVerificationSuccess, email
     }, [email, location.state]);
 
     const handleMaxAttemptsReached = () => {
-        setError('Maximum verification attempts reached. Redirecting to signup...');
+        setError('Հասանելի է փորձերի առավելագույն քանակը: Վերահղում դեպի գրանցում...');
 
         localStorage.removeItem('verificationEmail');
         localStorage.removeItem(`resendAttempts_${email}`);
@@ -103,7 +103,7 @@ const VerifyCodePage = ({ isModal = false, onClose, onVerificationSuccess, email
             }
             navigate('/signup', {
                 state: {
-                    message: 'Maximum verification attempts reached. Please sign up again.'
+                    message: 'Հասանելի է փորձերի առավելագույն քանակը: Խնդրում ենք կրկին գրանցվել:'
                 }
             });
         }, 2000);
@@ -154,7 +154,7 @@ const VerifyCodePage = ({ isModal = false, onClose, onVerificationSuccess, email
 
         const pinCode = pin.join('');
         if (pinCode.length !== 6) {
-            setError('Please enter a 6-digit verification code');
+            setError('Խնդրում ենք մուտքագրել 6-նիշ հաստատման կոդ');
             return;
         }
 
@@ -168,21 +168,21 @@ const VerifyCodePage = ({ isModal = false, onClose, onVerificationSuccess, email
                 localStorage.removeItem('verificationEmail');
                 localStorage.removeItem(`resendAttempts_${email}`);
 
-                // Close verify modal
+                // Փակել հաստատման մոդալը
                 if (isModal && onClose) {
                     onClose();
                 }
 
-                // Call the success callback to open login modal in HomePage
+                // Կանչել հաջողության callback-ը՝ մուտքի մոդալը բացելու համար HomePage-ում
                 if (onVerificationSuccess) {
                     onVerificationSuccess();
                 }
             } else {
-                setError(result.message || 'Verification failed. Please try again.');
+                setError(result.message || 'Հաստատումը ձախողվեց: Խնդրում ենք կրկին փորձել:');
             }
         } catch (err) {
-            console.error('Verification error:', err);
-            setError('Verification failed. Please try again.');
+            console.error('Հաստատման սխալ:', err);
+            setError('Հաստատումը ձախողվեց: Խնդրում ենք կրկին փորձել:');
         } finally {
             setLoading(false);
         }
@@ -211,17 +211,17 @@ const VerifyCodePage = ({ isModal = false, onClose, onVerificationSuccess, email
             });
 
             if (!response.ok) {
-                throw new Error('Failed to resend code');
+                throw new Error('Կոդի վերաուղարկումը ձախողվեց');
             }
 
             setPin(['', '', '', '', '', '']);
 
             if (newAttempts === MAX_RESEND_ATTEMPTS) {
-                setError('This is your last attempt. After this, you will be redirected to signup.');
+                setError('Սա ձեր վերջին փորձն է: Դրանից հետո դուք կվերահղվեք գրանցման էջ:');
             }
 
         } catch (err) {
-            setError('Failed to resend code. Please try again.');
+            setError('Կոդի վերաուղարկումը ձախողվեց: Խնդրում ենք կրկին փորձել:');
         } finally {
             setResendLoading(false);
         }
@@ -290,7 +290,7 @@ const VerifyCodePage = ({ isModal = false, onClose, onVerificationSuccess, email
                             padding: isModal ? '0' : { xs: '30px 20px', sm: '40px 30px', md: '50px 40px' },
                             position: 'relative'
                         }}>
-                            {/* Close Button - Only show in modal mode */}
+                            {/* Փակման կոճակ - Ցուցադրվում է միայն մոդալ ռեժիմում */}
                             {isModal && onClose && (
                                 <IconButton
                                     onClick={onClose}
@@ -341,7 +341,7 @@ const VerifyCodePage = ({ isModal = false, onClose, onVerificationSuccess, email
                                         WebkitTextFillColor: 'transparent',
                                         letterSpacing: '-0.5px'
                                     }}>
-                                        Museum
+                                        Թանգարան
                                     </Typography>
                                 </Box>
                                 <Typography variant="h4" sx={{
@@ -350,14 +350,14 @@ const VerifyCodePage = ({ isModal = false, onClose, onVerificationSuccess, email
                                     color: '#3E2723',
                                     mb: 1
                                 }}>
-                                    Verify Your Email
+                                    Հաստատեք Ձեր Էլ.փոստը
                                 </Typography>
                                 <Typography sx={{
                                     color: '#6B4C3A',
                                     fontSize: '14px',
                                     mb: 2
                                 }}>
-                                    Enter the 6-digit code sent to
+                                    Մուտքագրեք 6-նիշ կոդը, որն ուղարկվել է
                                 </Typography>
                                 <Typography sx={{
                                     color: '#A0522D',
@@ -381,7 +381,7 @@ const VerifyCodePage = ({ isModal = false, onClose, onVerificationSuccess, email
                                 }} />
                             </Box>
 
-                            {/* Attempts counter */}
+                            {/* Փորձերի հաշվիչ */}
                             <Box sx={{
                                 display: 'flex',
                                 justifyContent: 'center',
@@ -398,7 +398,7 @@ const VerifyCodePage = ({ isModal = false, onClose, onVerificationSuccess, email
                                     border: '1px solid rgba(160, 82, 45, 0.15)',
                                     fontWeight: 500
                                 }}>
-                                    Attempts: <span style={{ color: '#A0522D', fontWeight: 700 }}>{resendAttempts}</span>/{MAX_RESEND_ATTEMPTS}
+                                    Փորձեր: <span style={{ color: '#A0522D', fontWeight: 700 }}>{resendAttempts}</span>/{MAX_RESEND_ATTEMPTS}
                                 </Typography>
                             </Box>
 
@@ -431,7 +431,7 @@ const VerifyCodePage = ({ isModal = false, onClose, onVerificationSuccess, email
                                 p: { xs: 3, sm: 5 },
                                 pt: { xs: 2, sm: 3 }
                             }}>
-                                {/* PIN Input Fields */}
+                                {/* PIN Մուտքագրման Դաշտեր */}
                                 <Box sx={{
                                     display: 'flex',
                                     justifyContent: 'center',
@@ -494,7 +494,7 @@ const VerifyCodePage = ({ isModal = false, onClose, onVerificationSuccess, email
                                     ))}
                                 </Box>
 
-                                {/* Buttons side by side */}
+                                {/* Կոճակներ կողք-կողքի */}
                                 <Stack direction="row" spacing={2}>
                                     <Button
                                         type="submit"
@@ -528,7 +528,7 @@ const VerifyCodePage = ({ isModal = false, onClose, onVerificationSuccess, email
                                         {loading ? (
                                             <CircularProgress size={24} sx={{ color: '#FFFFFF' }} />
                                         ) : (
-                                            'Verify Email'
+                                            'Հաստատել Էլ.փոստը'
                                         )}
                                     </Button>
 
@@ -559,7 +559,7 @@ const VerifyCodePage = ({ isModal = false, onClose, onVerificationSuccess, email
                                             transition: 'all 0.3s'
                                         }}
                                     >
-                                        {resendLoading ? 'Sending...' : (resendAttempts >= MAX_RESEND_ATTEMPTS ? 'Max attempts reached' : 'Resend Code')}
+                                        {resendLoading ? 'Ուղարկվում է...' : (resendAttempts >= MAX_RESEND_ATTEMPTS ? 'Փորձերի առավելագույն քանակ' : 'Վերաուղարկել Կոդը')}
                                     </Button>
                                 </Stack>
                             </Box>

@@ -6,10 +6,12 @@
   <component name="ChangeListManager">
     <list default="true" id="52f9de53-701b-4b52-b101-40303d7b40ec" name="Changes" comment="">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/pages/EventsPage.js" beforeDir="false" afterPath="$PROJECT_DIR$/src/pages/EventsPage.js" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/pages/AboutUsPage.js" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/pages/AdminDashboardPage.js" beforeDir="false" afterPath="$PROJECT_DIR$/src/pages/AdminDashboardPage.js" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/pages/AdminLoginPage.js" beforeDir="false" afterPath="$PROJECT_DIR$/src/pages/AdminLoginPage.js" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/pages/HomePage.js" beforeDir="false" afterPath="$PROJECT_DIR$/src/pages/HomePage.js" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/pages/LoginPage.js" beforeDir="false" afterPath="$PROJECT_DIR$/src/pages/LoginPage.js" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/pages/SignUpPage.js" beforeDir="false" afterPath="$PROJECT_DIR$/src/pages/SignUpPage.js" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/pages/ProfilePage.js" beforeDir="false" afterPath="$PROJECT_DIR$/src/pages/ProfilePage.js" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/pages/VerifyCodePage.js" beforeDir="false" afterPath="$PROJECT_DIR$/src/pages/VerifyCodePage.js" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -179,14 +181,7 @@
       <workItem from="1776335731965" duration="5509000" />
       <workItem from="1776434229756" duration="8374000" />
       <workItem from="1776443685480" duration="22000" />
-      <workItem from="1776605687450" duration="1239000" />
-    </task>
-    <task id="LOCAL-00024" summary="Bugs fixes.">
-      <created>1772630143446</created>
-      <option name="number" value="00024" />
-      <option name="presentableId" value="LOCAL-00024" />
-      <option name="project" value="LOCAL" />
-      <updated>1772630143446</updated>
+      <workItem from="1776605687450" duration="4363000" />
     </task>
     <task id="LOCAL-00025" summary="Bugs fixes.">
       <created>1772880416609</created>
@@ -524,7 +519,14 @@
       <option name="project" value="LOCAL" />
       <updated>1776443692955</updated>
     </task>
-    <option name="localTasksCounter" value="73" />
+    <task id="LOCAL-00073" summary="Bugs fix.">
+      <created>1776606992667</created>
+      <option name="number" value="00073" />
+      <option name="presentableId" value="LOCAL-00073" />
+      <option name="project" value="LOCAL" />
+      <updated>1776606992667</updated>
+    </task>
+    <option name="localTasksCounter" value="74" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">

@@ -42,6 +42,7 @@ import { LocalizationProvider } from '@mui/x-date-pickers/LocalizationProvider';
 import { AdapterDayjs } from '@mui/x-date-pickers/AdapterDayjs';
 import { DateTimePicker } from '@mui/x-date-pickers/DateTimePicker';
 import dayjs from 'dayjs';
+import 'dayjs/locale/hy-am';
 import {
     Add as AddIcon,
     Edit as EditIcon,
@@ -71,7 +72,10 @@ import { alpha, styled } from '@mui/material/styles';
 import { adminMuseumAPI, adminEventAPI, adminStatsAPI } from '../services/adminAPI';
 import { isAdmin } from '../utils/jwtUtils';
 
-// Gradient Button - warm brown/orange gradient
+// Սահմանել dayjs-ի locale-ը հայերեն
+dayjs.locale('hy-am');
+
+// Գրադիենտ Կոճակ
 const GradientButton = styled(Button)(({ theme }) => ({
     background: 'linear-gradient(135deg, #8B5E3C 0%, #6B3A2A 100%)',
     borderRadius: '12px',
@@ -85,7 +89,7 @@ const GradientButton = styled(Button)(({ theme }) => ({
     }
 }));
 
-// Outlined Button - warm brown border
+// Եզրագծով Կոճակ
 const OutlinedButton = styled(Button)(({ theme }) => ({
     borderRadius: '12px',
     padding: '10px 24px',
@@ -99,7 +103,7 @@ const OutlinedButton = styled(Button)(({ theme }) => ({
     }
 }));
 
-// Stat Card - cream background with warm brown accents
+// Վիճակագրության Քարտ
 const StatCard = styled(Paper)(({ theme }) => ({
     background: '#FFF8F0',
     borderRadius: '20px',
@@ -112,7 +116,7 @@ const StatCard = styled(Paper)(({ theme }) => ({
     }
 }));
 
-// Flat Text Field - warm cream background
+// Հարթ Տեքստային Դաշտ
 const FlatTextField = styled(TextField)(({ theme }) => ({
     '& .MuiOutlinedInput-root': {
         backgroundColor: '#FFF8F0',
@@ -134,7 +138,7 @@ const FlatTextField = styled(TextField)(({ theme }) => ({
     }
 }));
 
-// Flat Select - warm cream background
+// Հարթ Ընտրիչ
 const FlatSelect = styled(Select)(({ theme }) => ({
     backgroundColor: '#FFF8F0',
     borderRadius: '8px',
@@ -195,59 +199,139 @@ const DetailText = styled(Box)(({ theme }) => ({
     }
 }));
 
+// Հայաստանի քաղաքներ
 const ARMENIAN_CITIES = [
-    { value: 'YEREVAN', label: 'Yerevan' },
-    { value: 'GYUMRI', label: 'Gyumri' },
-    { value: 'VANADZOR', label: 'Vanadzor' },
-    { value: 'VAGHARSHAPAT', label: 'Vagharshapat' },
-    { value: 'ABOVYAN', label: 'Abovyan' },
-    { value: 'KAPAN', label: 'Kapan' },
-    { value: 'HRAZDAN', label: 'Hrazdan' },
-    { value: 'ARMAVIR', label: 'Armavir' },
-    { value: 'ARTASHAT', label: 'Artashat' },
-    { value: 'IJEVAN', label: 'Ijevan' },
-    { value: 'GAVAR', label: 'Gavar' },
-    { value: 'GORIS', label: 'Goris' },
-    { value: 'CHARENTSAVAN', label: 'Charentsavan' },
-    { value: 'ARARAT', label: 'Ararat' },
-    { value: 'MASIS', label: 'Masis' },
-    { value: 'SEVAN', label: 'Sevan' },
-    { value: 'ASHTARAK', label: 'Ashtarak' },
-    { value: 'DILIJAN', label: 'Dilijan' },
-    { value: 'SISIAN', label: 'Sisian' },
-    { value: 'ALAVERDI', label: 'Alaverdi' },
-    { value: 'STEPANAVAN', label: 'Stepanavan' },
-    { value: 'MARTUNI', label: 'Martuni' },
-    { value: 'VARDENIS', label: 'Vardenis' },
-    { value: 'YEGHVARD', label: 'Yeghvard' },
-    { value: 'METSAMOR', label: 'Metsamor' },
-    { value: 'BERD', label: 'Berd' },
-    { value: 'TASHIR', label: 'Tashir' },
-    { value: 'APARAN', label: 'Aparan' },
-    { value: 'VAYK', label: 'Vayk' },
-    { value: 'JERMUK', label: 'Jermuk' }
+    'Երևան',
+    'Գյումրի',
+    'Վանաձոր',
+    'Վաղարշապատ',
+    'Աբովյան',
+    'Կապան',
+    'Հրազդան',
+    'Արմավիր',
+    'Արտաշատ',
+    'Իջևան',
+    'Գավառ',
+    'Գորիս',
+    'Չարենցավան',
+    'Արարատ',
+    'Մասիս',
+    'Սևան',
+    'Աշտարակ',
+    'Դիլիջան',
+    'Սիսիան',
+    'Ալավերդի',
+    'Ստեփանավան',
+    'Մարտունի',
+    'Վարդենիս',
+    'Եղվարդ',
+    'Մեծամոր',
+    'Բերդ',
+    'Տաշիր',
+    'Ապարան',
+    'Վայք',
+    'Ջերմուկ'
 ];
 
-const eventCategories = [
-    { value: 'ART', label: '🎨 Art' },
-    { value: 'HISTORY', label: '📜 History' },
-    { value: 'SCIENCE', label: '🔬 Science' },
-    { value: 'NATURAL_HISTORY', label: '🌿 Natural History' },
-    { value: 'TECHNOLOGY', label: '💻 Technology' },
-    { value: 'MILITARY', label: '⚔️ Military' },
-    { value: 'ARCHAEOLOGY', label: '🏺 Archaeology' },
-    { value: 'CULTURAL', label: '🎭 Cultural' },
-    { value: 'MARITIME', label: '⚓ Maritime' },
-    { value: 'SPACE', label: '🚀 Space' },
-    { value: 'TRANSPORT', label: '🚗 Transport' },
-    { value: 'RELIGIOUS', label: '⛪ Religious' },
-    { value: 'ETHNOGRAPHIC', label: '👥 Ethnographic' },
-    { value: 'OPEN_AIR', label: '🌳 Open Air' }
+// Միջոցառումների կատեգորիաներ - անգլերենից հայերեն թարգմանության map
+const categoryTranslationMap = {
+    'ART': 'Արվեստ',
+    'HISTORY': 'Պատմություն',
+    'SCIENCE': 'Գիտություն',
+    'NATURAL_HISTORY': 'Բնական Պատմություն',
+    'TECHNOLOGY': 'Տեխնոլոգիա',
+    'MILITARY': 'Ռազմական',
+    'ARCHAEOLOGY': 'Հնագիտություն',
+    'CULTURAL': 'Մշակութային',
+    'MARITIME': 'Ծովային',
+    'SPACE': 'Տիեզերք',
+    'TRANSPORT': 'Տրանսպորտ',
+    'RELIGIOUS': 'Կրոնական',
+    'ETHNOGRAPHIC': 'Ազգագրական',
+    'OPEN_AIR': 'Բաց Երկնքի Տակ',
+    // Հայերեն արժեքների համար (եթե արդեն հայերեն է)
+    'Արվեստ': 'Արվեստ',
+    'Պատմություն': 'Պատմություն',
+    'Գիտություն': 'Գիտություն',
+    'Բնական Պատմություն': 'Բնական Պատմություն',
+    'Տեխնոլոգիա': 'Տեխնոլոգիա',
+    'Ռազմական': 'Ռազմական',
+    'Հնագիտություն': 'Հնագիտություն',
+    'Մշակութային': 'Մշակութային',
+    'Ծովային': 'Ծովային',
+    'Տիեզերք': 'Տիեզերք',
+    'Տրանսպորտ': 'Տրանսպորտ',
+    'Կրոնական': 'Կրոնական',
+    'Ազգագրական': 'Ազգագրական',
+    'Բաց Երկնքի Տակ': 'Բաց Երկնքի Տակ'
+};
+
+// Կատեգորիաների ցանկ Select-ի համար
+const eventCategoriesList = [
+    'Արվեստ',
+    'Պատմություն',
+    'Գիտություն',
+    'Բնական Պատմություն',
+    'Տեխնոլոգիա',
+    'Ռազմական',
+    'Հնագիտություն',
+    'Մշակութային',
+    'Ծովային',
+    'Տիեզերք',
+    'Տրանսպորտ',
+    'Կրոնական',
+    'Ազգագրական',
+    'Բաց Երկնքի Տակ'
 ];
 
-const eventTypes = [
-    { value: 'MOBILE', label: '📱 Mobile' }
-];
+// Միջոցառումների տեսակներ
+const eventTypesList = ['Շրջիկ'];
+
+// Քաղաքի translation map (եթե անգլերեն է եկել)
+const cityTranslationMap = {
+    'YEREVAN': 'Երևան',
+    'GYUMRI': 'Գյումրի',
+    'VANADZOR': 'Վանաձոր',
+    'VAGHARSHAPAT': 'Վաղարշապատ',
+    'ABOVYAN': 'Աբովյան',
+    'KAPAN': 'Կապան',
+    'HRAZDAN': 'Հրազդան',
+    'ARMAVIR': 'Արմավիր',
+    'ARTASHAT': 'Արտաշատ',
+    'IJEVAN': 'Իջևան',
+    'GAVAR': 'Գավառ',
+    'GORIS': 'Գորիս',
+    'CHARENTSAVAN': 'Չարենցավան',
+    'ARARAT': 'Արարատ',
+    'MASIS': 'Մասիս',
+    'SEVAN': 'Սևան',
+    'ASHTARAK': 'Աշտարակ',
+    'DILIJAN': 'Դիլիջան',
+    'SISIAN': 'Սիսիան',
+    'ALAVERDI': 'Ալավերդի',
+    'STEPANAVAN': 'Ստեփանավան',
+    'MARTUNI': 'Մարտունի',
+    'VARDENIS': 'Վարդենիս',
+    'YEGHVARD': 'Եղվարդ',
+    'METSAMOR': 'Մեծամոր',
+    'BERD': 'Բերդ',
+    'TASHIR': 'Տաշիր',
+    'APARAN': 'Ապարան',
+    'VAYK': 'Վայք',
+    'JERMUK': 'Ջերմուկ'
+};
+
+// Օգնական ֆունկցիա կատեգորիան թարգմանելու համար
+const translateCategory = (category) => {
+    if (!category) return '';
+    return categoryTranslationMap[category] || category;
+};
+
+// Օգնական ֆունկցիա քաղաքը թարգմանելու համար
+const translateCity = (city) => {
+    if (!city) return '';
+    return cityTranslationMap[city] || city;
+};
 
 const parseEventDate = (dateValue) => {
     if (!dateValue) return dayjs();
@@ -269,9 +353,9 @@ const parseEventDate = (dateValue) => {
 };
 
 const formatEventDate = (dateValue) => {
-    if (!dateValue) return 'Date not set';
+    if (!dateValue) return 'Ամսաթիվ նշված չէ';
     const parsed = parseEventDate(dateValue);
-    return parsed.isValid() ? parsed.format('MMM D, YYYY HH:mm') : 'Invalid date';
+    return parsed.isValid() ? parsed.format('DD MMM, YYYY HH:mm') : 'Անվավեր ամսաթիվ';
 };
 
 const AdminDashboardPage = () => {
@@ -303,16 +387,19 @@ const AdminDashboardPage = () => {
     const [museumsList, setMuseumsList] = useState([]);
 
     const [eventFormData, setEventFormData] = useState({
-        name: '', description: '', eventCategory: '', eventType: 'MOBILE',
-        eventDate: dayjs(), guidePrice: '', ticketPrice: '', location: '', duration: '', museumId: ''
+        name: '',
+        description: '',
+        eventCategory: '',
+        eventType: 'Շրջիկ',
+        eventDate: dayjs(),
+        guidePrice: '',
+        ticketPrice: '',
+        location: '',
+        duration: '',
+        museumId: ''
     });
 
     const [museumFormData, setMuseumFormData] = useState({ name: '' });
-
-    // UPDATED: No validation at all - any input is allowed
-    const validatePhoneNumber = (phone) => {
-        return true; // Allow any format, any characters, empty, anything
-    };
 
     useEffect(() => {
         const token = localStorage.getItem('token');
@@ -336,7 +423,7 @@ const AdminDashboardPage = () => {
                 loadMuseumsForDropdown()
             ]);
         } catch (error) {
-            console.error('Error loading data:', error);
+            console.error('Տվյալների բեռնման սխալ:', error);
         } finally {
             setLoading(false);
         }
@@ -354,7 +441,7 @@ const AdminDashboardPage = () => {
             });
             setActiveImageIndex(newIndices);
         } catch (error) {
-            console.error('Error loading events:', error);
+            console.error('Միջոցառումների բեռնման սխալ:', error);
         }
     };
 
@@ -364,7 +451,7 @@ const AdminDashboardPage = () => {
             setMuseums(response.data.content || []);
             setMuseumsTotalPages(response.data.totalPages || 0);
         } catch (error) {
-            console.error('Error loading museums:', error);
+            console.error('Թանգարանների բեռնման սխալ:', error);
         }
     };
 
@@ -376,7 +463,7 @@ const AdminDashboardPage = () => {
                 totalEvents: response.data.totalEvents || 0
             });
         } catch (error) {
-            console.error('Error loading stats:', error);
+            console.error('Վիճակագրության բեռնման սխալ:', error);
         }
     };
 
@@ -385,15 +472,23 @@ const AdminDashboardPage = () => {
             const response = await adminMuseumAPI.getAllMuseums(0, 100);
             setMuseumsList(response.data.content || []);
         } catch (error) {
-            console.error('Error loading museums:', error);
+            console.error('Թանգարանների բեռնման սխալ:', error);
         }
     };
 
     const handleOpenCreateEventDialog = () => {
         setEditingEvent(null);
         setEventFormData({
-            name: '', description: '', eventCategory: '', eventType: 'MOBILE',
-            eventDate: dayjs(), guidePrice: '', ticketPrice: '', location: '', duration: '', museumId: ''
+            name: '',
+            description: '',
+            eventCategory: '',
+            eventType: 'Շրջիկ',
+            eventDate: dayjs(),
+            guidePrice: '',
+            ticketPrice: '',
+            location: '',
+            duration: '',
+            museumId: ''
         });
         setImageFiles([]);
         setImagePreviews([]);
@@ -408,12 +503,12 @@ const AdminDashboardPage = () => {
         setEventFormData({
             name: event.name,
             description: event.description,
-            eventCategory: event.eventCategory,
-            eventType: event.eventType || 'MOBILE',
+            eventCategory: translateCategory(event.eventCategory), // Թարգմանել կատեգորիան
+            eventType: event.eventType === 'MOBILE' ? 'Շրջիկ' : (event.eventType || 'Շրջիկ'),
             eventDate: parseEventDate(event.eventDate),
             guidePrice: event.guidePrice?.toString() || '',
             ticketPrice: event.ticketPrice?.toString() || '',
-            location: event.location,
+            location: translateCity(event.location), // Թարգմանել քաղաքը
             duration: event.duration?.toString() || '',
             museumId: event.museumId
         });
@@ -482,12 +577,9 @@ const AdminDashboardPage = () => {
     const handleSubmitEvent = async () => {
         if (!eventFormData.name || !eventFormData.description || !eventFormData.eventCategory ||
             !eventFormData.location || !eventFormData.guidePrice || !eventFormData.ticketPrice || !eventFormData.museumId) {
-            setSnackbar({ open: true, message: 'Please fill all required fields', severity: 'warning' });
+            setSnackbar({ open: true, message: 'Խնդրում ենք լրացնել բոլոր պարտադիր դաշտերը', severity: 'warning' });
             return;
         }
-
-        // UPDATED: No phone number validation - any input is accepted
-        // Phone number can be anything: empty, any format, any characters
 
         setLoading(true);
         try {
@@ -508,7 +600,7 @@ const AdminDashboardPage = () => {
                 name: eventFormData.name,
                 description: eventFormData.description,
                 eventCategory: eventFormData.eventCategory,
-                eventType: eventFormData.eventType,
+                eventType: eventFormData.eventType === 'Շրջիկ' ? 'MOBILE' : eventFormData.eventType,
                 eventDate: formattedDate,
                 guidePrice: parseInt(eventFormData.guidePrice),
                 ticketPrice: parseInt(eventFormData.ticketPrice),
@@ -526,18 +618,18 @@ const AdminDashboardPage = () => {
                     imageFiles,
                     existingImages
                 );
-                setSnackbar({ open: true, message: 'Event updated successfully', severity: 'success' });
+                setSnackbar({ open: true, message: 'Միջոցառումը հաջողությամբ թարմացվեց', severity: 'success' });
             } else {
                 await adminEventAPI.createEventWithImages(submitData, imageFiles);
-                setSnackbar({ open: true, message: 'Event created successfully', severity: 'success' });
+                setSnackbar({ open: true, message: 'Միջոցառումը հաջողությամբ ստեղծվեց', severity: 'success' });
             }
 
             handleCloseEventDialog();
             await loadEvents();
             await loadStats();
         } catch (error) {
-            console.error('Error saving event:', error);
-            let errorMessage = 'Failed to save event';
+            console.error('Միջոցառման պահպանման սխալ:', error);
+            let errorMessage = 'Միջոցառման պահպանումը ձախողվեց';
             if (error.response?.data) {
                 errorMessage = typeof error.response.data === 'string' ? error.response.data : error.response.data.message || errorMessage;
             }
@@ -549,7 +641,7 @@ const AdminDashboardPage = () => {
 
     const handleSubmitMuseum = async () => {
         if (!museumFormData.name) {
-            setSnackbar({ open: true, message: 'Please enter museum name', severity: 'warning' });
+            setSnackbar({ open: true, message: 'Խնդրում ենք մուտքագրել թանգարանի անունը', severity: 'warning' });
             return;
         }
 
@@ -557,46 +649,46 @@ const AdminDashboardPage = () => {
         try {
             if (editingMuseum) {
                 await adminMuseumAPI.updateMuseum(editingMuseum.id, museumFormData);
-                setSnackbar({ open: true, message: 'Museum updated successfully', severity: 'success' });
+                setSnackbar({ open: true, message: 'Թանգարանը հաջողությամբ թարմացվեց', severity: 'success' });
             } else {
                 await adminMuseumAPI.createMuseum(museumFormData);
-                setSnackbar({ open: true, message: 'Museum created successfully', severity: 'success' });
+                setSnackbar({ open: true, message: 'Թանգարանը հաջողությամբ ստեղծվեց', severity: 'success' });
             }
             handleCloseMuseumDialog();
             await loadMuseums();
             await loadStats();
             await loadMuseumsForDropdown();
         } catch (error) {
-            setSnackbar({ open: true, message: 'Failed to save museum', severity: 'error' });
+            setSnackbar({ open: true, message: 'Թանգարանի պահպանումը ձախողվեց', severity: 'error' });
         } finally {
             setLoading(false);
         }
     };
 
     const handleDeleteEvent = async (eventId) => {
-        if (window.confirm('Are you sure you want to delete this event?')) {
+        if (window.confirm('Վստա՞հ եք, որ ցանկանում եք ջնջել այս միջոցառումը:')) {
             try {
                 await adminEventAPI.deleteEvent(eventId);
-                setSnackbar({ open: true, message: 'Event deleted successfully', severity: 'success' });
+                setSnackbar({ open: true, message: 'Միջոցառումը հաջողությամբ ջնջվեց', severity: 'success' });
                 await loadEvents();
                 await loadStats();
             } catch (error) {
-                setSnackbar({ open: true, message: 'Failed to delete event', severity: 'error' });
+                setSnackbar({ open: true, message: 'Միջոցառման ջնջումը ձախողվեց', severity: 'error' });
             }
         }
     };
 
     const handleDeleteMuseum = async (museumId) => {
-        if (window.confirm('Delete this museum? This will also delete all associated events.')) {
+        if (window.confirm('Ջնջե՞լ այս թանգարանը: Սա կջնջի նաև բոլոր կապված միջոցառումները:')) {
             try {
                 await adminMuseumAPI.deleteMuseum(museumId);
-                setSnackbar({ open: true, message: 'Museum deleted successfully', severity: 'success' });
+                setSnackbar({ open: true, message: 'Թանգարանը հաջողությամբ ջնջվեց', severity: 'success' });
                 await loadMuseums();
                 await loadEvents();
                 await loadStats();
                 await loadMuseumsForDropdown();
             } catch (error) {
-                setSnackbar({ open: true, message: 'Failed to delete museum', severity: 'error' });
+                setSnackbar({ open: true, message: 'Թանգարանի ջնջումը ձախողվեց', severity: 'error' });
             }
         }
     };
@@ -607,11 +699,6 @@ const AdminDashboardPage = () => {
         await logout();
         handleMenuClose();
         navigate('/');
-    };
-
-    const getCategoryDisplayName = (categoryValue) => {
-        const category = eventCategories.find(cat => cat.value === categoryValue);
-        return category ? category.label : categoryValue;
     };
 
     const handleNextImage = (eventId, totalImages) => {
@@ -646,7 +733,7 @@ const AdminDashboardPage = () => {
                 '*::-webkit-scrollbar-thumb:hover': { background: '#6B3A2A' }
             }} />
             <Box sx={{ minHeight: '100vh', background: '#F5E6D3' }}>
-                {/* Header */}
+                {/* Վերնագիր */}
                 <Box sx={{
                     position: 'sticky',
                     top: 0,
@@ -662,8 +749,8 @@ const AdminDashboardPage = () => {
                                 <AdminIcon sx={{ color: 'white', fontSize: 28 }} />
                             </Box>
                             <Box>
-                                <Typography variant="h6" sx={{ fontWeight: 700, color: '#4A2A1A' }}>Admin Dashboard</Typography>
-                                <Typography variant="caption" sx={{ color: '#8B6914' }}>Manage museums and events</Typography>
+                                <Typography variant="h6" sx={{ fontWeight: 700, color: '#4A2A1A' }}>Ադմինիստրատորի Վահանակ</Typography>
+                                <Typography variant="caption" sx={{ color: '#8B6914' }}>Կառավարել թանգարանները և միջոցառումները</Typography>
                             </Box>
                         </Box>
                         <IconButton onClick={handleMenuOpen} sx={{ background: 'linear-gradient(135deg, #8B5E3C 0%, #6B3A2A 100%)', width: '45px', height: '45px' }}>
@@ -673,20 +760,20 @@ const AdminDashboardPage = () => {
                 </Box>
 
                 <Menu anchorEl={anchorEl} open={Boolean(anchorEl)} onClose={handleMenuClose} PaperProps={{ sx: { bgcolor: '#FFF8F0', color: '#3D2A1A', minWidth: '200px', borderRadius: '12px' } }}>
-                    <MenuItem onClick={() => navigate('/profile')}><PersonIcon sx={{ mr: 2, color: '#8B5E3C' }} /> Profile</MenuItem>
+                    <MenuItem onClick={() => navigate('/profile')}><PersonIcon sx={{ mr: 2, color: '#8B5E3C' }} /> Պրոֆիլ</MenuItem>
                     <Divider sx={{ borderColor: '#A0784C' }} />
-                    <MenuItem onClick={handleLogout}><LogoutIcon sx={{ mr: 2, color: '#f44336' }} /> Logout</MenuItem>
+                    <MenuItem onClick={handleLogout}><LogoutIcon sx={{ mr: 2, color: '#f44336' }} /> Դուրս Գալ</MenuItem>
                 </Menu>
 
-                {/* Main Content */}
+                {/* Հիմնական Բովանդակություն */}
                 <Box sx={{ py: { xs: 2, sm: 3, md: 4 }, px: { xs: 2, sm: 3, md: 4, lg: 6 } }}>
-                    {/* Stats Cards */}
+                    {/* Վիճակագրության Քարտեր */}
                     <Grid container spacing={{ xs: 2, sm: 3 }} sx={{ mb: 4 }}>
                         <Grid item xs={12} sm={6}>
                             <StatCard>
                                 <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
                                     <Box>
-                                        <Typography variant="body2" sx={{ color: '#8B6914', mb: 1, fontWeight: 600 }}>Total Museums</Typography>
+                                        <Typography variant="body2" sx={{ color: '#8B6914', mb: 1, fontWeight: 600 }}>Ընդհանուր Թանգարաններ</Typography>
                                         <Typography variant="h3" sx={{ fontWeight: 700, color: '#8B5E3C' }}>{stats.totalMuseums}</Typography>
                                     </Box>
                                     <Avatar sx={{ bgcolor: alpha('#8B5E3C', 0.15), width: 56, height: 56 }}>
@@ -699,7 +786,7 @@ const AdminDashboardPage = () => {
                             <StatCard>
                                 <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
                                     <Box>
-                                        <Typography variant="body2" sx={{ color: '#8B6914', mb: 1, fontWeight: 600 }}>Total Events</Typography>
+                                        <Typography variant="body2" sx={{ color: '#8B6914', mb: 1, fontWeight: 600 }}>Ընդհանուր Միջոցառումներ</Typography>
                                         <Typography variant="h3" sx={{ fontWeight: 700, color: '#6B8E23' }}>{stats.totalEvents}</Typography>
                                     </Box>
                                     <Avatar sx={{ bgcolor: alpha('#6B8E23', 0.15), width: 56, height: 56 }}>
@@ -710,28 +797,28 @@ const AdminDashboardPage = () => {
                         </Grid>
                     </Grid>
 
-                    {/* Tabs */}
+                    {/* Ներդիրներ */}
                     <Box sx={{ borderBottom: '1px solid #A0784C', mb: 3 }}>
                         <Tabs value={activeTab} onChange={(e, v) => setActiveTab(v)}>
-                            <Tab label={`Events (${stats.totalEvents})`} sx={{ textTransform: 'none', fontWeight: 600, color: '#4A2A1A', '&.Mui-selected': { color: '#8B5E3C' } }} />
-                            <Tab label={`Museums (${stats.totalMuseums})`} sx={{ textTransform: 'none', fontWeight: 600, color: '#4A2A1A', '&.Mui-selected': { color: '#8B5E3C' } }} />
+                            <Tab label={`Միջոցառումներ (${stats.totalEvents})`} sx={{ textTransform: 'none', fontWeight: 600, color: '#4A2A1A', '&.Mui-selected': { color: '#8B5E3C' } }} />
+                            <Tab label={`Թանգարաններ (${stats.totalMuseums})`} sx={{ textTransform: 'none', fontWeight: 600, color: '#4A2A1A', '&.Mui-selected': { color: '#8B5E3C' } }} />
                         </Tabs>
                     </Box>
 
-                    {/* Events Tab */}
+                    {/* Միջոցառումների Ներդիր */}
                     {activeTab === 0 && (
                         <Box>
                             <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 3, flexWrap: 'wrap', gap: 2 }}>
-                                <Typography variant="h6" sx={{ fontWeight: 700, color: '#4A2A1A' }}>All Events ({events.length})</Typography>
-                                <GradientButton startIcon={<AddIcon />} onClick={handleOpenCreateEventDialog}>Add New Event</GradientButton>
+                                <Typography variant="h6" sx={{ fontWeight: 700, color: '#4A2A1A' }}>Բոլոր Միջոցառումները ({events.length})</Typography>
+                                <GradientButton startIcon={<AddIcon />} onClick={handleOpenCreateEventDialog}>Ավելացնել Նոր Միջոցառում</GradientButton>
                             </Box>
 
                             {loading ? (
                                 <Box sx={{ display: 'flex', justifyContent: 'center', py: 8 }}><CircularProgress sx={{ color: '#8B5E3C' }} /></Box>
                             ) : events.length === 0 ? (
                                 <Box sx={{ textAlign: 'center', py: 8 }}>
-                                    <Typography sx={{ color: '#8B6914' }}>No events found</Typography>
-                                    <Button onClick={handleOpenCreateEventDialog} sx={{ mt: 2, color: '#8B5E3C' }}>Create your first event</Button>
+                                    <Typography sx={{ color: '#8B6914' }}>Միջոցառումներ չեն գտնվել</Typography>
+                                    <Button onClick={handleOpenCreateEventDialog} sx={{ mt: 2, color: '#8B5E3C' }}>Ստեղծել ձեր առաջին միջոցառումը</Button>
                                 </Box>
                             ) : (
                                 <Box>
@@ -739,6 +826,9 @@ const AdminDashboardPage = () => {
                                         const images = event.imageUrls || [];
                                         const currentIndex = activeImageIndex[event.id] || 0;
                                         const museum = museumsList.find(m => m.id === event.museumId);
+                                        // Թարգմանել կատեգորիան և քաղաքը ցուցադրման համար
+                                        const displayCategory = translateCategory(event.eventCategory);
+                                        const displayLocation = translateCity(event.location);
 
                                         return (
                                             <Grow in={true} key={event.id}>
@@ -749,7 +839,6 @@ const AdminDashboardPage = () => {
                                                     borderRadius: '16px'
                                                 }}>
                                                     <Grid container spacing={3}>
-                                                        {/* Images Carousel */}
                                                         <Grid item xs={12} md={5}>
                                                             <Box sx={{
                                                                 position: 'relative',
@@ -780,21 +869,19 @@ const AdminDashboardPage = () => {
                                                                 ) : (
                                                                     <Box sx={{ textAlign: 'center' }}>
                                                                         <ImageIcon sx={{ fontSize: 60, color: alpha('#8B5E3C', 0.3) }} />
-                                                                        <Typography variant="body2" sx={{ color: '#8B6914', mt: 1 }}>No images</Typography>
+                                                                        <Typography variant="body2" sx={{ color: '#8B6914', mt: 1 }}>Նկարներ չկան</Typography>
                                                                     </Box>
                                                                 )}
                                                             </Box>
                                                         </Grid>
 
-                                                        {/* Event Details */}
                                                         <Grid item xs={12} md={7}>
                                                             <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', mb: 2, flexWrap: 'wrap', gap: 1 }}>
                                                                 <Typography variant="h5" sx={{ fontWeight: 700, color: '#4A2A1A' }}>{event.name}</Typography>
-                                                                <Chip label="Active" size="small" sx={{ bgcolor: alpha('#6B8E23', 0.15), color: '#556B2F', fontWeight: 600 }} />
+                                                                <Chip label="Ակտիվ" size="small" sx={{ bgcolor: alpha('#6B8E23', 0.15), color: '#556B2F', fontWeight: 600 }} />
                                                             </Box>
                                                             <Typography variant="body2" sx={{ color: '#5A3A2A', mb: 3, lineHeight: 1.6 }}>{event.description}</Typography>
 
-                                                            {/* Details with Icons */}
                                                             <Box sx={{ mb: 3 }}>
                                                                 <Grid container spacing={2}>
                                                                     <Grid item xs={12} sm={6}>
@@ -803,7 +890,7 @@ const AdminDashboardPage = () => {
                                                                                 <PriceIcon sx={{ fontSize: 18 }} />
                                                                             </DetailIcon>
                                                                             <DetailText>
-                                                                                <div className="label">Guide Price</div>
+                                                                                <div className="label">Ուղեցույցի Գին</div>
                                                                                 <div className="value" style={{ color: '#8B5E3C' }}>{event.guidePrice?.toLocaleString()} ֏</div>
                                                                             </DetailText>
                                                                         </DetailItem>
@@ -814,7 +901,7 @@ const AdminDashboardPage = () => {
                                                                                 <TicketIcon sx={{ fontSize: 18 }} />
                                                                             </DetailIcon>
                                                                             <DetailText>
-                                                                                <div className="label">Ticket Price</div>
+                                                                                <div className="label">Տոմսի Գին</div>
                                                                                 <div className="value" style={{ color: '#6B8E23' }}>{event.ticketPrice?.toLocaleString()} ֏</div>
                                                                             </DetailText>
                                                                         </DetailItem>
@@ -825,8 +912,8 @@ const AdminDashboardPage = () => {
                                                                                 <CategoryIcon sx={{ fontSize: 18 }} />
                                                                             </DetailIcon>
                                                                             <DetailText>
-                                                                                <div className="label">Category</div>
-                                                                                <div className="value">{getCategoryDisplayName(event.eventCategory)}</div>
+                                                                                <div className="label">Կատեգորիա</div>
+                                                                                <div className="value">{displayCategory}</div>
                                                                             </DetailText>
                                                                         </DetailItem>
                                                                     </Grid>
@@ -836,22 +923,21 @@ const AdminDashboardPage = () => {
                                                                                 <LocationIcon sx={{ fontSize: 18 }} />
                                                                             </DetailIcon>
                                                                             <DetailText>
-                                                                                <div className="label">Location</div>
-                                                                                <div className="value">{event.location}</div>
+                                                                                <div className="label">Վայր</div>
+                                                                                <div className="value">{displayLocation}</div>
                                                                             </DetailText>
                                                                         </DetailItem>
                                                                     </Grid>
                                                                 </Grid>
                                                             </Box>
 
-                                                            {/* Museum and Date Row */}
                                                             <Box sx={{ display: 'flex', gap: 2, mb: 3, flexWrap: 'wrap' }}>
                                                                 <DetailItem sx={{ flex: 1 }}>
                                                                     <DetailIcon>
                                                                         <MuseumIcon sx={{ fontSize: 18 }} />
                                                                     </DetailIcon>
                                                                     <DetailText>
-                                                                        <div className="label">Museum</div>
+                                                                        <div className="label">Թանգարան</div>
                                                                         <div className="value">{museum?.name || '-'}</div>
                                                                     </DetailText>
                                                                 </DetailItem>
@@ -860,29 +946,27 @@ const AdminDashboardPage = () => {
                                                                         <CalendarIcon sx={{ fontSize: 18 }} />
                                                                     </DetailIcon>
                                                                     <DetailText>
-                                                                        <div className="label">Event Date</div>
+                                                                        <div className="label">Միջոցառման Ամսաթիվ</div>
                                                                         <div className="value">{formatEventDate(event.eventDate)}</div>
                                                                     </DetailText>
                                                                 </DetailItem>
                                                             </Box>
 
-                                                            {/* Duration */}
                                                             {event.duration && (
                                                                 <DetailItem sx={{ mb: 2 }}>
                                                                     <DetailIcon>
                                                                         <AccessTimeIcon sx={{ fontSize: 18 }} />
                                                                     </DetailIcon>
                                                                     <DetailText>
-                                                                        <div className="label">Duration</div>
-                                                                        <div className="value">{event.duration} hours</div>
+                                                                        <div className="label">Տևողություն</div>
+                                                                        <div className="value">{event.duration} ժամ</div>
                                                                     </DetailText>
                                                                 </DetailItem>
                                                             )}
 
-                                                            {/* Contact Information - Phone Number (no restrictions) */}
                                                             {(event.contactEmail || event.phoneNumber) && (
                                                                 <Box sx={{ mt: 2, p: 2, bgcolor: '#FFF8F0', borderRadius: '12px', border: '1px solid #A0784C' }}>
-                                                                    <Typography variant="subtitle2" sx={{ fontWeight: 700, color: '#4A2A1A', mb: 1.5 }}>📞 Contact Information</Typography>
+                                                                    <Typography variant="subtitle2" sx={{ fontWeight: 700, color: '#4A2A1A', mb: 1.5 }}>Կոնտակտային Տվյալներ</Typography>
                                                                     {event.contactEmail && (
                                                                         <DetailItem sx={{ mb: 1 }}>
                                                                             <DetailIcon sx={{ width: '28px', height: '28px' }}>
@@ -934,19 +1018,19 @@ const AdminDashboardPage = () => {
                         </Box>
                     )}
 
-                    {/* Museums Tab */}
+                    {/* Թանգարանների Ներդիր */}
                     {activeTab === 1 && (
                         <Box>
                             <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 3 }}>
-                                <Typography variant="h6" sx={{ fontWeight: 700, color: '#4A2A1A' }}>All Museums ({museums.length})</Typography>
-                                <GradientButton startIcon={<AddIcon />} onClick={handleOpenCreateMuseumDialog}>Add New Museum</GradientButton>
+                                <Typography variant="h6" sx={{ fontWeight: 700, color: '#4A2A1A' }}>Բոլոր Թանգարանները ({museums.length})</Typography>
+                                <GradientButton startIcon={<AddIcon />} onClick={handleOpenCreateMuseumDialog}>Ավելացնել Նոր Թանգարան</GradientButton>
                             </Box>
                             {loading ? (
                                 <Box sx={{ display: 'flex', justifyContent: 'center', py: 8 }}><CircularProgress sx={{ color: '#8B5E3C' }} /></Box>
                             ) : museums.length === 0 ? (
                                 <Box sx={{ textAlign: 'center', py: 8 }}>
-                                    <Typography sx={{ color: '#8B6914' }}>No museums found</Typography>
-                                    <Button onClick={handleOpenCreateMuseumDialog} sx={{ mt: 2, color: '#8B5E3C' }}>Create first museum</Button>
+                                    <Typography sx={{ color: '#8B6914' }}>Թանգարաններ չեն գտնվել</Typography>
+                                    <Button onClick={handleOpenCreateMuseumDialog} sx={{ mt: 2, color: '#8B5E3C' }}>Ստեղծել առաջին թանգարանը</Button>
                                 </Box>
                             ) : (
                                 <Grid container spacing={3}>
@@ -997,35 +1081,49 @@ const AdminDashboardPage = () => {
                     )}
                 </Box>
 
-                {/* Event Dialog */}
+                {/* Միջոցառման Երկխոսություն */}
                 <Dialog open={eventDialogOpen} onClose={handleCloseEventDialog} maxWidth="md" fullWidth PaperProps={{ sx: { borderRadius: '20px', backgroundColor: '#FFF8F0' } }}>
                     <DialogTitle sx={{ borderBottom: '1px solid #A0784C' }}>
                         <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
                             {editingEvent ? <EditIcon sx={{ color: '#8B5E3C' }} /> : <AddIcon sx={{ color: '#8B5E3C' }} />}
-                            <Typography variant="h5" sx={{ fontWeight: 700, color: '#4A2A1A' }}>{editingEvent ? 'Edit Event' : 'Create Event'}</Typography>
+                            <Typography variant="h5" sx={{ fontWeight: 700, color: '#4A2A1A' }}>{editingEvent ? 'Խմբագրել Միջոցառումը' : 'Ստեղծել Միջոցառում'}</Typography>
                         </Box>
                         <IconButton onClick={handleCloseEventDialog} sx={{ position: 'absolute', right: 16, top: 16, color: '#8B6914' }}><CloseIcon /></IconButton>
                     </DialogTitle>
                     <DialogContent sx={{ p: 3 }}>
                         <Box sx={{ display: 'flex', flexDirection: 'column', gap: 2 }}>
-                            <FlatTextField fullWidth label="Event Name" name="name" value={eventFormData.name} onChange={handleEventInputChange} required />
-                            <FlatTextField fullWidth multiline rows={3} label="Description" name="description" value={eventFormData.description} onChange={handleEventInputChange} required />
+                            <FlatTextField fullWidth label="Միջոցառման Անվանում" name="name" value={eventFormData.name} onChange={handleEventInputChange} required />
+                            <FlatTextField fullWidth multiline rows={3} label="Նկարագրություն" name="description" value={eventFormData.description} onChange={handleEventInputChange} required />
 
                             <Grid container spacing={2}>
                                 <Grid item xs={12} sm={6}>
                                     <FormControl fullWidth required>
-                                        <InputLabel sx={{ color: '#5A3A2A' }}>Category</InputLabel>
-                                        <FlatSelect name="eventCategory" value={eventFormData.eventCategory} onChange={handleEventInputChange} label="Category">
-                                            <MenuItem value="">Select</MenuItem>
-                                            {eventCategories.map(cat => <MenuItem key={cat.value} value={cat.value}>{cat.label}</MenuItem>)}
+                                        <InputLabel sx={{ color: '#5A3A2A' }}>Կատեգորիա</InputLabel>
+                                        <FlatSelect
+                                            name="eventCategory"
+                                            value={eventFormData.eventCategory}
+                                            onChange={handleEventInputChange}
+                                            label="Կատեգորիա"
+                                        >
+                                            <MenuItem value="">Ընտրել Կատեգորիան</MenuItem>
+                                            {eventCategoriesList.map(cat => (
+                                                <MenuItem key={cat} value={cat}>{cat}</MenuItem>
+                                            ))}
                                         </FlatSelect>
                                     </FormControl>
                                 </Grid>
                                 <Grid item xs={12} sm={6}>
                                     <FormControl fullWidth>
-                                        <InputLabel sx={{ color: '#5A3A2A' }}>Type</InputLabel>
-                                        <FlatSelect name="eventType" value={eventFormData.eventType} onChange={handleEventInputChange} label="Type">
-                                            {eventTypes.map(type => <MenuItem key={type.value} value={type.value}>{type.label}</MenuItem>)}
+                                        <InputLabel sx={{ color: '#5A3A2A' }}>Տեսակ</InputLabel>
+                                        <FlatSelect
+                                            name="eventType"
+                                            value={eventFormData.eventType}
+                                            onChange={handleEventInputChange}
+                                            label="Տեսակ"
+                                        >
+                                            {eventTypesList.map(type => (
+                                                <MenuItem key={type} value={type}>{type}</MenuItem>
+                                            ))}
                                         </FlatSelect>
                                     </FormControl>
                                 </Grid>
@@ -1034,19 +1132,33 @@ const AdminDashboardPage = () => {
                             <Grid container spacing={2}>
                                 <Grid item xs={12} sm={6}>
                                     <FormControl fullWidth required>
-                                        <InputLabel sx={{ color: '#5A3A2A' }}>Museum</InputLabel>
-                                        <FlatSelect name="museumId" value={eventFormData.museumId} onChange={handleEventInputChange} label="Museum">
-                                            <MenuItem value="">Select</MenuItem>
-                                            {museumsList.map(m => <MenuItem key={m.id} value={m.id}>{m.name}</MenuItem>)}
+                                        <InputLabel sx={{ color: '#5A3A2A' }}>Թանգարան</InputLabel>
+                                        <FlatSelect
+                                            name="museumId"
+                                            value={eventFormData.museumId}
+                                            onChange={handleEventInputChange}
+                                            label="Թանգարան"
+                                        >
+                                            <MenuItem value="">Ընտրել Թանգարանը</MenuItem>
+                                            {museumsList.map(m => (
+                                                <MenuItem key={m.id} value={m.id}>{m.name}</MenuItem>
+                                            ))}
                                         </FlatSelect>
                                     </FormControl>
                                 </Grid>
                                 <Grid item xs={12} sm={6}>
                                     <FormControl fullWidth required>
-                                        <InputLabel sx={{ color: '#5A3A2A' }}>City</InputLabel>
-                                        <FlatSelect name="location" value={eventFormData.location} onChange={handleEventInputChange} label="City">
-                                            <MenuItem value="">Select</MenuItem>
-                                            {ARMENIAN_CITIES.map(city => <MenuItem key={city.value} value={city.value}>{city.label}</MenuItem>)}
+                                        <InputLabel sx={{ color: '#5A3A2A' }}>Քաղաք</InputLabel>
+                                        <FlatSelect
+                                            name="location"
+                                            value={eventFormData.location}
+                                            onChange={handleEventInputChange}
+                                            label="Քաղաք"
+                                        >
+                                            <MenuItem value="">Ընտրել Քաղաքը</MenuItem>
+                                            {ARMENIAN_CITIES.map(city => (
+                                                <MenuItem key={city} value={city}>{city}</MenuItem>
+                                            ))}
                                         </FlatSelect>
                                     </FormControl>
                                 </Grid>
@@ -1054,17 +1166,35 @@ const AdminDashboardPage = () => {
 
                             <Grid container spacing={2}>
                                 <Grid item xs={12} sm={6}>
-                                    <FlatTextField fullWidth type="number" label="Guide Price (AMD)" name="guidePrice" value={eventFormData.guidePrice} onChange={handleEventInputChange} required InputProps={{ startAdornment: <InputAdornment position="start" sx={{ color: '#8B5E3C' }}>֏</InputAdornment> }} />
+                                    <FlatTextField
+                                        fullWidth
+                                        type="number"
+                                        label="Ուղեցույցի Գին (֏)"
+                                        name="guidePrice"
+                                        value={eventFormData.guidePrice}
+                                        onChange={handleEventInputChange}
+                                        required
+                                        InputProps={{ startAdornment: <InputAdornment position="start" sx={{ color: '#8B5E3C' }}>֏</InputAdornment> }}
+                                    />
                                 </Grid>
                                 <Grid item xs={12} sm={6}>
-                                    <FlatTextField fullWidth type="number" label="Ticket Price (AMD)" name="ticketPrice" value={eventFormData.ticketPrice} onChange={handleEventInputChange} required InputProps={{ startAdornment: <InputAdornment position="start" sx={{ color: '#6B8E23' }}>֏</InputAdornment> }} />
+                                    <FlatTextField
+                                        fullWidth
+                                        type="number"
+                                        label="Տոմսի Գին (֏)"
+                                        name="ticketPrice"
+                                        value={eventFormData.ticketPrice}
+                                        onChange={handleEventInputChange}
+                                        required
+                                        InputProps={{ startAdornment: <InputAdornment position="start" sx={{ color: '#6B8E23' }}>֏</InputAdornment> }}
+                                    />
                                 </Grid>
                             </Grid>
 
                             <Grid container spacing={2}>
                                 <Grid item xs={12} sm={6}>
                                     <DateTimePicker
-                                        label="Event Date"
+                                        label="Միջոցառման Ամսաթիվ"
                                         value={eventFormData.eventDate}
                                         onChange={(newValue) => setEventFormData(prev => ({ ...prev, eventDate: newValue }))}
                                         slotProps={{
@@ -1081,42 +1211,49 @@ const AdminDashboardPage = () => {
                                     />
                                 </Grid>
                                 <Grid item xs={12} sm={6}>
-                                    <FlatTextField fullWidth type="number" label="Duration (hours)" name="duration" value={eventFormData.duration} onChange={handleEventInputChange} />
+                                    <FlatTextField
+                                        fullWidth
+                                        type="number"
+                                        label="Տևողություն (ժամ)"
+                                        name="duration"
+                                        value={eventFormData.duration}
+                                        onChange={handleEventInputChange}
+                                    />
                                 </Grid>
                             </Grid>
 
-                            {/* Contact Information - Phone Number with NO restrictions */}
+                            {/* Կոնտակտային Տվյալներ */}
                             <Box>
-                                <Typography variant="subtitle1" sx={{ fontWeight: 700, color: '#4A2A1A', mb: 2 }}>Contact Information</Typography>
+                                <Typography variant="subtitle1" sx={{ fontWeight: 700, color: '#4A2A1A', mb: 2 }}>Կոնտակտային Տվյալներ</Typography>
                                 <FlatTextField
                                     fullWidth
                                     type="email"
-                                    label="Contact Email"
+                                    label="Կոնտակտային Էլ.փոստ"
                                     value={contactEmail}
                                     onChange={(e) => setContactEmail(e.target.value)}
                                     sx={{ mb: 2 }}
                                 />
                                 <FlatTextField
                                     fullWidth
-                                    label="Phone Number"
+                                    label="Հեռախոսահամար"
                                     value={phoneNumber}
                                     onChange={(e) => setPhoneNumber(e.target.value)}
-                                    placeholder="Any format allowed (optional)"
-                                    helperText="No restrictions - any format, any characters"
+                                    placeholder="Ցանկացած ձևաչափ թույլատրվում է (ըստ ցանկության)"
+                                    helperText="Ոչ մի սահմանափակում - ցանկացած ձևաչափ, ցանկացած նիշ"
                                 />
                             </Box>
 
-                            {/* Images Section */}
+                            {/* Նկարների Բաժին */}
                             <Box>
-                                <Typography variant="subtitle1" sx={{ fontWeight: 700, color: '#4A2A1A', mb: 2 }}>Images</Typography>
+                                <Typography variant="subtitle1" sx={{ fontWeight: 700, color: '#4A2A1A', mb: 2 }}>Նկարներ</Typography>
                                 <OutlinedButton component="label" startIcon={<UploadIcon />} fullWidth sx={{ py: 1.5, backgroundColor: '#FFF8F0' }}>
-                                    Choose Images
+                                    Ընտրել Նկարներ
                                     <input type="file" multiple accept="image/*" onChange={handleImageSelect} hidden />
                                 </OutlinedButton>
 
                                 {existingImages.length > 0 && (
                                     <Box sx={{ mt: 2 }}>
-                                        <Typography variant="body2" sx={{ color: '#8B6914', mb: 1 }}>Current Images:</Typography>
+                                        <Typography variant="body2" sx={{ color: '#8B6914', mb: 1 }}>Ընթացիկ Նկարներ:</Typography>
                                         <ImageList cols={3} rowHeight={100} sx={{ mb: 2 }}>
                                             {existingImages.map((url, idx) => (
                                                 <ImageListItem key={idx} sx={{ position: 'relative', borderRadius: '8px', overflow: 'hidden' }}>
@@ -1132,7 +1269,7 @@ const AdminDashboardPage = () => {
 
                                 {imagePreviews.length > 0 && (
                                     <Box sx={{ mt: 2 }}>
-                                        <Typography variant="body2" sx={{ color: '#8B6914', mb: 1 }}>New Images:</Typography>
+                                        <Typography variant="body2" sx={{ color: '#8B6914', mb: 1 }}>Նոր Նկարներ:</Typography>
                                         <ImageList cols={3} rowHeight={100}>
                                             {imagePreviews.map((preview, idx) => (
                                                 <ImageListItem key={idx} sx={{ position: 'relative', borderRadius: '8px', overflow: 'hidden' }}>
@@ -1149,29 +1286,29 @@ const AdminDashboardPage = () => {
                         </Box>
                     </DialogContent>
                     <DialogActions sx={{ p: 3, borderTop: '1px solid #A0784C' }}>
-                        <OutlinedButton onClick={handleCloseEventDialog}>Cancel</OutlinedButton>
+                        <OutlinedButton onClick={handleCloseEventDialog}>Չեղարկել</OutlinedButton>
                         <GradientButton onClick={handleSubmitEvent} disabled={loading}>
-                            {loading ? <CircularProgress size={24} /> : (editingEvent ? 'Update' : 'Create')}
+                            {loading ? <CircularProgress size={24} /> : (editingEvent ? 'Թարմացնել' : 'Ստեղծել')}
                         </GradientButton>
                     </DialogActions>
                 </Dialog>
 
-                {/* Museum Dialog */}
+                {/* Թանգարանի Երկխոսություն */}
                 <Dialog open={museumDialogOpen} onClose={handleCloseMuseumDialog} maxWidth="sm" fullWidth PaperProps={{ sx: { borderRadius: '20px', backgroundColor: '#FFF8F0' } }}>
                     <DialogTitle sx={{ borderBottom: '1px solid #A0784C' }}>
                         <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
                             {editingMuseum ? <EditIcon sx={{ color: '#8B5E3C' }} /> : <AddIcon sx={{ color: '#8B5E3C' }} />}
-                            <Typography variant="h5" sx={{ fontWeight: 700, color: '#4A2A1A' }}>{editingMuseum ? 'Edit Museum' : 'Create Museum'}</Typography>
+                            <Typography variant="h5" sx={{ fontWeight: 700, color: '#4A2A1A' }}>{editingMuseum ? 'Խմբագրել Թանգարանը' : 'Ստեղծել Թանգարան'}</Typography>
                         </Box>
                         <IconButton onClick={handleCloseMuseumDialog} sx={{ position: 'absolute', right: 16, top: 16, color: '#8B6914' }}><CloseIcon /></IconButton>
                     </DialogTitle>
                     <DialogContent sx={{ p: 3 }}>
-                        <FlatTextField fullWidth label="Museum Name" name="name" value={museumFormData.name} onChange={handleMuseumInputChange} required sx={{ mt: 1 }} />
+                        <FlatTextField fullWidth label="Թանգարանի Անվանում" name="name" value={museumFormData.name} onChange={handleMuseumInputChange} required sx={{ mt: 1 }} />
                     </DialogContent>
                     <DialogActions sx={{ p: 3, borderTop: '1px solid #A0784C' }}>
-                        <OutlinedButton onClick={handleCloseMuseumDialog}>Cancel</OutlinedButton>
+                        <OutlinedButton onClick={handleCloseMuseumDialog}>Չեղարկել</OutlinedButton>
                         <GradientButton onClick={handleSubmitMuseum} disabled={loading}>
-                            {loading ? <CircularProgress size={24} /> : (editingMuseum ? 'Update' : 'Create')}
+                            {loading ? <CircularProgress size={24} /> : (editingMuseum ? 'Թարմացնել' : 'Ստեղծել')}
                         </GradientButton>
                     </DialogActions>
                 </Dialog>
