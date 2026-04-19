@@ -139,7 +139,7 @@ const DetailText = styled(Box)(({ theme }) => ({
 }));
 
 // ========== ԹԱՐԳՄԱՆՈՒԹՅԱՆ MAP-ԵՐ ==========
-// Կատեգորիաներ - անգլերենից հայերեն (UI-ի ցուցադրման համար)
+// Կատեգորիաներ - անգլերենից հայերեն
 const categoryToArmenian = {
     'ART': 'Արվեստ',
     'HISTORY': 'Պատմություն',
@@ -157,7 +157,7 @@ const categoryToArmenian = {
     'OPEN_AIR': 'Բաց Երկնքի Տակ'
 };
 
-// Կատեգորիաներ - հայերենից անգլերեն (backend-ին ուղարկելու համար)
+// Կատեգորիաներ - հայերենից անգլերեն
 const armenianToCategory = {
     'Արվեստ': 'ART',
     'Պատմություն': 'HISTORY',
@@ -257,7 +257,7 @@ const museumToArmenian = {
     'Gyumri Museum of Architecture': 'Գյումրու Ճարտարապետության Թանգարան'
 };
 
-// Թանգարաններ - հայերենից անգլերեն (որոնման համար)
+// Թանգարաններ - հայերենից անգլերեն
 const armenianToMuseum = {
     'Հայաստանի Պատմության Թանգարան': 'History Museum of Armenia',
     'Մատենադարան': 'Matenadaran',
@@ -391,7 +391,6 @@ const formatPriceAMD = (price) => {
 };
 
 const getCategoryDisplayName = (categoryValue) => {
-    // categoryValue-ն կարող է լինել անգլերեն կամ հայերեն
     const armenianName = translateCategoryToArmenian(categoryValue);
     const category = EVENT_CATEGORIES_DISPLAY.find(cat => cat.value === armenianName);
     return category ? category.label : armenianName;
@@ -428,91 +427,54 @@ const EventsPage = () => {
     // Դրոշակ՝ հետևելու համար, թե արդյոք որոնում է կատարվել
     const [hasSearched, setHasSearched] = useState(false);
 
-    useEffect(() => {
-        const savedParams = sessionStorage.getItem('eventsSearchParams');
-        if (savedParams) {
-            const params = JSON.parse(savedParams);
-            if (params.query) setSearchQuery(params.query);
-            if (params.category) setSelectedCategory(translateCategoryToArmenian(params.category));
-            if (params.location) setSelectedLocation(translateCityToArmenian(params.location));
-            if (params.museum) setSelectedMuseum(translateMuseumToArmenian(params.museum));
-            if (params.minTicketPrice) setMinTicketPrice(params.minTicketPrice);
-            if (params.maxTicketPrice) setMaxTicketPrice(params.maxTicketPrice);
-            if (params.minTicketPrice && params.maxTicketPrice) {
-                setTicketPriceRange([parseInt(params.minTicketPrice), parseInt(params.maxTicketPrice)]);
-            }
-            sessionStorage.removeItem('eventsSearchParams');
-        }
-
-        const urlParams = new URLSearchParams(location.search);
-        const queryFromUrl = urlParams.get('query');
-        const categoryFromUrl = urlParams.get('category');
-        const locationFromUrl = urlParams.get('location');
-        const museumFromUrl = urlParams.get('museum');
-        const minPriceFromUrl = urlParams.get('minTicketPrice');
-        const maxPriceFromUrl = urlParams.get('maxTicketPrice');
-
-        if (queryFromUrl) setSearchQuery(queryFromUrl);
-        if (categoryFromUrl) setSelectedCategory(translateCategoryToArmenian(categoryFromUrl));
-        if (locationFromUrl) setSelectedLocation(translateCityToArmenian(locationFromUrl));
-        if (museumFromUrl) setSelectedMuseum(translateMuseumToArmenian(museumFromUrl));
-        if (minPriceFromUrl) setMinTicketPrice(minPriceFromUrl);
-        if (maxPriceFromUrl) setMaxTicketPrice(maxPriceFromUrl);
-        if (minPriceFromUrl && maxPriceFromUrl) {
-            setTicketPriceRange([parseInt(minPriceFromUrl), parseInt(maxPriceFromUrl)]);
-        }
-
-        loadEvents();
-    }, []);
-
-    useEffect(() => {
-        if (hasSearched) {
-            loadEvents();
-        }
-    }, [page, sortBy, sortDirection]);
-
-    const loadEvents = async () => {
+    // ՈՐՈՆՄԱՆ ՀԻՄՆԱԿԱՆ ՖՈՒՆԿՑԻԱ - միշտ օգտագործում է ընթացիկ state-ները
+    const performSearch = async () => {
         setLoading(true);
         try {
-            const response = await eventAPI.getAllEvents(page, 10, sortBy, sortDirection);
+            const response = await eventAPI.getAllEvents(0, 10, sortBy, sortDirection);
             let filteredEvents = response.data.content || [];
 
-            if (hasSearched) {
-                if (searchQuery) {
-                    filteredEvents = filteredEvents.filter(event =>
-                        event.name?.toLowerCase().includes(searchQuery.toLowerCase()) ||
-                        event.description?.toLowerCase().includes(searchQuery.toLowerCase())
-                    );
-                }
+            // Օգտագործել ընթացիկ filter արժեքները
+            const currentSearchQuery = searchQuery;
+            const currentSelectedCategory = selectedCategory;
+            const currentSelectedLocation = selectedLocation;
+            const currentSelectedMuseum = selectedMuseum;
+            const currentMinTicketPrice = minTicketPrice;
+            const currentMaxTicketPrice = maxTicketPrice;
 
-                if (selectedCategory) {
-                    const englishCategory = translateCategoryToEnglish(selectedCategory);
-                    filteredEvents = filteredEvents.filter(event => event.eventCategory === englishCategory);
-                }
-
-                if (selectedLocation) {
-                    const englishLocation = translateCityToEnglish(selectedLocation);
-                    filteredEvents = filteredEvents.filter(event => event.location === englishLocation);
-                }
-
-                if (selectedMuseum) {
-                    const englishMuseum = translateMuseumToEnglish(selectedMuseum);
-                    filteredEvents = filteredEvents.filter(event => event.museumName === englishMuseum);
-                }
-
-                if (minTicketPrice && !isNaN(parseInt(minTicketPrice))) {
-                    filteredEvents = filteredEvents.filter(event =>
-                        event.ticketPrice >= parseInt(minTicketPrice)
-                    );
-                }
-                if (maxTicketPrice && !isNaN(parseInt(maxTicketPrice))) {
-                    filteredEvents = filteredEvents.filter(event =>
-                        event.ticketPrice <= parseInt(maxTicketPrice)
-                    );
-                }
+            if (currentSearchQuery) {
+                filteredEvents = filteredEvents.filter(event =>
+                    event.name?.toLowerCase().includes(currentSearchQuery.toLowerCase()) ||
+                    event.description?.toLowerCase().includes(currentSearchQuery.toLowerCase())
+                );
             }
 
-            // Թարգմանել ցուցադրման համար
+            if (currentSelectedCategory) {
+                const englishCategory = translateCategoryToEnglish(currentSelectedCategory);
+                filteredEvents = filteredEvents.filter(event => event.eventCategory === englishCategory);
+            }
+
+            if (currentSelectedLocation) {
+                const englishLocation = translateCityToEnglish(currentSelectedLocation);
+                filteredEvents = filteredEvents.filter(event => event.location === englishLocation);
+            }
+
+            if (currentSelectedMuseum) {
+                const englishMuseum = translateMuseumToEnglish(currentSelectedMuseum);
+                filteredEvents = filteredEvents.filter(event => event.museumName === englishMuseum);
+            }
+
+            if (currentMinTicketPrice && !isNaN(parseInt(currentMinTicketPrice))) {
+                filteredEvents = filteredEvents.filter(event =>
+                    event.ticketPrice >= parseInt(currentMinTicketPrice)
+                );
+            }
+            if (currentMaxTicketPrice && !isNaN(parseInt(currentMaxTicketPrice))) {
+                filteredEvents = filteredEvents.filter(event =>
+                    event.ticketPrice <= parseInt(currentMaxTicketPrice)
+                );
+            }
+
             const translatedEvents = filteredEvents.map(event => ({
                 ...event,
                 displayCategory: translateCategoryToArmenian(event.eventCategory),
@@ -530,6 +492,34 @@ const EventsPage = () => {
             });
             setActiveImageIndex(newIndices);
         } catch (error) {
+            console.error('Որոնման սխալ:', error);
+            setSnackbar({ open: true, message: 'Որոնումը ձախողվեց', severity: 'error' });
+        } finally {
+            setLoading(false);
+        }
+    };
+
+    // Բեռնել բոլոր միջոցառումները առանց ֆիլտրերի
+    const loadAllEvents = async () => {
+        setLoading(true);
+        try {
+            const response = await eventAPI.getAllEvents(0, 10, sortBy, sortDirection);
+            const translatedEvents = (response.data.content || []).map(event => ({
+                ...event,
+                displayCategory: translateCategoryToArmenian(event.eventCategory),
+                displayLocation: translateCityToArmenian(event.location),
+                displayMuseumName: translateMuseumToArmenian(event.museumName)
+            }));
+            setEvents(translatedEvents);
+            setTotalPages(response.data.totalPages);
+            setTotalElements(translatedEvents.length);
+
+            const newIndices = {};
+            translatedEvents.forEach(event => {
+                newIndices[event.id] = 0;
+            });
+            setActiveImageIndex(newIndices);
+        } catch (error) {
             console.error('Միջոցառումների բեռնման սխալ:', error);
             setSnackbar({ open: true, message: 'Միջոցառումների բեռնումը ձախողվեց', severity: 'error' });
         } finally {
@@ -537,12 +527,14 @@ const EventsPage = () => {
         }
     };
 
+    // Որոնման կոճակի սեղմում
     const handleSearch = () => {
         setPage(0);
         setHasSearched(true);
-        loadEvents();
+        performSearch();
     };
 
+    // Մաքրել ֆիլտրերը
     const handleClearFilters = () => {
         setSearchQuery('');
         setSelectedCategory('');
@@ -553,7 +545,7 @@ const EventsPage = () => {
         setTicketPriceRange([0, 1000000]);
         setPage(0);
         setHasSearched(false);
-        setTimeout(() => loadEvents(), 100);
+        loadAllEvents();
     };
 
     const handlePriceRangeChange = (event, newValue) => {
@@ -565,11 +557,21 @@ const EventsPage = () => {
     const handleSortChange = (e) => {
         setSortBy(e.target.value);
         setPage(0);
+        if (hasSearched) {
+            performSearch();
+        } else {
+            loadAllEvents();
+        }
     };
 
     const handleSortDirectionToggle = () => {
         setSortDirection(prev => prev === 'asc' ? 'desc' : 'asc');
         setPage(0);
+        if (hasSearched) {
+            performSearch();
+        } else {
+            loadAllEvents();
+        }
     };
 
     const handleMenuOpen = (event) => setAnchorEl(event.currentTarget);
@@ -609,6 +611,50 @@ const EventsPage = () => {
             [eventId]: ((prev[eventId] || 0) - 1 + totalImages) % totalImages
         }));
     };
+
+    // Սկզբնական բեռնում
+    useEffect(() => {
+        const savedParams = sessionStorage.getItem('eventsSearchParams');
+        if (savedParams) {
+            const params = JSON.parse(savedParams);
+            if (params.query) setSearchQuery(params.query);
+            if (params.category) setSelectedCategory(translateCategoryToArmenian(params.category));
+            if (params.location) setSelectedLocation(translateCityToArmenian(params.location));
+            if (params.museum) setSelectedMuseum(translateMuseumToArmenian(params.museum));
+            if (params.minTicketPrice) setMinTicketPrice(params.minTicketPrice);
+            if (params.maxTicketPrice) setMaxTicketPrice(params.maxTicketPrice);
+            if (params.minTicketPrice && params.maxTicketPrice) {
+                setTicketPriceRange([parseInt(params.minTicketPrice), parseInt(params.maxTicketPrice)]);
+            }
+            sessionStorage.removeItem('eventsSearchParams');
+            setHasSearched(true);
+            setTimeout(() => performSearch(), 100);
+        } else {
+            loadAllEvents();
+        }
+
+        const urlParams = new URLSearchParams(location.search);
+        const queryFromUrl = urlParams.get('query');
+        const categoryFromUrl = urlParams.get('category');
+        const locationFromUrl = urlParams.get('location');
+        const museumFromUrl = urlParams.get('museum');
+        const minPriceFromUrl = urlParams.get('minTicketPrice');
+        const maxPriceFromUrl = urlParams.get('maxTicketPrice');
+
+        if (queryFromUrl || categoryFromUrl || locationFromUrl || museumFromUrl || minPriceFromUrl || maxPriceFromUrl) {
+            if (queryFromUrl) setSearchQuery(queryFromUrl);
+            if (categoryFromUrl) setSelectedCategory(translateCategoryToArmenian(categoryFromUrl));
+            if (locationFromUrl) setSelectedLocation(translateCityToArmenian(locationFromUrl));
+            if (museumFromUrl) setSelectedMuseum(translateMuseumToArmenian(museumFromUrl));
+            if (minPriceFromUrl) setMinTicketPrice(minPriceFromUrl);
+            if (maxPriceFromUrl) setMaxTicketPrice(maxPriceFromUrl);
+            if (minPriceFromUrl && maxPriceFromUrl) {
+                setTicketPriceRange([parseInt(minPriceFromUrl), parseInt(maxPriceFromUrl)]);
+            }
+            setHasSearched(true);
+            setTimeout(() => performSearch(), 100);
+        }
+    }, []);
 
     const userInitial = user?.userName ? user.userName.charAt(0).toUpperCase() : '';
     const activeFiltersCount = [searchQuery, selectedCategory, selectedLocation, selectedMuseum, minTicketPrice].filter(Boolean).length;
@@ -1183,21 +1229,6 @@ const EventsPage = () => {
                                     </Grow>
                                 );
                             })}
-                        </Box>
-                    )}
-
-                    {/* Էջատում */}
-                    {totalPages > 1 && hasSearched && (
-                        <Box sx={{ display: 'flex', justifyContent: 'center', mt: 5 }}>
-                            <Pagination
-                                count={totalPages}
-                                page={page + 1}
-                                onChange={(e, newPage) => setPage(newPage - 1)}
-                                sx={{
-                                    '& .MuiPaginationItem-root': { color: colors.text, borderColor: colors.border },
-                                    '& .Mui-selected': { bgcolor: colors.primary, color: 'white', '&:hover': { bgcolor: colors.primaryDark } }
-                                }}
-                            />
                         </Box>
                     )}
                 </Box>
