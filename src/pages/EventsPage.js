@@ -254,7 +254,10 @@ const museumToArmenian = {
     'Megerian Carpet Museum': 'Մեգերյան Կարպետի Թանգարան',
     'Sergey Parajanov Museum': 'Սերգեյ Փարաջանովի Թանգարան',
     'Khor Virap Museum': 'Խոր Վիրապի Թանգարան',
-    'Gyumri Museum of Architecture': 'Գյումրու Ճարտարապետության Թանգարան'
+    'Gyumri Museum of Architecture': 'Գյումրու Ճարտարապետության Թանգարան',
+    'Louvre': 'Լուվրի Թանգարան',
+    'British Museum': 'Բրիտանական Թանգարան',
+    'Metropolitan Museum of Art': 'Մետրոպոլիտեն Արվեստի Թանգարան'
 };
 
 // Թանգարաններ - հայերենից անգլերեն
@@ -268,7 +271,25 @@ const armenianToMuseum = {
     'Մեգերյան Կարպետի Թանգարան': 'Megerian Carpet Museum',
     'Սերգեյ Փարաջանովի Թանգարան': 'Sergey Parajanov Museum',
     'Խոր Վիրապի Թանգարան': 'Khor Virap Museum',
-    'Գյումրու Ճարտարապետության Թանգարան': 'Gyumri Museum of Architecture'
+    'Գյումրու Ճարտարապետության Թանգարան': 'Gyumri Museum of Architecture',
+    'Լուվրի Թանգարան': 'Louvre',
+    'Բրիտանական Թանգարան': 'British Museum',
+    'Մետրոպոլիտեն Արվեստի Թանգարան': 'Metropolitan Museum of Art'
+};
+
+// Միջոցառման տեսակներ - անգլերենից հայերեն
+const eventTypeToArmenian = {
+    'MOBILE': 'Շրջիկ',
+    'FIXED': 'Ստացիոնար',
+    'ONLINE': 'Առցանց',
+    'EXHIBITION': 'Ցուցահանդես',
+    'WORKSHOP': 'Սեմինար',
+    'LECTURE': 'Դասախոսություն',
+    'TOUR': 'Էքսկուրսիա',
+    'CONCERT': 'Համերգ',
+    'FESTIVAL': 'Փառատոն',
+    'CONFERENCE': 'Համաժողով',
+    'SEMINAR': 'Սեմինար'
 };
 
 // ========== UI-ՈՒՄ ՕԳՏԱԳՈՐԾՎՈՂ ՑԱՆԿԵՐ (ՀԱՅԵՐԵՆ) ==========
@@ -299,7 +320,10 @@ const ARMENIAN_MUSEUMS_DISPLAY = [
     { value: 'Մեգերյան Կարպետի Թանգարան', label: '🪢 Մեգերյան Կարպետի Թանգարան' },
     { value: 'Սերգեյ Փարաջանովի Թանգարան', label: '🎬 Սերգեյ Փարաջանովի Թանգարան' },
     { value: 'Խոր Վիրապի Թանգարան', label: '⛪ Խոր Վիրապի Թանգարան' },
-    { value: 'Գյումրու Ճարտարապետության Թանգարան', label: '🏛️ Գյումրու Ճարտարապետության Թանգարան' }
+    { value: 'Գյումրու Ճարտարապետության Թանգարան', label: '🏛️ Գյումրու Ճարտարապետության Թանգարան' },
+    { value: 'Լուվրի Թանգարան', label: '🇫🇷 Լուվրի Թանգարան' },
+    { value: 'Բրիտանական Թանգարան', label: '🇬🇧 Բրիտանական Թանգարան' },
+    { value: 'Մետրոպոլիտեն Արվեստի Թանգարան', label: '🇺🇸 Մետրոպոլիտեն Արվեստի Թանգարան' }
 ];
 
 const ARMENIAN_LOCATIONS_DISPLAY = [
@@ -335,13 +359,34 @@ const ARMENIAN_LOCATIONS_DISPLAY = [
     { value: 'Ջերմուկ', label: 'Ջերմուկ' }
 ];
 
-// ========== ՕԳՆԱԿԱՆ ՖՈՒՆԿՑԻԱՆԵՐ ==========
+// ========== ԹԱՐԳՄԱՆՈՒԹՅԱՆ ՕԳՆԱԿԱՆ ՖՈՒՆԿՑԻԱՆԵՐ ==========
 const translateCategoryToArmenian = (engValue) => categoryToArmenian[engValue] || engValue;
 const translateCategoryToEnglish = (armValue) => armenianToCategory[armValue] || armValue;
 const translateCityToArmenian = (engValue) => cityToArmenian[engValue] || engValue;
 const translateCityToEnglish = (armValue) => armenianToCity[armValue] || armValue;
 const translateMuseumToArmenian = (engValue) => museumToArmenian[engValue] || engValue;
 const translateMuseumToEnglish = (armValue) => armenianToMuseum[armValue] || armValue;
+const translateEventTypeToArmenian = (engValue) => eventTypeToArmenian[engValue] || engValue;
+
+// ========== EVENT-Ը ԹԱՐԳՄԱՆՈՂ ՖՈՒՆԿՑԻԱ ==========
+// Այս ֆունկցիան ստանում է backend-ից եկած event-ը և վերադարձնում ամբողջությամբ թարգմանված տարբերակը
+const translateEventToArmenian = (event) => {
+    if (!event) return event;
+
+    return {
+        ...event,
+        // Պահպանել բնօրինակ անգլերեն արժեքները ֆիլտրման համար
+        originalCategory: event.eventCategory,
+        originalLocation: event.location,
+        originalMuseumName: event.museumName,
+        originalEventType: event.eventType,
+        // Ավելացնել թարգմանված արժեքներ ցուցադրման համար
+        eventCategoryArm: translateCategoryToArmenian(event.eventCategory),
+        locationArm: translateCityToArmenian(event.location),
+        museumNameArm: translateMuseumToArmenian(event.museumName),
+        eventTypeArm: translateEventTypeToArmenian(event.eventType)
+    };
+};
 
 // Օժանդակ ֆունկցիա միջոցառման ամսաթիվը ձևաչափելու համար
 const formatEventDate = (eventDate) => {
@@ -375,7 +420,7 @@ const formatEventDate = (eventDate) => {
         }
 
         if (date && date.isValid()) {
-            return date.format('MMMM D, YYYY, HH:mm');
+            return date.locale('hy-am').format('MMMM D, YYYY, HH:mm');
         }
 
         return null;
@@ -388,12 +433,6 @@ const formatEventDate = (eventDate) => {
 const formatPriceAMD = (price) => {
     if (!price && price !== 0) return '֏0';
     return new Intl.NumberFormat('hy-AM', { style: 'currency', currency: 'AMD', minimumFractionDigits: 0 }).format(price);
-};
-
-const getCategoryDisplayName = (categoryValue) => {
-    const armenianName = translateCategoryToArmenian(categoryValue);
-    const category = EVENT_CATEGORIES_DISPLAY.find(cat => cat.value === armenianName);
-    return category ? category.label : armenianName;
 };
 
 const EventsPage = () => {
@@ -475,12 +514,8 @@ const EventsPage = () => {
                 );
             }
 
-            const translatedEvents = filteredEvents.map(event => ({
-                ...event,
-                displayCategory: translateCategoryToArmenian(event.eventCategory),
-                displayLocation: translateCityToArmenian(event.location),
-                displayMuseumName: translateMuseumToArmenian(event.museumName)
-            }));
+            // Թարգմանել բոլոր event-երը հայերեն
+            const translatedEvents = filteredEvents.map(event => translateEventToArmenian(event));
 
             setEvents(translatedEvents);
             setTotalPages(response.data.totalPages);
@@ -504,12 +539,8 @@ const EventsPage = () => {
         setLoading(true);
         try {
             const response = await eventAPI.getAllEvents(0, 10, sortBy, sortDirection);
-            const translatedEvents = (response.data.content || []).map(event => ({
-                ...event,
-                displayCategory: translateCategoryToArmenian(event.eventCategory),
-                displayLocation: translateCityToArmenian(event.location),
-                displayMuseumName: translateMuseumToArmenian(event.museumName)
-            }));
+            // Թարգմանել բոլոր event-երը հայերեն
+            const translatedEvents = (response.data.content || []).map(event => translateEventToArmenian(event));
             setEvents(translatedEvents);
             setTotalPages(response.data.totalPages);
             setTotalElements(translatedEvents.length);
@@ -657,7 +688,7 @@ const EventsPage = () => {
     }, []);
 
     const userInitial = user?.userName ? user.userName.charAt(0).toUpperCase() : '';
-    const activeFiltersCount = [searchQuery, selectedCategory, selectedLocation, selectedMuseum, minTicketPrice].filter(Boolean).length;
+    const activeFiltersCount = [searchQuery, selectedCategory, selectedLocation, selectedMuseum, minTicketPrice, maxTicketPrice].filter(Boolean).length;
 
     return (
         <LocalizationProvider dateAdapter={AdapterDayjs}>
@@ -900,12 +931,12 @@ const EventsPage = () => {
                                     }}>
                                         <Box sx={{ textAlign: 'center', flex: 1 }}>
                                             <Typography variant="caption" sx={{ color: colors.textLight }}>Նվազագույն Գին</Typography>
-                                            <Typography variant="h6" sx={{ fontWeight: 700, color: colors.primary }}>{ticketPriceRange[0].toLocaleString()} ֏</Typography>
+                                            <Typography variant="h6" sx={{ fontWeight: 700, color: colors.primary }}>{ticketPriceRange[0].toLocaleString('hy-AM')} ֏</Typography>
                                         </Box>
                                         <Box sx={{ width: 30, height: 2, background: colors.gradient }} />
                                         <Box sx={{ textAlign: 'center', flex: 1 }}>
                                             <Typography variant="caption" sx={{ color: colors.textLight }}>Առավելագույն Գին</Typography>
-                                            <Typography variant="h6" sx={{ fontWeight: 700, color: colors.primary }}>{ticketPriceRange[1].toLocaleString()} ֏</Typography>
+                                            <Typography variant="h6" sx={{ fontWeight: 700, color: colors.primary }}>{ticketPriceRange[1].toLocaleString('hy-AM')} ֏</Typography>
                                         </Box>
                                     </Box>
 
@@ -913,7 +944,7 @@ const EventsPage = () => {
                                         value={ticketPriceRange}
                                         onChange={handlePriceRangeChange}
                                         valueLabelDisplay="on"
-                                        valueLabelFormat={(value) => `${value.toLocaleString()} ֏`}
+                                        valueLabelFormat={(value) => `${value.toLocaleString('hy-AM')} ֏`}
                                         min={0}
                                         max={1000000}
                                         step={10000}
@@ -943,11 +974,11 @@ const EventsPage = () => {
                                     {/* Արագ գնային կոճակներ */}
                                     <Box sx={{ display: 'flex', gap: 1, mt: 3, flexWrap: 'wrap' }}>
                                         {[
-                                            { label: '10k-ից ցածր', min: 0, max: 10000 },
-                                            { label: '10k - 50k', min: 10000, max: 50000 },
-                                            { label: '50k - 100k', min: 50000, max: 100000 },
-                                            { label: '100k - 300k', min: 100000, max: 300000 },
-                                            { label: '300k+', min: 300000, max: 1000000 }
+                                            { label: '10,000֏-ից ցածր', min: 0, max: 10000 },
+                                            { label: '10,000֏ - 50,000֏', min: 10000, max: 50000 },
+                                            { label: '50,000֏ - 100,000֏', min: 50000, max: 100000 },
+                                            { label: '100,000֏ - 300,000֏', min: 100000, max: 300000 },
+                                            { label: '300,000֏+', min: 300000, max: 1000000 }
                                         ].map((preset) => (
                                             <Button
                                                 key={preset.label}
@@ -996,7 +1027,7 @@ const EventsPage = () => {
                                 {activeFiltersCount > 0 && (
                                     <Box sx={{ display: 'flex', justifyContent: 'flex-end', mt: 2 }}>
                                         <Button startIcon={<ClearIcon />} onClick={handleClearFilters} sx={{ color: colors.primary }}>
-                                            Մաքրել Բոլորը ({activeFiltersCount})
+                                            Մաքրել բոլոր ֆիլտրերը ({activeFiltersCount})
                                         </Button>
                                     </Box>
                                 )}
@@ -1040,8 +1071,11 @@ const EventsPage = () => {
                             <Typography variant="h6" sx={{ color: colors.textLight }}>
                                 Միջոցառումներ չեն գտնվել
                             </Typography>
+                            <Typography variant="body2" sx={{ color: colors.textLight, mt: 1 }}>
+                                Փորձեք փոխել ֆիլտրերը կամ որոնման հարցումը
+                            </Typography>
                             <Button onClick={handleClearFilters} sx={{ mt: 2, color: colors.primary }}>
-                                Մաքրել ֆիլտրերը
+                                Մաքրել բոլոր ֆիլտրերը
                             </Button>
                         </Box>
                     ) : (
@@ -1133,14 +1167,14 @@ const EventsPage = () => {
                                                         </Grid>
                                                     </Grid>
 
-                                                    {/* Միջոցառման մանրամասների ցանց */}
+                                                    {/* Միջոցառման մանրամասների ցանց - ՕԳՏԱԳՈՐԾԵԼ ԹԱՐԳՄԱՆՎԱԾ ԱՐԺԵՔՆԵՐԸ */}
                                                     <Grid container spacing={2} sx={{ mb: 3 }}>
                                                         <Grid item xs={12} sm={6}>
                                                             <DetailItem>
                                                                 <DetailIcon><CategoryIcon sx={{ fontSize: 20 }} /></DetailIcon>
                                                                 <DetailText>
                                                                     <div className="label">Կատեգորիա</div>
-                                                                    <div className="value">{event.displayCategory}</div>
+                                                                    <div className="value">{event.eventCategoryArm || event.eventCategory}</div>
                                                                 </DetailText>
                                                             </DetailItem>
                                                         </Grid>
@@ -1149,7 +1183,7 @@ const EventsPage = () => {
                                                                 <DetailIcon><LocationIcon sx={{ fontSize: 20 }} /></DetailIcon>
                                                                 <DetailText>
                                                                     <div className="label">Վայր</div>
-                                                                    <div className="value">{event.displayLocation}</div>
+                                                                    <div className="value">{event.locationArm || event.location}</div>
                                                                 </DetailText>
                                                             </DetailItem>
                                                         </Grid>
@@ -1158,7 +1192,7 @@ const EventsPage = () => {
                                                                 <DetailIcon><MuseumIcon sx={{ fontSize: 20 }} /></DetailIcon>
                                                                 <DetailText>
                                                                     <div className="label">Թանգարան</div>
-                                                                    <div className="value">{event.displayMuseumName || '-'}</div>
+                                                                    <div className="value">{event.museumNameArm || event.museumName || '-'}</div>
                                                                 </DetailText>
                                                             </DetailItem>
                                                         </Grid>
@@ -1177,7 +1211,7 @@ const EventsPage = () => {
                                                                     <DetailIcon><AccessTimeIcon sx={{ fontSize: 20 }} /></DetailIcon>
                                                                     <DetailText>
                                                                         <div className="label">Տևողություն</div>
-                                                                        <div className="value">{event.duration} {event.duration === 1 ? 'ժամ' : 'ժամ'}</div>
+                                                                        <div className="value">{event.duration} ժամ</div>
                                                                     </DetailText>
                                                                 </DetailItem>
                                                             </Grid>
@@ -1188,7 +1222,7 @@ const EventsPage = () => {
                                                                     <DetailIcon><StarIcon sx={{ fontSize: 20 }} /></DetailIcon>
                                                                     <DetailText>
                                                                         <div className="label">Միջոցառման Տեսակ</div>
-                                                                        <div className="value">{event.eventType === 'MOBILE' ? 'Շրջիկ' : event.eventType}</div>
+                                                                        <div className="value">{event.eventTypeArm || event.eventType}</div>
                                                                     </DetailText>
                                                                 </DetailItem>
                                                             </Grid>
