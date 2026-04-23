@@ -46,13 +46,11 @@ import LoginPage from './LoginPage';
 import SignUpPage from './SignUpPage';
 import VerifyCodePage from './VerifyCodePage';
 
-// Հատուկ անիմացիաներ
 const pulse = keyframes`
     0%, 100% { opacity: 0.4; transform: scale(1); }
     50% { opacity: 0.7; transform: scale(1.05); }
 `;
 
-// Ջերմ շագանակագույն գունային համակարգ
 const colors = {
     primary: '#C4A484',
     primaryDark: '#A0522D',
