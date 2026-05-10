@@ -1,4 +1,5 @@
 // src/pages/PaymentPage.js
+
 import React, { useState, useEffect } from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
 import {
@@ -35,9 +36,10 @@ import {
     Lock as LockIcon,
     Visibility as VisibilityIcon,
     VisibilityOff as VisibilityOffIcon,
-    Info as InfoIcon
+    CheckCircle as CheckCircleIcon
 } from '@mui/icons-material';
 import { useAuth } from '../context/AuthContext';
+import { emailAPI } from '../services/apiService';
 
 const colors = {
     primary: '#C4A484',
@@ -65,27 +67,18 @@ const PaymentPage = () => {
 
     const [activeStep, setActiveStep] = useState(0);
     const [loading, setLoading] = useState(false);
+    const [sendingEmail, setSendingEmail] = useState(false);
     const [snackbar, setSnackbar] = useState({ open: false, message: '', severity: 'success' });
-
-    // CVV visibility state
     const [showCvv, setShowCvv] = useState(false);
-
-    // Տոմսերի քանակ
     const [ticketQuantity, setTicketQuantity] = useState(1);
     const [includeGuide, setIncludeGuide] = useState(false);
-
-    // Կոնտակտային տվյալներ
     const [fullName, setFullName] = useState(user?.userName || '');
     const [email, setEmail] = useState(user?.email || '');
     const [phone, setPhone] = useState('');
-
-    // Վճարման տվյալներ (քարտի դաշտեր)
     const [cardNumber, setCardNumber] = useState('');
     const [cardName, setCardName] = useState('');
     const [expiryDate, setExpiryDate] = useState('');
     const [cvv, setCvv] = useState('');
-
-    // Errors
     const [errors, setErrors] = useState({});
 
     useEffect(() => {
@@ -113,7 +106,6 @@ const PaymentPage = () => {
 
     const totalAmount = calculateTotal();
 
-    // Վալիդացիա կոնտակտային տվյալների համար
     const validateContactInfo = () => {
         const newErrors = {};
         if (!fullName.trim()) newErrors.fullName = 'Մուտքագրեք Ձեր լրիվ անունը';
@@ -124,7 +116,6 @@ const PaymentPage = () => {
         return newErrors;
     };
 
-    // Վալիդացիա քարտի տվյալների համար
     const validateCardInfo = () => {
         const newErrors = {};
         const cleanCardNumber = cardNumber.replace(/\s/g, '');
@@ -135,7 +126,6 @@ const PaymentPage = () => {
         if (!expiryDate.match(/^(0[1-9]|1[0-2])\/([0-9]{2})$/)) {
             newErrors.expiryDate = 'Մուտքագրեք վավեր ժամկետ (MM/YY)';
         }
-        // CVV-ն պետք է լինի 3 նիշ
         if (!cvv.match(/^\d{3}$/)) {
             newErrors.cvv = 'CVV/CVC կոդը պետք է լինի 3 նիշ';
         }
@@ -144,7 +134,6 @@ const PaymentPage = () => {
 
     const handleNext = () => {
         if (activeStep === 0) {
-            // Տոմսերի քանակի ստուգում
             if (ticketQuantity < 1) {
                 setErrors({ ticketQuantity: 'Տոմսերի քանակը պետք է լինի առնվազն 1' });
                 return;
@@ -156,7 +145,6 @@ const PaymentPage = () => {
             setActiveStep(1);
             setErrors({});
         } else if (activeStep === 1) {
-            // Կոնտակտային տվյալների ստուգում
             const contactErrors = validateContactInfo();
             if (Object.keys(contactErrors).length > 0) {
                 setErrors(contactErrors);
@@ -165,7 +153,6 @@ const PaymentPage = () => {
             setActiveStep(2);
             setErrors({});
         } else if (activeStep === 2) {
-            // Քարտի տվյալների ստուգում
             const cardErrors = validateCardInfo();
             if (Object.keys(cardErrors).length > 0) {
                 setErrors(cardErrors);
@@ -181,16 +168,70 @@ const PaymentPage = () => {
         setErrors({});
     };
 
-    // Վճարում - միշտ հաջող
-    const handlePayment = () => {
+    // PaymentPage.js - sendEmailConfirmation ֆունկցիան
+
+    const sendEmailConfirmation = async (bookingData) => {
+        setSendingEmail(true);
+        try {
+            const eventDateFormatted = new Date(event.eventDate).toLocaleDateString('hy-AM', {
+                year: 'numeric',
+                month: 'long',
+                day: 'numeric',
+                hour: '2-digit',
+                minute: '2-digit',
+                hour12: false
+            });
+
+            console.log('Sending email to new endpoint: /api/booking/send-ticket-email');
+
+            // Օգտագործել fetch առանց ավելորդ headers-ների
+            const response = await fetch('http://localhost:8080/api/booking/send-ticket-email', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({
+                    email: email,
+                    bookingId: bookingData.bookingId,
+                    eventName: event.name,
+                    museumName: event.museumNameArm || event.museumName,
+                    location: event.locationArm || event.location,
+                    eventDate: eventDateFormatted,
+                    ticketQuantity: ticketQuantity,
+                    ticketPrice: event.ticketPrice,
+                    guidePrice: includeGuide ? event.guidePrice : 0,
+                    includeGuide: includeGuide,
+                    totalAmount: totalAmount,
+                    phoneNumber: phone,
+                    fullName: fullName
+                })
+            });
+
+            console.log('Response status:', response.status);
+
+            if (!response.ok) {
+                const errorText = await response.text();
+                throw new Error(`HTTP ${response.status}: ${errorText}`);
+            }
+
+            const data = await response.text();
+            console.log('Email sent successfully:', data);
+            return true;
+        } catch (emailError) {
+            console.error('Failed to send ticket confirmation email:', emailError);
+            return false;
+        } finally {
+            setSendingEmail(false);
+        }
+    };
+    const handlePayment = async () => {
         setLoading(true);
 
-        // Սիմուլյացիա - 1.5 վայրկյան
-        setTimeout(() => {
-            setLoading(false);
-
+        // Simulate payment processing
+        setTimeout(async () => {
             const bookingData = {
                 id: Date.now(),
+                bookingId: `BK-${Date.now()}-${Math.random().toString(36).substr(2, 8).toUpperCase()}`,
                 eventId: event.id,
                 eventName: event.name,
                 eventDate: event.eventDate,
@@ -210,26 +251,42 @@ const PaymentPage = () => {
                 last4Digits: cardNumber.replace(/\s/g, '').slice(-4)
             };
 
+            // Save to localStorage
             const existingBookings = JSON.parse(localStorage.getItem('userBookings') || '[]');
             existingBookings.unshift(bookingData);
             localStorage.setItem('userBookings', JSON.stringify(existingBookings));
 
-            setSnackbar({ open: true, message: 'Վճարումը հաջողությամբ կատարվեց', severity: 'success' });
+            // Send email confirmation
+            const emailSent = await sendEmailConfirmation(bookingData);
+
+            setLoading(false);
+
+            if (emailSent) {
+                setSnackbar({
+                    open: true,
+                    message: 'Վճարումը հաջողությամբ կատարվեց։ Տոմսը ուղարկվել է ձեր էլ.փոստին',
+                    severity: 'success'
+                });
+            } else {
+                setSnackbar({
+                    open: true,
+                    message: 'Վճարումը հաջողվեց, սակայն էլ.փոստի ուղարկումը ձախողվեց։ Տոմսը պահպանված է ձեր պրոֆիլում։',
+                    severity: 'warning'
+                });
+            }
 
             setTimeout(() => {
-                navigate('/payment-success', { state: { booking: bookingData } });
-            }, 1000);
+                navigate('/payment-success', { state: { booking: bookingData, emailSent: emailSent } });
+            }, 1500);
         }, 1500);
     };
 
-    // Format card number with spaces
     const formatCardNumber = (value) => {
         const v = value.replace(/\s/g, '').replace(/\D/g, '').slice(0, 16);
         const parts = v.match(/.{1,4}/g);
         return parts ? parts.join(' ') : v;
     };
 
-    // Format expiry date
     const formatExpiryDate = (value) => {
         const v = value.replace(/\D/g, '').slice(0, 4);
         if (v.length >= 2) {
@@ -238,7 +295,6 @@ const PaymentPage = () => {
         return v;
     };
 
-    // Handle CVV input - only 3 digits
     const handleCvvChange = (value) => {
         const cleaned = value.replace(/\D/g, '').slice(0, 3);
         setCvv(cleaned);
@@ -274,13 +330,11 @@ const PaymentPage = () => {
                             border: `1px solid ${colors.border}`,
                             overflow: 'hidden'
                         }}>
-                            {/* Header */}
                             <Box sx={{ p: 3, background: colors.gradient, color: 'white' }}>
                                 <Typography variant="h5" sx={{ fontWeight: 700, mb: 1 }}>Ամրագրել տոմսեր</Typography>
                                 <Typography variant="body2" sx={{ opacity: 0.9 }}>Լրացրեք հետևյալ տվյալները ամրագրման համար</Typography>
                             </Box>
 
-                            {/* Stepper */}
                             <Box sx={{ px: 3, pt: 3 }}>
                                 <Stepper activeStep={activeStep} alternativeLabel>
                                     {steps.map((label) => (
@@ -300,9 +354,8 @@ const PaymentPage = () => {
 
                             <Divider sx={{ my: 3 }} />
 
-                            {/* Step Content */}
                             <Box sx={{ p: 3 }}>
-                                {/* Step 0 - Տոմսերի քանակ */}
+                                {/* Step 0 - Ticket Quantity */}
                                 {activeStep === 0 && (
                                     <Fade in>
                                         <Box>
@@ -371,13 +424,17 @@ const PaymentPage = () => {
                                     </Fade>
                                 )}
 
-                                {/* Step 1 - Կոնտակտային տվյալներ */}
+                                {/* Step 1 - Contact Information */}
                                 {activeStep === 1 && (
                                     <Fade in>
                                         <Box>
                                             <Typography variant="h6" sx={{ mb: 3, color: colors.text, fontWeight: 600 }}>
                                                 📞 Կոնտակտային տվյալներ
                                             </Typography>
+
+                                            <Alert severity="info" sx={{ mb: 3, borderRadius: '12px' }}>
+                                                Տոմսը կուղարկվի ձեր նշված էլ.փոստին
+                                            </Alert>
 
                                             <Grid container spacing={2}>
                                                 <Grid item xs={12}>
@@ -446,15 +503,13 @@ const PaymentPage = () => {
                                     </Fade>
                                 )}
 
-                                {/* Step 2 - Վճարման տվյալներ (քարտի դաշտեր) */}
+                                {/* Step 2 - Payment Information */}
                                 {activeStep === 2 && (
                                     <Fade in>
                                         <Box>
                                             <Typography variant="h6" sx={{ mb: 3, color: colors.text, fontWeight: 600 }}>
                                                 💳 Վճարման տվյալներ
                                             </Typography>
-
-
 
                                             <Grid container spacing={2}>
                                                 <Grid item xs={12}>
@@ -560,15 +615,15 @@ const PaymentPage = () => {
 
                                             <Box sx={{ mt: 3, p: 2, bgcolor: alpha(colors.primary, 0.03), borderRadius: '12px' }}>
                                                 <Typography variant="caption" sx={{ color: colors.textLight, display: 'flex', alignItems: 'center', gap: 1 }}>
-                                                    <InfoIcon sx={{ fontSize: 14, color: colors.primary }} />
-                                                    CVV/CVC կոդը 3 նիշանոց անվտանգության կոդ է, որը գտնվում է քարտի հետևի մասում:
+                                                    <SecurityIcon sx={{ fontSize: 14, color: colors.primary }} />
+                                                    Տվյալները կոդավորված են և անվտանգ
                                                 </Typography>
                                             </Box>
                                         </Box>
                                     </Fade>
                                 )}
 
-                                {/* Step 3 - Հաստատում */}
+                                {/* Step 3 - Confirmation */}
                                 {activeStep === 3 && (
                                     <Fade in>
                                         <Box>
@@ -629,6 +684,12 @@ const PaymentPage = () => {
                                                     {phone}
                                                 </Typography>
                                             </Box>
+
+                                            <Alert severity="info" sx={{ mt: 2, borderRadius: '12px' }}>
+                                                <Typography variant="caption">
+                                                    Տոմսը կուղարկվի ձեր էլ.փոստին՝ <strong>{email}</strong>
+                                                </Typography>
+                                            </Alert>
                                         </Box>
                                     </Fade>
                                 )}
@@ -640,7 +701,7 @@ const PaymentPage = () => {
                                     <Button
                                         variant="outlined"
                                         onClick={handleBack}
-                                        disabled={activeStep === 0}
+                                        disabled={activeStep === 0 || loading || sendingEmail}
                                         sx={{
                                             borderRadius: '40px',
                                             borderColor: colors.border,
@@ -653,7 +714,7 @@ const PaymentPage = () => {
                                     <Button
                                         variant="contained"
                                         onClick={activeStep === 3 ? handlePayment : handleNext}
-                                        disabled={loading}
+                                        disabled={loading || sendingEmail}
                                         sx={{
                                             borderRadius: '40px',
                                             background: colors.gradient,
@@ -662,7 +723,15 @@ const PaymentPage = () => {
                                         }}
                                     >
                                         {loading ? (
-                                            <CircularProgress size={24} sx={{ color: 'white' }} />
+                                            <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
+                                                <CircularProgress size={20} sx={{ color: 'white' }} />
+                                                <Typography variant="body2">Վճարվում է...</Typography>
+                                            </Box>
+                                        ) : sendingEmail ? (
+                                            <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
+                                                <CircularProgress size={20} sx={{ color: 'white' }} />
+                                                <Typography variant="body2">Ուղարկվում է...</Typography>
+                                            </Box>
                                         ) : (
                                             activeStep === 3 ? '💳 Հաստատել և Վճարել' : 'Հաջորդ ➜'
                                         )}
@@ -730,6 +799,13 @@ const PaymentPage = () => {
                                         {totalAmount.toLocaleString()} ֏
                                     </Typography>
                                 </Box>
+
+                                <Alert severity="info" sx={{ mt: 2, borderRadius: '12px' }}>
+                                    <Typography variant="caption" sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
+                                        <CheckCircleIcon sx={{ fontSize: 16 }} />
+                                        Տոմսը կուղարկվի ձեր էլ.փոստին
+                                    </Typography>
+                                </Alert>
                             </Box>
                         </Paper>
                     </Grid>
@@ -737,10 +813,20 @@ const PaymentPage = () => {
 
                 <Snackbar
                     open={snackbar.open}
-                    autoHideDuration={4000}
+                    autoHideDuration={5000}
                     onClose={() => setSnackbar({ ...snackbar, open: false })}
+                    anchorOrigin={{ vertical: 'bottom', horizontal: 'center' }}
                 >
-                    <Alert severity={snackbar.severity} sx={{ borderRadius: '12px', bgcolor: colors.surface }}>
+                    <Alert
+                        severity={snackbar.severity}
+                        sx={{
+                            borderRadius: '12px',
+                            bgcolor: colors.surface,
+                            '& .MuiAlert-icon': {
+                                color: snackbar.severity === 'success' ? colors.success : colors.warning
+                            }
+                        }}
+                    >
                         {snackbar.message}
                     </Alert>
                 </Snackbar>
