@@ -454,11 +454,7 @@ const PaymentPage = () => {
                                                 💳 Վճարման տվյալներ
                                             </Typography>
 
-                                            <Alert severity="info" sx={{ mb: 3, borderRadius: '12px', bgcolor: alpha(colors.primary, 0.1) }}>
-                                                <Typography variant="body2">
-                                                    🔒 Մուտքագրեք Ձեր քարտի տվյալները: Սա դեմո տարբերակ է, բոլոր քարտերը կընդունվեն:
-                                                </Typography>
-                                            </Alert>
+
 
                                             <Grid container spacing={2}>
                                                 <Grid item xs={12}>
