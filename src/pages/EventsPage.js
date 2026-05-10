@@ -369,18 +369,15 @@ const translateMuseumToEnglish = (armValue) => armenianToMuseum[armValue] || arm
 const translateEventTypeToArmenian = (engValue) => eventTypeToArmenian[engValue] || engValue;
 
 // ========== EVENT-Ը ԹԱՐԳՄԱՆՈՂ ՖՈՒՆԿՑԻԱ ==========
-// Այս ֆունկցիան ստանում է backend-ից եկած event-ը և վերադարձնում ամբողջությամբ թարգմանված տարբերակը
 const translateEventToArmenian = (event) => {
     if (!event) return event;
 
     return {
         ...event,
-        // Պահպանել բնօրինակ անգլերեն արժեքները ֆիլտրման համար
         originalCategory: event.eventCategory,
         originalLocation: event.location,
         originalMuseumName: event.museumName,
         originalEventType: event.eventType,
-        // Ավելացնել թարգմանված արժեքներ ցուցադրման համար
         eventCategoryArm: translateCategoryToArmenian(event.eventCategory),
         locationArm: translateCityToArmenian(event.location),
         museumNameArm: translateMuseumToArmenian(event.museumName),
@@ -466,14 +463,18 @@ const EventsPage = () => {
     // Դրոշակ՝ հետևելու համար, թե արդյոք որոնում է կատարվել
     const [hasSearched, setHasSearched] = useState(false);
 
-    // ՈՐՈՆՄԱՆ ՀԻՄՆԱԿԱՆ ՖՈՒՆԿՑԻԱ - միշտ օգտագործում է ընթացիկ state-ները
+    // ========== ԱՄՐԱԳՐՄԱՆ ՖՈՒՆԿՑԻԱ ==========
+    const handleBookTicket = (event) => {
+        navigate('/payment', { state: { event: event } });
+    };
+
+    // ՈՐՈՆՄԱՆ ՀԻՄՆԱԿԱՆ ՖՈՒՆԿՑԻԱ
     const performSearch = async () => {
         setLoading(true);
         try {
             const response = await eventAPI.getAllEvents(0, 10, sortBy, sortDirection);
             let filteredEvents = response.data.content || [];
 
-            // Օգտագործել ընթացիկ filter արժեքները
             const currentSearchQuery = searchQuery;
             const currentSelectedCategory = selectedCategory;
             const currentSelectedLocation = selectedLocation;
@@ -514,7 +515,6 @@ const EventsPage = () => {
                 );
             }
 
-            // Թարգմանել բոլոր event-երը հայերեն
             const translatedEvents = filteredEvents.map(event => translateEventToArmenian(event));
 
             setEvents(translatedEvents);
@@ -534,12 +534,11 @@ const EventsPage = () => {
         }
     };
 
-    // Բեռնել բոլոր միջոցառումները առանց ֆիլտրերի
+    // Բեռնել բոլոր միջոցառումները
     const loadAllEvents = async () => {
         setLoading(true);
         try {
             const response = await eventAPI.getAllEvents(0, 10, sortBy, sortDirection);
-            // Թարգմանել բոլոր event-երը հայերեն
             const translatedEvents = (response.data.content || []).map(event => translateEventToArmenian(event));
             setEvents(translatedEvents);
             setTotalPages(response.data.totalPages);
@@ -558,14 +557,12 @@ const EventsPage = () => {
         }
     };
 
-    // Որոնման կոճակի սեղմում
     const handleSearch = () => {
         setPage(0);
         setHasSearched(true);
         performSearch();
     };
 
-    // Մաքրել ֆիլտրերը
     const handleClearFilters = () => {
         setSearchQuery('');
         setSelectedCategory('');
@@ -742,7 +739,6 @@ const EventsPage = () => {
 
                             {/* Աջ կողմ - Նավիգացիա և Օգտատիրոջ մենյու */}
                             <Box sx={{ display: 'flex', alignItems: 'center', gap: 4 }}>
-                                {/* Նավիգացիոն հղումներ */}
                                 <Box sx={{ display: { xs: 'none', md: 'flex' }, gap: 2 }}>
                                     <Button
                                         startIcon={<EventIcon />}
@@ -759,7 +755,6 @@ const EventsPage = () => {
                                     </Button>
                                 </Box>
 
-                                {/* Օգտատիրոջ մենյու */}
                                 <Box sx={{ display: 'flex', alignItems: 'center', gap: 2 }}>
                                     {user ? (
                                         <>
@@ -802,7 +797,7 @@ const EventsPage = () => {
                             <Grid item xs={12} md={3}>
                                 <TextField
                                     fullWidth
-                                    placeholder="Որոնել միջոցառումներ ըստ անվան կամ նկարագրության..."
+                                    placeholder="Որոնել միջոցառումներ..."
                                     value={searchQuery}
                                     onChange={(e) => setSearchQuery(e.target.value)}
                                     onKeyPress={(e) => e.key === 'Enter' && handleSearch()}
@@ -914,7 +909,6 @@ const EventsPage = () => {
 
                         <Collapse in={showFilters}>
                             <Box sx={{ mt: 3, pt: 3, borderTop: `1px solid ${colors.border}` }}>
-                                {/* Տոմսի գնի ֆիլտրի բաժին */}
                                 <Typography variant="subtitle1" sx={{ fontWeight: 600, mb: 2, color: colors.text }}>
                                     💰 Տոմսի Գնի Միջակայք (֏)
                                 </Typography>
@@ -971,7 +965,6 @@ const EventsPage = () => {
                                         }}
                                     />
 
-                                    {/* Արագ գնային կոճակներ */}
                                     <Box sx={{ display: 'flex', gap: 1, mt: 3, flexWrap: 'wrap' }}>
                                         {[
                                             { label: '10,000֏-ից ցածր', min: 0, max: 10000 },
@@ -1008,7 +1001,6 @@ const EventsPage = () => {
                                     </Box>
                                 </Box>
 
-                                {/* Տեսակավորման կառավարում */}
                                 <Box sx={{ display: 'flex', gap: 2, alignItems: 'center', flexWrap: 'wrap', mt: 2 }}>
                                     <FormControl size="small" sx={{ minWidth: 150 }}>
                                         <InputLabel sx={{ color: colors.textLight }}>Տեսակավորել Ըստ</InputLabel>
@@ -1044,7 +1036,7 @@ const EventsPage = () => {
 
                     {!loading && events.length > 0 && !hasSearched && (
                         <Box sx={{ mb: 3 }}>
-                            <Typography sx={{ color: colors.textLight }}>Ցուցադրվում է <strong style={{ color: colors.primary }}>{events.length}</strong> միջոցառում - Օգտագործեք ֆիլտրերը և սեղմեք Որոնել արդյունքները ճշգրտելու համար</Typography>
+                            <Typography sx={{ color: colors.textLight }}>Ցուցադրվում է <strong style={{ color: colors.primary }}>{events.length}</strong> միջոցառում</Typography>
                         </Box>
                     )}
 
@@ -1167,7 +1159,7 @@ const EventsPage = () => {
                                                         </Grid>
                                                     </Grid>
 
-                                                    {/* Միջոցառման մանրամասների ցանց - ՕԳՏԱԳՈՐԾԵԼ ԹԱՐԳՄԱՆՎԱԾ ԱՐԺԵՔՆԵՐԸ */}
+                                                    {/* Միջոցառման մանրամասների ցանց */}
                                                     <Grid container spacing={2} sx={{ mb: 3 }}>
                                                         <Grid item xs={12} sm={6}>
                                                             <DetailItem>
@@ -1257,6 +1249,32 @@ const EventsPage = () => {
                                                             )}
                                                         </Box>
                                                     )}
+
+                                                    {/* ========== ԱՄՐԱԳՐԵԼ ՏՈՄՍ ԿՈՃԱԿ ========== */}
+                                                    <Box sx={{ mt: 3 }}>
+                                                        <Button
+                                                            fullWidth
+                                                            variant="contained"
+                                                            size="large"
+                                                            startIcon={<TicketIcon />}
+                                                            onClick={() => handleBookTicket(event)}
+                                                            sx={{
+                                                                borderRadius: '40px',
+                                                                background: colors.gradient,
+                                                                py: 1.5,
+                                                                fontSize: '1rem',
+                                                                fontWeight: 700,
+                                                                textTransform: 'none',
+                                                                boxShadow: '0 4px 12px rgba(196, 164, 132, 0.3)',
+                                                                '&:hover': {
+                                                                    transform: 'translateY(-2px)',
+                                                                    boxShadow: '0 6px 20px rgba(196, 164, 132, 0.4)'
+                                                                }
+                                                            }}
+                                                        >
+                                                            🎫 Ամրագրել տոմսեր
+                                                        </Button>
+                                                    </Box>
                                                 </Grid>
                                             </Grid>
                                         </Box>

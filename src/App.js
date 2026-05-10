@@ -1,6 +1,7 @@
+// src/App.js
 import React from 'react';
-import {BrowserRouter as Router, Routes, Route, Navigate} from 'react-router-dom';
-import {AuthProvider} from './context/AuthContext';
+import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-dom';
+import { AuthProvider } from './context/AuthContext';
 import ProtectedRoute from './components/ProtectedRoute';
 import HomePage from './pages/HomePage';
 import ProfilePage from './pages/ProfilePage';
@@ -8,6 +9,8 @@ import LoginPage from './pages/LoginPage';
 import SignUpPage from './pages/SignUpPage';
 import VerifyCodePage from './pages/VerifyCodePage';
 import EventsPage from './pages/EventsPage';
+import PaymentPage from './pages/PaymentPage';
+import PaymentSuccessPage from './pages/PaymentSuccessPage';
 import AdminLoginPage from './pages/AdminLoginPage';
 import AdminDashboardPage from './pages/AdminDashboardPage';
 import './App.css';
@@ -42,6 +45,24 @@ const AppContent = () => {
                     element={
                         <ProtectedRoute>
                             <EventsPage/>
+                        </ProtectedRoute>
+                    }
+                />
+
+                {/* Payment Pages - Require Authentication */}
+                <Route
+                    path="/payment"
+                    element={
+                        <ProtectedRoute>
+                            <PaymentPage/>
+                        </ProtectedRoute>
+                    }
+                />
+                <Route
+                    path="/payment-success"
+                    element={
+                        <ProtectedRoute>
+                            <PaymentSuccessPage/>
                         </ProtectedRoute>
                     }
                 />
